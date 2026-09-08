@@ -123,7 +123,7 @@ def render_trials_tab() -> None:
                 "Merkmal", ["mean", "median", "std", "max", "min"],
                 key="trials_bvt_feature",
             )
-            df_bvt = baseline_vs_task(trial, timeline, trial.streams[0], feature=feature)
+            df_bvt = baseline_vs_task(timeline, trial.streams[0], feature=feature)
             if df_bvt.empty:
                 st.info("Keine vollständigen Baseline-/Task-Segmente gefunden.")
             else:

@@ -10,7 +10,12 @@ from __future__ import annotations
 import pandas as pd
 
 from src.feature_engineering.sensor_features import compute_window_features
-from src.models.experiment_records import SensorStreamRecord, TrialRecord, TrialTimeline
+from src.models.experiment_records import (
+    EventType,
+    SensorStreamRecord,
+    TrialRecord,
+    TrialTimeline,
+)
 from src.preprocessing.windowing import slice_stream
 
 # ── Eventdichte ───────────────────────────────────────────────────────────────
@@ -19,10 +24,11 @@ def event_density(timeline: TrialTimeline, trial: TrialRecord) -> pd.DataFrame:
     """
     Events pro Sekunde je Segment und für den gesamten Trial.
 
-    Ein Event zählt zu einem Segment, wenn sein Timestamp in
-    [start_ms, end_ms] liegt (unvollständige Segmente ohne Ende werden bis
-    zur letzten Event-Zeit ausgwertet — bewusst tolerant, da die Rohdaten
-    laut Plan nicht immer End-Events haben).
+    Ein Event wird dem *frühesten* Segment zugewiesen, das seinen Timestamp
+    enthält ([start, end]; unvollständige Segmente bis zur letzten Event-Zeit).
+    Grenzereignisse, die gleichzeitig das Ende eines und den Start des
+    nächsten Segments markieren (z. B. task:end + task:start am selben
+    Timestamp), werden dadurch genau einmal gezählt.
     """
     if not trial.events:
         return pd.DataFrame()
@@ -43,10 +49,27 @@ def event_density(timeline: TrialTimeline, trial: TrialRecord) -> pd.DataFrame:
         "events_per_s": round(len(trial.events) / total_dur_s, 4),
     })
 
+    # Segmente sind nach Start sortiert. Ein Event wird höchstens einmal
+    # zugewiesen; liegt ein Event genau auf einer Segmentgrenze (Ende des
+    # einen = Start des nächsten), bestimmt der Event-Typ das Ziel:
+    # END-Events zählen zum früheren, START-Events zum späteren Segment.
+    counts: dict[int, int] = {id(seg): 0 for seg in timeline.segments}
+    for e in trial.events:
+        containing = [
+            seg for seg in timeline.segments
+            if seg.start_ms <= e.timestamp <= (seg.end_ms if seg.end_ms is not None else last_event_ts)
+        ]
+        if not containing:
+            continue
+        if len(containing) > 1 and e.event_type in (EventType.TASK_START, EventType.BASELINE_START, EventType.QUESTIONNAIRE_START):
+            counts[id(containing[-1])] += 1
+        else:
+            counts[id(containing[0])] += 1
+
     for seg in timeline.segments:
         end = seg.end_ms if seg.end_ms is not None else last_event_ts
         dur_s = max((end - seg.start_ms) / 1000.0, 1e-9)
-        n = sum(1 for e in trial.events if seg.start_ms <= e.timestamp <= end)
+        n = counts[id(seg)]
         domain = getattr(seg, "domain", None) or ""
         rows.append({
             "trial_id": trial.trial_id,
@@ -65,7 +88,6 @@ def event_density(timeline: TrialTimeline, trial: TrialRecord) -> pd.DataFrame:
 # ── Baseline-vs-Task-Vergleich ────────────────────────────────────────────────
 
 def baseline_vs_task(
-    trial: TrialRecord,
     timeline: TrialTimeline,
     stream: SensorStreamRecord,
     feature: str = "mean",
@@ -73,46 +95,47 @@ def baseline_vs_task(
     """
     Vergleicht Kanal-Merkmale zwischen Baseline- und Task-Segmenten.
 
-    Pro Segment wird der Kanal-Mittelwert (bzw. ``feature``) über die
-    Samples im Segment berechnet; ausgegeben wird pro Kanal der
-    Baseline-Mittelwert, der Task-Mittelwert und deren Differenz
-    (Task − Baseline). Segmente mit Domain-Info (falls vorhanden) werden
-    zusätzlich einzeln ausgewiesen.
+    Gruppiert wird nach ``segment_type`` (nicht nach dem Label — ein
+    Baseline-Segment darf auch 'rest' heißen). Wiederholte Segmente
+    gleichen Typs fließen alle ein (kein Überschreiben); fehlende
+    Einzelwerte (Kanal in einem Segment nicht messbar) werden bei der
+    Mittelwertbildung übersprungen statt als NaN zu propagieren.
     """
-    segs = [s for s in timeline.segments if s.end_ms is not None]
-    segs = [s for s in segs if s.segment_type in ("baseline", "task")]
+    segs = [
+        s for s in timeline.segments
+        if s.end_ms is not None and s.segment_type in ("baseline", "task")
+    ]
     if not segs:
         return pd.DataFrame()
 
-    per_segment: dict[str, dict[str, float]] = {}
+    # groups[segment_type] = Liste von {channel: wert} je Segment
+    groups: dict[str, list[dict[str, float]]] = {"baseline": [], "task": []}
     for seg in segs:
         sliced = slice_stream(stream, seg.start_ms, seg.end_ms)
         feats = compute_window_features(sliced)
-        if not feats:
-            continue
-        domain = getattr(seg, "domain", None)
-        key = seg.label + (f" [{domain}]" if domain else "")
-        per_segment[key] = {ch: f.get(feature, float("nan")) for ch, f in feats.items()}
+        if feats:
+            groups[seg.segment_type].append(
+                {ch: f[feature] for ch, f in feats.items() if f.get(feature) is not None}
+            )
 
-    if not per_segment:
-        return pd.DataFrame()
-
-    base_keys = [k for k in per_segment if k.startswith("baseline")]
-    task_keys = [k for k in per_segment if k.startswith("task")]
-    all_channels = sorted({ch for d in per_segment.values() for ch in d})
-
+    all_channels = sorted(
+        {ch for dicts in groups.values() for d in dicts for ch in d}
+    )
     rows = []
     for ch in all_channels:
-        base_vals = [per_segment[k][ch] for k in base_keys if ch in per_segment[k]]
-        task_vals = [per_segment[k][ch] for k in task_keys if ch in per_segment[k]]
-        base_mean = sum(base_vals) / len(base_vals) if base_vals else float("nan")
-        task_mean = sum(task_vals) / len(task_vals) if task_vals else float("nan")
-        rows.append({
-            "channel": ch,
-            "baseline_mean": round(base_mean, 6),
-            "task_mean": round(task_mean, 6),
-            "delta_task_minus_baseline": round(task_mean - base_mean, 6),
-        })
+        row: dict = {"channel": ch}
+        means: dict[str, float] = {}
+        for g in ("baseline", "task"):
+            vals = [d[ch] for d in groups[g] if ch in d]
+            means[g] = sum(vals) / len(vals) if vals else float("nan")
+            row[f"n_{g}_segments"] = len(vals)
+        row["baseline_mean"] = round(means["baseline"], 6)
+        row["task_mean"] = round(means["task"], 6)
+        if any(v != v for v in means.values()):  # NaN-check
+            row["delta_task_minus_baseline"] = float("nan")
+        else:
+            row["delta_task_minus_baseline"] = round(means["task"] - means["baseline"], 6)
+        rows.append(row)
     return pd.DataFrame(rows)
 
 

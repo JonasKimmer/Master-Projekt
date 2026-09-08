@@ -64,22 +64,37 @@ def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
     timeline = TrialTimeline(trial_id=trial_id)
     sorted_events = sorted(events, key=lambda e: e.timestamp)
 
-    # pending_starts[(base_label, domain)] = queue of unmatched start events.
-    # Pairing is restricted to the same domain so a missing end event can
-    # never cause a start of one domain to be paired with the end of another.
-    pending_starts: dict[tuple[str, str | None], list[EventRecord]] = defaultdict(list)
+    # pending_starts[base_label] = queue of unmatched start events.
+    # Matching-Regeln pro END-Event (robust gegenüber asymmetrischen
+    # Domain-Metadaten, ohne Cross-Domain-Fehlpaarungen zu erlauben):
+    #   1. ältester Start mit exakt passender Domain
+    #   2. ältester Start ohne Domain-Info
+    #   3. nur wenn das END selbst keine Domain trägt: ältester Start
+    #      insgesamt (Domain ist dann nicht unterscheidbar)
+    pending_starts: dict[str, list[EventRecord]] = defaultdict(list)
+
+    def _find_match(queue: list[EventRecord], end_domain) -> int | None:
+        for i, s in enumerate(queue):
+            if s.meta.get("domain") == end_domain:
+                return i
+        for i, s in enumerate(queue):
+            if s.meta.get("domain") is None:
+                return i
+        if end_domain is None and queue:
+            return 0
+        return None
 
     for event in sorted_events:
         base = _base_label(event.label)
         seg_type = _segment_type(event.event_type)
-        key = (base, event.meta.get("domain"))
 
         if event.event_type in _START_TYPES:
-            pending_starts[key].append(event)
+            pending_starts[base].append(event)
 
         elif event.event_type in _END_TYPES:
-            if pending_starts[key]:
-                start_event = pending_starts[key].pop(0)  # FIFO
+            match_idx = _find_match(pending_starts[base], event.meta.get("domain"))
+            if match_idx is not None:
+                start_event = pending_starts[base].pop(match_idx)
                 timeline.segments.append(Segment(
                     label=base,
                     segment_type=seg_type,
@@ -96,7 +111,7 @@ def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
                 )
 
     # Flush unmatched STARTs as incomplete segments
-    for (base, domain), stack in pending_starts.items():
+    for base, stack in pending_starts.items():
         for start_event in stack:
             seg_type = _segment_type(start_event.event_type)
             timeline.segments.append(Segment(
