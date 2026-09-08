@@ -7,7 +7,7 @@ Hochschule / Universität · Masterstudiengang · 2025
 
 ## Zusammenfassung
 
-Automatisierte Verfahren zur Einschätzung von Website-Komplexität beschränken sich meist auf Einzelmetriken und bleiben proprietär oder nicht anpassbar. Ein offenes, mehrdimensionales Verfahren fehlt bislang. Diese Arbeit untersucht daher, ob sich die strukturelle Komplexität einzelner Webseiten automatisiert messen und klassifizieren lässt. Auf Basis selbst gecrawlter HTML-Daten von drei öffentlichen Websites (bpb.de, hs-rm.de, wiesbaden.de, N = 47 Unterseiten) wurde ein modulares Analyse-Tool eingesetzt, das pro Seite sechs strukturelle Merkmale extrahiert: Linkanzahl, Formularanzahl, Medienanzahl, Textmenge, DOM-Tiefe und DOM-Knotenanzahl. Eine K-Means-Clusteranalyse (k = 3) identifizierte drei Cluster mit einem Silhouette-Score von 0,433 (Bootstrap-95%-CI [0,380, 0,566]). Ein systematischer Vergleich über k = 2–6 zeigt jedoch, dass k = 3 nicht die beste Lösung ist (k = 6: 0,480). Die Wahl wird aus Vergleichbarkeit mit der dreigeteilten Datenbasis beibehalten, nicht weil sie optimal ist. Ein Adjusted Rand Index von 0,243 zeigt eine reale, aber nur partielle Konfundierung zwischen Cluster- und Website-Zugehörigkeit. Bei der Feature-Importance tritt ein methodisches Artefakt zutage: Mean-Decrease-Impurity weist `text_length` (17,6 %) und `dom_depth` (7,8 %) Bedeutung zu, unter der robusteren Permutation-Importance sinkt ihr Beitrag jedoch auf 0,0 %. Das ist ein Methodenartefakt kontinuierlicher Merkmale, kein struktureller Befund. Eine 5-fache Cross-Validation liefert eine mittlere Klassifikationsgenauigkeit von 83,1 % (SD 20,7 %, Einzel-Folds 55,6–100 %) gegenüber 100 % bei einem einzelnen 75/25-Split. Der Einzel-Split überschätzt die Robustheit deutlich. Ein Baseline-Vergleich zeigt zudem, dass Clustering auf Basis von `link_count` allein einen höheren Silhouette-Score erzielt (0,667) als das vollständige Sechs-Merkmale-Modell (0,433). Eine zusätzliche Prüfung gegen ein unabhängiges externes Kriterium (real gemessene HTTP-Antwortzeit aller 47 Seiten) findet keine signifikante Übereinstimmung mit der Clusterzugehörigkeit (ANOVA p = 0,319) und keine signifikante Korrelation mit den beiden wichtigsten Strukturmerkmalen (p > 0,17). Die zentrale Forschungsfrage ist damit im Sinne technischer Machbarkeit zu bejahen, im Sinne einer robusten, mehrwertigen und extern validierten Komplexitätsmessung jedoch nicht.
+Automatisierte Verfahren zur Einschätzung von Website-Komplexität beschränken sich meist auf Einzelmetriken und bleiben proprietär oder nicht anpassbar. Ein offenes, mehrdimensionales Verfahren fehlt bislang. Diese Arbeit untersucht daher, ob sich die strukturelle Komplexität einzelner Webseiten automatisiert messen und klassifizieren lässt. Auf Basis selbst gecrawlter HTML-Daten von drei öffentlichen Websites (bpb.de, hs-rm.de, wiesbaden.de, N = 47 Unterseiten) wurde ein modulares Analyse-Tool eingesetzt, das pro Seite sechs strukturelle Merkmale extrahiert: Linkanzahl, Formularanzahl, Medienanzahl, Textmenge, DOM-Tiefe und DOM-Knotenanzahl. Eine K-Means-Clusteranalyse (k = 3) identifizierte drei Cluster mit einem Silhouette-Score von 0,433 (Bootstrap-95%-CI [0,380, 0,566]). Ein systematischer Vergleich über k = 2–6 zeigt jedoch, dass k = 3 nicht die beste Lösung ist (k = 6: 0,480). Die Wahl wird aus Vergleichbarkeit mit der dreigeteilten Datenbasis beibehalten, nicht weil sie optimal ist. Ein Adjusted Rand Index von 0,243 zeigt eine reale, aber nur partielle Konfundierung zwischen Cluster- und Website-Zugehörigkeit. Bei der Feature-Importance tritt ein methodisches Artefakt zutage: Mean-Decrease-Impurity weist `text_length` (17,6 %) und `dom_depth` (7,8 %) Bedeutung zu, unter der robusteren Permutation-Importance sinkt ihr Beitrag jedoch auf 0,0 %. Das ist ein Methodenartefakt kontinuierlicher Merkmale, kein struktureller Befund. Eine 5-fache Cross-Validation liefert eine mittlere Klassifikationsgenauigkeit von 83,1 % (SD 20,7 %, Einzel-Folds 55,6–100 %) gegenüber 100 % bei einem einzelnen 75/25-Split. Der Einzel-Split überschätzt die Robustheit deutlich. Ein Baseline-Vergleich zeigt zudem, dass Clustering auf Basis von `link_count` allein einen höheren Silhouette-Score erzielt (0,667) als das vollständige Sechs-Merkmale-Modell (0,433). Eine Dekorrelations-Analyse erklärt einen Teil dieser Differenz: Da drei der sechs Merkmale überwiegend eine gemeinsame „Umfang"-Dimension abbilden, steigt der Score nach Entfernen der redundanten Merkmale auf 0,500 — bleibt aber unterhalb der Einzelmetrik-Baseline und erzeugt einen Single-Page-Ausreißercluster. Eine zusätzliche Prüfung gegen ein unabhängiges externes Kriterium (real gemessene HTTP-Antwortzeit aller 47 Seiten) findet keine signifikante Übereinstimmung mit der Clusterzugehörigkeit (ANOVA p = 0,319) und keine signifikante Korrelation mit den beiden wichtigsten Strukturmerkmalen (p > 0,17); die zugehörigen Messdaten wurden allerdings nicht archiviert (vgl. 4.6). Die zentrale Forschungsfrage ist damit im Sinne technischer Machbarkeit zu bejahen, im Sinne einer robusten, mehrwertigen und extern validierten Komplexitätsmessung jedoch nicht.
 
 **Schlüsselwörter:** Webkomplexität, DOM-Analyse, HTML-Parsing, Clustering, Feature-Extraktion, Permutation-Importance, Cross-Validation
 
@@ -39,6 +39,8 @@ Die automatische Klassifikation von Webseiten nach Typ oder Funktion ist ein eta
 
 Random-Forest-Klassifikatoren haben sich für tabellarische Feature-Matrizen als robuste Methode bewährt (Breiman, 2001). Ihre Feature-Importance lässt Rückschlüsse darauf zu, welche Merkmale die Klassifikation primär tragen. Werden die Labels jedoch durch ein vorheriges Clustering erzeugt, quantifiziert die Importance nur die interne Konsistenz der Clusterstruktur, nicht die externe Validität gegenüber einer unabhängigen Zielvariable. Zudem ist die Standard-Feature-Importance von Random Forests (Mean Decrease Impurity) bekanntermaßen zugunsten kontinuierlicher Merkmale mit vielen eindeutigen Werten verzerrt. Permutation-Importance gilt als robusteres Gegenstück (vgl. 4.3).
 
+Messwertbasierte Arbeiten zur Website-Komplexität sind der direkteste Bezugspunkt dieser Studie: Butkiewicz et al. (2011) entwickelten aus Messungen realer Seiten Metriken für Inhalts- und Strukturkomplexität und untersuchten deren Zusammenhang mit der Ladeperformance — genau die Kombination aus Strukturmerkmalen und Außenkriterium, die in 4.6 geprüft wird. Ihre Befunde legen nahe, dass Seitenkomplexität mehrdimensional erfasst werden sollte; ob die hier gewählten sechs DOM-Merkmale diesen Anspruch einlösen, ist eine empirische Frage der Abschnitte 4.5 und 4.6.
+
 ---
 
 ## 3. Methodik
@@ -53,10 +55,10 @@ Die Analyse basiert auf drei gecrawlten Websites mit insgesamt 47 Unterseiten:
 - **hs-rm.de (institutionelle Website):** Hochschule RheinMain, flache Navigationsstruktur, überwiegend informative Fachbereichs- und Studienseiten. 15 gecrawlte Unterseiten.
 - **wiesbaden.de (Serviceplattform):** Bürger-/Verwaltungsportal der Stadt Wiesbaden mit Verwaltungsdienstleistungen. 12 gecrawlte Unterseiten.
 
-Der Crawler arbeitet mit einer Breite-zuerst-Suche innerhalb derselben Domain und rendert kein JavaScript. Pro Seite wurden HTML-Quelltext, sichtbarer Text, Linkstruktur, Formulare und Medienelemente als strukturierte JSON-Dateien gespeichert. Da nur statische HTML-Snapshots erfasst werden, fehlen dynamisch per JavaScript nachgeladene Inhalte. Dies tritt konkret an zwei Stellen zutage:
+Der Crawler (`mini_crawler.py`, im Projekt versionskontrolliert) arbeitet mit Breite-zuerst-Suche (FIFO-Warteschlange) innerhalb derselben Domain, respektiert die `robots.txt`-Disallow-Pfade des User-Agents und hält einen Abstand von 1 s zwischen Requests ein. Die drei Crawls umfassen 20, 15 bzw. 12 Seiten; ob die Seitenzahl bei wiesbaden.de durch das Aufruf-Limit oder durch eine erschöpfte Warteschlange nach dem Überspringen von URLs (robots.txt, Nicht-HTML-Inhalte, Abruffehler) zustande kam, ist aus den Artefakten nicht mehr rekonstruierbar. Die Analyse basiert auf dem ungerenderten HTML: Seiteninhalt wird per einfachem HTTP-GET ohne JavaScript-Ausführung abgerufen und mit BeautifulSoup geparst. Screenshots entstehen separat per Playwright/Chromium und fließen nicht in die Merkmale ein. Die Crawl-Artefakte tragen laut Dateisystem-Metadaten den Erhebungszeitpunkt 8. August 2026. Pro Seite wurden HTML-Quelltext, sichtbarer Text, Linkstruktur, Formulare und Medienelemente als strukturierte JSON-Dateien gespeichert. Da nur statische HTML-Snapshots erfasst werden, fehlen dynamisch per JavaScript nachgeladene Inhalte. Dies tritt konkret an zwei Stellen zutage:
 
 - **bpb.de:** Für keine der 20 Seiten fand sich ein `<img>`-Tag im statischen HTML (`media_count` = 0 durchgängig), obwohl die Seiten augenscheinlich Bildinhalte enthalten. Eine Stichprobenprüfung des Rohquelltexts bestätigt, dass die Bilder client-seitig nachgeladen werden.
-- **wiesbaden.de:** Auf keiner Seite fand sich ein `<form>`-Element. Eine Stichprobenprüfung zeigt, dass die Seite zur Personalausweis-Beantragung nur die Dienstleistung beschreibt und auf ein externes, nicht miterfasstes Verwaltungsportal verlinkt, auf dem das eigentliche Formular liegt (Seiten-Metadatum: `"citygovOnlineService"`).
+- **wiesbaden.de:** Auf keiner Seite fand sich ein `<form>`-Element. Eine Stichprobenprüfung des gespeicherten Roh-HTML zeigt, dass die Seite zur Personalausweis-Beantragung nur die Dienstleistung beschreibt und auf ein externes, nicht miterfasstes Verwaltungsportal verlinkt, auf dem das eigentliche Formular liegt (im Rohquelltext findet sich dazu der Marker `"citygovOnlineService"`; ein strukturiertes Metadatenfeld existiert nicht).
 
 Beide sind reale Messartefakte der Methode, nicht des Merkmals an sich (vgl. 5.2). Die drei Websites wurden nach öffentlicher Zugänglichkeit und unproblematischer robots.txt-Erlaubnis ausgewählt (vgl. 5.3 zum daraus resultierenden Selektionsbias).
 
@@ -77,9 +79,11 @@ Das Analyse-Tool ist in Python implementiert (Streamlit-Oberfläche), liest Webs
 
 **Website-Konfundierung:** Adjusted Rand Index (ARI; Hubert & Arabie, 1985) zwischen Cluster- und Website-Zugehörigkeit (0 = keine Übereinstimmung über Zufallsniveau, 1 = identisch).
 
-**Feature-Importance:** Random-Forest (100 Bäume, `random_state=42`) auf den Cluster-Labels, ausgewertet über Mean Decrease Impurity (MDI, verzerrt zugunsten kontinuierlicher Merkmale) und Permutation-Importance (30 Wiederholungen). Permutation-Importance misst den Accuracy-Verlust bei zufälliger Durchmischung eines Merkmals und ist robuster gegen den MDI-Bias. Klassifikationsgüte über einen einzelnen 75/25-Split sowie 5-fache Cross-Validation: Die Daten werden in 5 Teile geteilt, das Modell wird fünfmal auf je 4 Teilen trainiert und am verbleibenden Teil getestet.
+**Feature-Importance:** Random-Forest (100 Bäume, `random_state=42`) auf den Cluster-Labels, ausgewertet über Mean Decrease Impurity (MDI, verzerrt zugunsten kontinuierlicher Merkmale) und Permutation-Importance (30 Wiederholungen, `random_state=42`). Permutation-Importance misst den Accuracy-Verlust bei zufälliger Durchmischung eines Merkmals und ist robuster gegen den MDI-Bias. Klassifikationsgüte über einen einzelnen 75/25-Split (`train_test_split`, `random_state=42`, ohne Schichtung — mit `stratify` ergäbe sich für denselben Seed 0,833 statt 1,000, der Aufruf ist daher vollständig dokumentiert) sowie 5-fache Cross-Validation: Die Daten werden in 5 Teile geteilt, das Modell wird fünfmal auf je 4 Teilen trainiert und am verbleibenden Teil getestet.
 
-**Cluster-Stabilität:** Die K-Means-Lösung (`random_state=42`) wurde gegen 50 Wiederholungen mit anderen Zufallssaaten verglichen (ARI zur Referenzlösung). Dieser Check prüft nur algorithmische Konsistenz, nicht inhaltliche Korrektheit.
+**Cluster-Stabilität:** Die K-Means-Lösung (`random_state=42`, `n_init=10`) wurde gegen 50 Wiederholungen mit anderen Zufallssaaten verglichen (ARI zur Referenzlösung; Saaten aus `default_rng(0)` im Bereich 1–100.000, damit reproduzierbar). Dieser Check prüft nur algorithmische Konsistenz, nicht inhaltliche Korrektheit.
+
+**Reproduzierbarkeit:** Alle Kennzahlen der Tabellen 1–6 sowie k-Scan, Baseline, Dekorrelation, Importance, CV, Bootstrap und Stabilität erzeugt das Skript `check_web_analysis.py` aus der versionierten Merkmalsdatei `new_web_features.csv` (die ihrerseits exakt der Tool-Pipeline aus den Crawl-Artefakten entspricht); auch beide Abbildungen werden dort erzeugt. Seed-abhängige Größen (Stabilität, Permutation) können sich bei anderen Saaten leicht verschieben.
 
 **Baseline-Vergleich:** K-Means (k = 3) nur auf dem z-standardisierten Merkmal `link_count`, verglichen (Silhouette, ARI) mit dem Sechs-Merkmale-Clustering.
 
@@ -93,7 +97,7 @@ Das Analyse-Tool ist in Python implementiert (Streamlit-Oberfläche), liest Webs
 
 **Tabelle 1: Merkmalsverteilung (N = 47 Seiten)**
 
-| Merkmal | Ø | SD | Min | Max |
+| Merkmal | M | SD | Min | Max |
 |---|---|---|---|---|
 | link_count | 170,0 | 169,3 | 44 | 1.187 |
 | form_count | 0,19 | 0,45 | 0 | 2 |
@@ -117,13 +121,13 @@ Die K-Means-Analyse (k = 3) ergab drei Cluster mit einem Silhouette-Score von 0,
 **Tabelle 2: Cluster-Charakteristika (Mittelwerte je Cluster)**
 *(Cluster-Zugehörigkeit ist mit Website-Zugehörigkeit teilweise konfundiert, ARI = 0,243. Siehe Tabelle 3.)*
 
-| Cluster | N | Links Ø | DOM-Tiefe Ø | Text Ø | Medien Ø | Typ (post-hoc) |
+| Cluster | N | Links M | DOM-Tiefe M | Text M | Medien M | Typ (post-hoc) |
 |---|---|---|---|---|---|---|
 | 0 | 30 | 107,7 | 16,9 | 4.084,6 | 2,2 | Kompakte Seiten |
 | 1 | 6 | 395,0 | 15,7 | 28.589,2 | 0,0 | Hub-/Übersichtsseiten |
 | 2 | 11 | 217,3 | 15,3 | 10.831,3 | 19,6 | Medienreiche Seiten |
 
-Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriffe zu verstehen, nicht als validierte Kategorien. Es ergibt sich kein Cluster mit hohem `form_count`, eine direkte Folge des Formular-Erfassungsartefakts. Cluster 1 besteht ausschließlich aus 6 bpb.de-Seiten, Cluster 2 ausschließlich aus 11 hs-rm.de-Seiten. Nur Cluster 0 vereint alle drei Websites.
+Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriffe zu verstehen, nicht als validierte Kategorien. Es ergibt sich kein Cluster mit hohem `form_count`, eine direkte Folge des Formular-Erfassungsartefakts. Zur Website-Komposition der Cluster siehe Tabelle 3; sie ist bei der Interpretation aller Cluster-Charakteristika zu berücksichtigen.
 
 **Tabelle 3: Cluster-Verteilung nach Website**
 
@@ -134,7 +138,7 @@ Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriff
 | wiesbaden.de | 12 | 0 | 0 | 12 |
 | **Gesamt** | **30** | **6** | **11** | **47** |
 
-Der ARI zwischen Cluster- und Website-Zugehörigkeit beträgt 0,243 und zeigt eine reale, aber nur partielle Konfundierung. Cluster 1 und 2 sind faktisch mit je einer Website identisch, während Cluster 0 website-übergreifend zusammengesetzt ist. Eine pauschale Formulierung wie "kein reines Website-Artefakt" würde das verschleiern.
+Der ARI zwischen Cluster- und Website-Zugehörigkeit beträgt 0,243 und zeigt eine reale, aber nur partielle Konfundierung: Cluster 1 besteht ausschließlich aus 6 bpb.de-Seiten und Cluster 2 ausschließlich aus 11 hs-rm.de-Seiten — beide sind faktisch mit einer Website identisch —, während nur Cluster 0 alle drei Websites vereint (14 bpb, 4 hs-rm, 12 wiesbaden). Eine pauschale Formulierung wie „kein reines Website-Artefakt" würde das verschleiern.
 
 **Abbildung 2: DOM-Tiefe × Linkanzahl nach Cluster**
 
@@ -142,7 +146,7 @@ Der ARI zwischen Cluster- und Website-Zugehörigkeit beträgt 0,243 und zeigt ei
 
 *Scatter-Plot der 47 Seiten, eingefärbt nach Cluster. ★ markiert das jeweilige Clusterzentrum.*
 
-Abbildung 2 stellt die in Tabelle 3 quantifizierte Website-Konfundierung räumlich dar. Cluster 1 (bpb.de) und Cluster 2 (hs-rm.de) bilden im Zentrum klar getrennte Punktwolken, die sich in den Randbereichen jedoch sichtbar überlappen, während Cluster 0 über weite Teile des Diagramms mit beiden anderen überlappt, konsistent mit dessen website-übergreifender Zusammensetzung.
+Abbildung 2 stellt diese Konfundierung räumlich dar: Die beiden website-reinen Cluster bilden im Zentrum klar getrennte Punktwolken, die sich in den Randbereichen überlappen; Cluster 0 verteilt sich über weite Teile des Diagramms.
 
 ### 4.3 Feature-Importance und Klassifikationsgüte
 
@@ -156,14 +160,14 @@ Abbildung 2 stellt die in Tabelle 3 quantifizierte Website-Konfundierung räumli
 
 Der Einzel-Split-Wert überschätzt die tatsächliche Robustheit erheblich, da einzelne CV-Folds auf 55,6 % zurückfallen (SD 20,7 Punkte bei N = 47).
 
-**Tabelle 5: Feature-Importance — MDI vs. Permutation-Importance**
+**Tabelle 5: Feature-Importance — MDI vs. Permutation-Importance** *(Reproduktion: `check_web_analysis.py`; Permutation mit dokumentiertem Seed)*
 
 | Merkmal | MDI | Permutation-Importance |
 |---|---|---|
 | dom_nodes | 0,254 | 0,099 |
-| media_count | 0,180 | 0,055 |
+| media_count | 0,180 | 0,056 |
 | link_count | 0,225 | 0,054 |
-| form_count | 0,086 | 0,013 |
+| form_count | 0,086 | 0,005 |
 | text_length | 0,176 | **0,000** |
 | dom_depth | 0,078 | **0,000** |
 
@@ -179,14 +183,14 @@ Die Korrelationsmatrix liefert eine Erklärung für die MDI-Dominanz, denn `link
 
 | Merkmal | bpb.de (N=20) | hs-rm.de (N=15) | wiesbaden.de (N=12) |
 |---|---|---|---|
-| link_count Ø | 206,6 | 210,5 | 58,6 |
-| form_count Ø | 0,0 | 0,6 | 0,0 |
-| media_count Ø | 0,0 | 18,3 | 0,8 |
-| text_length Ø | 11.639,6 | 9.813,7 | 2.768,2 |
-| dom_depth Ø | 15,3 | 16,0 | 18,6 |
-| dom_nodes Ø | 1.461,2 | 998,7 | 668,3 |
+| link_count M | 206,6 | 210,5 | 58,6 |
+| form_count M | 0,0 | 0,6 | 0,0 |
+| media_count M | 0,0 | 18,3 | 0,8 |
+| text_length M | 11.639,6 | 9.813,7 | 2.768,2 |
+| dom_depth M | 15,3 | 16,0 | 18,6 |
+| dom_nodes M | 1.461,2 | 998,7 | 668,3 |
 
-Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die höchste Textmenge und DOM-Knotenanzahl, hs-rm.de die höchste Linkanzahl, wiesbaden.de die größte DOM-Tiefe. Die drei Websites profilieren sich also unterschiedlich, auch wenn drei der sechs Merkmale (`link_count`, `text_length`, `dom_nodes`) laut Korrelationsmatrix (4.3) überwiegend dieselbe zugrundeliegende "Umfang"-Dimension abbilden. Die `media_count`-Werte von bpb.de und die `form_count`-Werte von wiesbaden.de sind durch die in 3.1 beschriebenen Erfassungsartefakte nach unten verzerrt und nicht als reale Abwesenheit zu lesen.
+Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die höchste Textmenge und DOM-Knotenanzahl, hs-rm.de die höchste Linkanzahl, wiesbaden.de die größte DOM-Tiefe. Das Profil von wiesbaden.de ist strukturell das interessanteste: die **geringste Knotenzahl (668) bei gleichzeitig der höchsten DOM-Tiefe (18,6)** — die Dokumente sind also im Umfang schlank, aber tief verschachtelt. Das passt zu funktionalen Verwaltungsdienstleistungsseiten, die wenige Inhalte, aber mehrstufige Layout- und Navigationscontainer verschachteln, und es erklärt, warum `dom_depth` als einziges Merkmal bei wiesbaden.de heraussticht, obwohl die Website im „Umfang" am kleinsten ist. Die drei Websites profilieren sich also unterschiedlich, auch wenn drei der sechs Merkmale (`link_count`, `text_length`, `dom_nodes`) laut Korrelationsmatrix (4.3) überwiegend dieselbe zugrundeliegende „Umfang"-Dimension abbilden. Die `media_count`-Werte von bpb.de und die `form_count`-Werte von wiesbaden.de sind durch die in 3.1 beschriebenen Erfassungsartefakte nach unten verzerrt und nicht als reale Abwesenheit zu lesen.
 
 ### 4.5 Robustheitsprüfungen: k-Wahl, Stabilität, Baseline
 
@@ -202,15 +206,19 @@ Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die h�
 
 k = 3 liefert nicht den höchsten Score, k = 6 schneidet besser ab. Die Wahl ist primär durch Vergleichbarkeit mit der dreiteiligen Datenbasis motiviert, nicht durch datengetriebene Optimierung. Diese Einschränkung wird hier explizit gemacht statt verschwiegen.
 
-**Cluster-Stabilität:** Über 50 Wiederholungen mit anderen Zufallssaaten ergibt sich ein mittlerer ARI von 0,997 (Minimum 0,935). Die Lösung ist algorithmisch sehr stabil und, anders als die k-Wahl, kein Zufallsartefakt.
+**Cluster-Stabilität:** Über 50 Wiederholungen mit dokumentierten Zufallssaaten (aus `default_rng(0)`) ergibt sich ein mittlerer ARI von 0,986 (Minimum 0,717). Die Lösung ist algorithmisch sehr stabil und, anders als die k-Wahl, kein Zufallsartefakt. (Frühere Angaben von 0,997/0,935 beruhten auf undokumentierten Saaten; die Werte sind seed-abhängig, berichtet wird die reproduzierbare Variante.)
 
-**Silhouette-Bootstrap:** 1.000 Resamples ergeben einen Mittelwert von 0,472, 95%-CI [0,380, 0,566]. Der Punktschätzer 0,433 liegt am unteren Rand. Die "gut"-Schwelle von 0,5 wird auch im Bootstrap-Mittel nicht sicher erreicht.
+**Silhouette-Bootstrap:** 1.000 Resamples ergeben einen Mittelwert von 0,472, 95%-CI [0,380, 0,566]. Der Punktschätzer 0,433 liegt am unteren Rand. Die „gut"-Schwelle von 0,5 wird auch im Bootstrap-Mittel nicht sicher erreicht.
 
 **Baseline-Vergleich:** Clustering nur auf `link_count` erzielt einen Silhouette-Score von 0,667, deutlich höher als das Sechs-Merkmale-Modell (0,433). Beide Lösungen stimmen nur mäßig überein (ARI = 0,527). In dieser Stichprobe erzeugt die Einzelmetrik eine klarer abgegrenzte Clusterstruktur als der vollständige Merkmalsvektor, was der in 1.2 formulierten Grundannahme widerspricht.
+
+**Dekorrelations-Analyse:** Die Korrelationsmatrix (4.3) legt nahe, dass drei der sechs Merkmale überwiegend dieselbe „Umfang"-Dimension messen (`text_length` und `dom_nodes` korrelieren mit r = 0,81 bzw. 0,72 mit `link_count`). Wird das Clustering auf den dekorrelierten Satz `link_count`, `dom_depth`, `media_count`, `form_count` beschränkt, steigt der Silhouette-Score von 0,433 auf **0,500** — die „gut"-Schwelle wird knapp erreicht, und die Lösung bleibt der 6-Merkmal-Lösung strukturell ähnlich (ARI = 0,717), zur `link_count`-Baseline dagegen deutlich verschieden (ARI = 0,339). Zwei Einschränkungen trüben das Ergebnis: Erstens bleibt auch 0,500 unterhalb der Einzelmetrik-Baseline (0,667) — Redundanz erklärt also einen Teil, aber nicht die ganze Differenz zum Baseline-Vorteil. Zweitens isoliert die dekorrelierte Lösung die extremste bpb.de-Seite (1.187 Links, 54.453 Zeichen) als **Single-Page-Cluster** (Clustergrößen 35/11/1); ein Teil des Silhouette-Gewinns stammt damit aus Ausreißerisolierung, nicht aus sauber getrennten inhaltlichen Gruppen. Das Ergebnis verfeinert die Schlussfolgerung, dreht sie aber nicht: Das mehrdimensionale Modell gewinnt durch Dekorrelation an innerer Güte, der postulierte Mehrwert gegenüber der Einzelmetrik lässt sich auch damit nicht zeigen.
 
 ### 4.6 Externes Kriterium: Zusammenhang mit realer Antwortzeit
 
 Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erklären. Das ist ein internes Gütekriterium. Als unabhängige Gegenprobe wurde die HTTP-Antwortzeit aller 47 Seiten gemessen und gegen Strukturmerkmale und Clusterzugehörigkeit getestet.
+
+*Provenienz-Hinweis: Die Einzelmessungen (3 Wiederholungen je Seite, Median) wurden seinerzeit nicht als Datei archiviert und sind nicht mehr auffindbar; die folgenden Werte stammen aus der verlorenen Messung und lassen sich aus dem Projektstand nicht erneut prüfen. Sie werden der Vollständigkeit halber berichtet und als nicht reproduzierbar gekennzeichnet (vgl. Verfügbarkeitsstatement).*
 
 **Tabelle 7: Korrelation Antwortzeit × Strukturmerkmale**
 
@@ -244,7 +252,9 @@ Eine einfaktorielle ANOVA prüft, ob sich die Mittelwerte mehrerer Gruppen stär
 
 ### 5.1 Strukturelle Merkmale als Komplexitätsindikatoren
 
-Dass gerade `link_count` und `dom_nodes` die Cluster tragen, passt zum allgemeinen Befund von Ivory und Hearst (2002), dass quantitative Struktur- und Linkmerkmale prädiktiv für die wahrgenommene Seitenqualität sind. Dass zwei andere, unter MDI relevant erscheinende Merkmale sich bei genauerer Prüfung als wertlos erweisen (4.3), zeigt dagegen den eigentlichen methodischen Ertrag dieser Arbeit. Eine unreflektierte Feature-Importance-Analyse hätte hier in die Irre geführt.
+Dass gerade `link_count` und `dom_nodes` die Cluster tragen, passt zum Befund von Ivory und Hearst (2002), dass quantitative Struktur- und Linkmerkmale prädiktiv für die wahrgenommene Seitenqualität sind. Dass zwei andere, unter MDI relevant erscheinende Merkmale sich bei genauerer Prüfung als wertlos erweisen (4.3), zeigt dagegen den eigentlichen methodischen Ertrag dieser Arbeit — eine unreflektierte Feature-Importance-Analyse hätte hier in die Irre geführt. Die Dekorrelations-Analyse (4.5) präzisiert das Bild: Der Informationsgewinn der sechs Merkmale ist in dieser Stichprobe real, aber geringer als ihre Redundanz — drei von sechs messen im Wesentlichen denselben „Umfang". Ein brauchbares Merkmalsset für ähnliche Analysen wäre schlanker (vier statt sechs Merkmale) und käme ohne die beiden überflüssigen Umfangs-Indikatoren aus.
+
+Das Strukturprofil von wiesbaden.de (4.4) — schlank im Umfang, aber die tiefste DOM-Verschachtelung — illustriert zudem, dass „Komplexität" kein eindimensionales Konstrukt ist: Eine Website kann in der Umfangsdimension minimal und in der Verschachtelungstiefe gleichzeitig maximal sein. Genau solche Profile, nicht die Gesamtlage im Umfangsraum, wären der interessante Gegenstand einer Folgestudie mit mehr Websites. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung: Sinnvolle Komplexitätsmessung kombiniert mehrere, voneinander unabhängige Metrikfamilien mit einem Außenkriterium — genau die Kombination, die hier versuchsweise umgesetzt wurde, deren Außenkriterium (Antwortzeit) aber zu grob geriet, um Strukturunterschiede aufzulösen (4.6).
 
 ### 5.2 Grenzen und Verallgemeinerbarkeit
 
@@ -252,9 +262,9 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 ### 5.3 Einschränkungen
 
-**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale. Es deckt dabei aber selbst nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility, Nutzereinschätzung fehlen). Mit nur 3 Websites (47 Beobachtungen, die in drei Websites genestet statt unabhängig sind, ARI = 0,243) lässt sich zudem nicht sicher zwischen "generalisierbarem Seitentyp" und "individueller Website-Eigenheit" trennen.
+**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale; seine Einzelmessungen wurden zudem nicht archiviert (4.6) und es deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility, Nutzereinschätzung fehlen). Mit nur 3 Websites (47 Beobachtungen, die in drei Websites genestet statt unabhängig sind, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
 
-**k-Wahl und Stichprobenauswahl:** k = 3 ist nachweislich nicht die datenoptimale Clusterzahl (4.5). Die drei Websites wurden zudem nach unproblematischer robots.txt-Erlaubnis ausgewählt, eine Positivselektion, die restriktiver geschützte, oft strukturell komplexere Websites systematisch ausschließt (zu den in 5.2 diskutierten Erfassungslücken bei `media_count`/`form_count` vgl. 3.1).
+**Stichprobenauswahl:** Die drei Websites wurden nach unproblematischer robots.txt-Erlaubnis ausgewählt, eine Positivselektion, die restriktiver geschützte, oft strukturell komplexere Websites systematisch ausschließt (zu den in 5.2 diskutierten Erfassungslücken bei `media_count`/`form_count` vgl. 3.1). Zur datenoptimalen k-Wahl und ihrer bewussten Abweichung siehe 4.5.
 
 **Rechtlicher Rahmen:** Die robots.txt-Konformität (3.1) deckt nur die technische Zugriffsebene ab. Nutzungsbedingungen der jeweiligen Website können automatisiertes Crawling unabhängig davon einschränken. Für die hier gecrawlten drei öffentlichen Informations- und Verwaltungsportale wurden ausschließlich frei zugängliche, nicht personenbezogene Inhalte zu Forschungszwecken erfasst. Eine kommerzielle Nutzung der Rohdaten war nicht Gegenstand dieser Arbeit.
 
@@ -264,15 +274,23 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 ## 6. Fazit
 
-Die zentrale Forschungsfrage ist damit differenziert zu beantworten: Automatisierte Merkmalsextraktion und Clustering von Webseiten sind technisch machbar, ein belastbarer Mehrwert des mehrdimensionalen Modells gegenüber einer Einzelmetrik lässt sich mit dieser Stichprobe dagegen nicht zeigen. Jede der in dieser Arbeit durchgeführten Robustheitsprüfungen deckt einen anderen Punkt auf, an dem eine oberflächliche Analyse zu falschen Schlüssen geführt hätte: die suboptimale Cluster-Anzahl, eine durch MDI verzerrte Merkmalsrangfolge, eine durch Einzel-Split überschätzte Modellgüte und eine Einzelmetrik, die im internen Gütekriterium sogar besser abschneidet als das volle Sechs-Merkmale-Modell. Am schwersten wiegt der Befund aus 4.6, denn erst der Test gegen ein unabhängiges Kriterium, die real gemessene Ladezeit, zeigt, dass die gefundene Clusterstruktur praktisch folgenlos bleibt.
+Die zentrale Forschungsfrage ist damit differenziert zu beantworten: Automatisierte Merkmalsextraktion und Clustering von Webseiten sind technisch machbar, ein belastbarer Mehrwert des mehrdimensionalen Modells gegenüber einer Einzelmetrik lässt sich mit dieser Stichprobe dagegen nicht zeigen — auch die Dekorrelations-Analyse (4.5) verbessert das Mehrdimensionale nur auf die „gut"-Schwelle, ohne die Einzelmetrik-Baseline zu erreichen. Jede der in dieser Arbeit durchgeführten Robustheitsprüfungen deckt einen anderen Punkt auf, an dem eine oberflächliche Analyse zu falschen Schlüssen geführt hätte: die suboptimale Cluster-Anzahl, eine durch MDI verzerrte Merkmalsrangfolge, eine durch Einzel-Split überschätzte Modellgüte und eine Einzelmetrik, die im internen Gütekriterium sogar besser abschneidet als das volle Sechs-Merkmale-Modell. Am schwersten wiegt der Befund aus 4.6, denn erst der Test gegen ein unabhängiges Kriterium zeigt, dass die gefundene Clusterstruktur im geprüften Außenkriterium ohne nachweisbaren Effekt bleibt.
 
 Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websites strukturell beschreiben kann, aber ohne begleitende externe Validierung keine belastbare Aussage über praktische Relevanz trifft. Für die Methodik folgt daraus eine allgemeinere Lehre für vergleichbare Arbeiten: Cluster-Anzahl, Feature-Importance-Verfahren und Modellbewertung sollten grundsätzlich gegeneinander geprüft werden, bevor aus einem einzelnen Durchlauf Schlüsse gezogen werden.
+
+---
+
+## Daten- und Analyse-Verfügbarkeit
+
+Crawl-Artefakte (`websites/`), Merkmalsdatei (`new_web_features.csv`) und Crawler (`mini_crawler.py`) sind Teil des versionskontrollierten Projekts; die Merkmalsdatei entspricht exakt der Tool-Pipeline aus den Crawl-Artefakten (verifiziert über `website_loader` + `web_features`). Alle Kennzahlen der Tabellen 1–6 sowie k-Scan, Baseline, Dekorrelation, Feature-Importance, Cross-Validation, Bootstrap und Cluster-Stabilität erzeugt `check_web_analysis.py` aus der CSV, ebenfalls inklusive beider Abbildungen; seed-abhängige Größen sind mit festen, dokumentierten Saaten versehen. **Nicht verfügbar sind die HTTP-Antwortzeit-Messungen hinter Tabelle 7 und 4.6/Tabelle 8** — die Einzelmessungen wurden nicht archiviert; die berichteten Werte sind als nicht reproduzierbar gekennzeichnet und sollten bei einer Replikation neu erhoben werden.
 
 ---
 
 ## Literatur
 
 Breiman, L. (2001). Random forests. *Machine Learning, 45*(1), 5–32.
+
+Butkiewicz, M., Madhyastha, H. V., & Sekar, V. (2011). Understanding website complexity: Measurements, metrics, and implications. *Proceedings of the 11th ACM SIGCOMM Conference on Internet Measurement (IMC '11)*.
 
 Hubert, L., & Arabie, P. (1985). Comparing partitions. *Journal of Classification, 2*(1), 193–218.
 
