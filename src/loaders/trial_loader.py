@@ -62,10 +62,26 @@ def _read_ndjson(path: str) -> list[dict[str, Any]]:
 
 _TS_KEYS: tuple[str, ...] = ("timestamp", "ts", "time", "t", "Timestamp", "Time")
 
+# Normalisierte Formen (klein, ohne Separatoren) der erlaubten Timestamp-Keys:
+# erfasst auch timestamp_ms / timestampMs / ts_ms / TimeMs etc.
+_TS_KEYS_NORMALIZED: set[str] = {"ts", "t", "time", "timestamp", "timestampms", "tsms", "timems"}
+
+
+def _normalize_key(key: str) -> str:
+    return key.lower().replace("_", "").replace("-", "")
+
 
 def _extract_timestamp(obj: dict[str, Any]) -> float | None:
+    # Exakte Treffer zuerst (bestehende Priorität), danach normalisierte
+    # Varianten wie timestamp_ms / timestampMs.
     for key in _TS_KEYS:
         if key in obj:
+            try:
+                return float(obj[key])
+            except (TypeError, ValueError):
+                pass
+    for key in obj:
+        if _normalize_key(key) in _TS_KEYS_NORMALIZED and key not in _TS_KEYS:
             try:
                 return float(obj[key])
             except (TypeError, ValueError):
@@ -115,17 +131,19 @@ def _flatten(obj: dict[str, Any], prefix: str = "") -> dict[str, Any]:
 
 _SKIP_KEYS = {"rate_hz", "fresh_shimmer", "fresh_gaze", "ts_iso", "trialid", "fusionconf"}
 
-# Leaf names that are timestamps, not sensor signals (compared case-insensitively)
-_TIMESTAMP_SUFFIXES = ("timestampms", "timestamp", "ts_ms")
+# Leaf names that are timestamps, not sensor signals (case-insensitive und
+# separator-normalisiert: timestamp_ms/timestampMs/TimestampMs …)
+_TIMESTAMP_SUFFIXES = ("timestampms", "timestamp", "tsms", "timems")
 
 
 def _is_skippable(key: str) -> bool:
     base = key.split(".")[-1].lower()  # last segment for skip-check
+    compact = base.replace("_", "").replace("-", "")
     return (
         key in _TS_KEYS
         or base in _TS_KEYS
         or base in _SKIP_KEYS
-        or base.endswith(_TIMESTAMP_SUFFIXES)
+        or compact.endswith(_TIMESTAMP_SUFFIXES)
     )
 
 
