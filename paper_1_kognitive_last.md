@@ -1,7 +1,7 @@
 # Kognitive Beanspruchung bei der Exploration interaktiver Datenvisualisierungen: Domäneneffekte und Belastungsindikatoren
 
 **Jonas Kimmer**  
-Hochschule / Universität · Masterstudiengang · 2025
+**[BITTE VOR ABGABE ERGÄNZEN: Hochschule · Studiengang · Matrikelnummer · Betreuer:in · Abgabedatum]** · 2026
 
 ---
 
@@ -266,3 +266,25 @@ Paas, F., Renkl, A., & Sweller, J. (2003). Cognitive load theory and instruction
 Sweller, J. (1988). Cognitive load during problem solving. *Cognitive Science, 12*(2), 257–285.
 
 Toker, D., & Conati, C. (2017). Leveraging pupil dilation measures for understanding visualization usage. *Proceedings of the ACM Symposium on Eye Tracking Research & Applications (ETRA '17), HAAPIE Workshop*.
+
+
+---
+
+## Ehrenwörtliche Erklärung
+
+Hiermit erkläre ich ehrenwörtlich, dass ich die vorliegende Arbeit selbstständig und nur unter
+Verwendung der angegebenen Hilfsmittel angefertigt habe. Die aus fremden Quellen direkt oder
+indirekt übernommenen Gedanken sind als solche kenntlich gemacht. Die Arbeit wurde bisher in
+gleicher oder ähnlicher Form keiner anderen Prüfungsbehörde vorgelegt und ist noch nicht
+veröffentlicht.
+
+Die Analyse- und Reproduktionsskripte wurden unter Zuhilfenahmen eines KI-gestützten
+Programmierwerkzeugs (Claude Code) erstellt und geprüft; die inhaltliche Konzeption, die
+Datenauswertung und die Interpretation liegen bei mir. Die Arbeit wurde gemäß den Regeln
+guter wissenschaftlicher Praxis erstellt.
+
+**[ORT], den [DATUM]**
+
+**[UNTERSCHRIFT]**
+
+*(Unterschrift bei Abgabe in Dokument/PDF einfügen — diese Seite gehört zur Hausarbeit)*

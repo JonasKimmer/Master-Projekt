@@ -1,7 +1,7 @@
 # Automatisierte Analyse struktureller Webkomplexität: Merkmalsextraktion und Klassifikation gecrawlter Webseiten
 
 **Jonas Kimmer**  
-Hochschule / Universität · Masterstudiengang · 2025
+**[BITTE VOR ABGABE ERGÄNZEN: Hochschule · Studiengang · Matrikelnummer · Betreuer:in · Abgabedatum]** · 2026
 
 ---
 
@@ -311,3 +311,25 @@ Qi, X., & Davison, B. D. (2009). Web page classification: Features and algorithm
 Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation and validation of cluster analysis. *Journal of Computational and Applied Mathematics, 20*, 53–65.
 
 Tuch, A. N., Presslaber, E. E., Stöcklin, M., Opwis, K., & Bargas-Avila, J. A. (2012). The role of visual complexity and prototypicality regarding first impression of websites: Working towards understanding aesthetic judgments. *International Journal of Human–Computer Studies*.
+
+
+---
+
+## Ehrenwörtliche Erklärung
+
+Hiermit erkläre ich ehrenwörtlich, dass ich die vorliegende Arbeit selbstständig und nur unter
+Verwendung der angegebenen Hilfsmittel angefertigt habe. Die aus fremden Quellen direkt oder
+indirekt übernommenen Gedanken sind als solche kenntlich gemacht. Die Arbeit wurde bisher in
+gleicher oder ähnlicher Form keiner anderen Prüfungsbehörde vorgelegt und ist noch nicht
+veröffentlicht.
+
+Die Analyse- und Reproduktionsskripte wurden unter Zuhilfenahmen eines KI-gestützten
+Programmierwerkzeugs (Claude Code) erstellt und geprüft; die inhaltliche Konzeption, die
+Datenauswertung und die Interpretation liegen bei mir. Die Arbeit wurde gemäß den Regeln
+guter wissenschaftlicher Praxis erstellt.
+
+**[ORT], den [DATUM]**
+
+**[UNTERSCHRIFT]**
+
+*(Unterschrift bei Abgabe in Dokument/PDF einfügen — diese Seite gehört zur Hausarbeit)*

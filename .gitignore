@@ -17,3 +17,4 @@ window_definitions.json
 
 # Claude Code Sitzungsdaten
 .claude/
+build/
