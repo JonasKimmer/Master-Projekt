@@ -128,6 +128,41 @@ class TestGapBoundaries:
             resample_stream(s, 1000.0)
 
 
+class TestEmptyStreamSyncGuards:
+    """Review3 #1: der Leere-Stream-Zweig von synchronize_streams darf die
+    target_hz-Validierung und den Rastergrößen-Guard nicht umgehen."""
+
+    def test_empty_stream_with_target_hz_zero_raises_value_error(self):
+        # Vorher: ZeroDivisionError (1000.0/0) im Leere-Stream-Zweig statt
+        # eines sauberen ValueErrors — abhängig davon, ob der leere Stream
+        # vor den Live-Streams iteriert wurde.
+        from src.models.experiment_records import SensorStreamRecord as SSR
+
+        empty = SSR(source="leer", modality="m", timestamps=[], channels={"y": []})
+        live = _stream([100.0, 200.0], {"x": [1.0, 2.0]})
+        with pytest.raises(ValueError, match="target_hz must be > 0"):
+            synchronize_streams([empty, live], 0.0)
+
+    def test_all_empty_streams_with_target_hz_zero_raises_value_error(self):
+        # Auch der Früh-/Trivial-Pfad 'alle Streams leer' muss validieren
+        from src.models.experiment_records import SensorStreamRecord as SSR
+
+        empty = SSR(source="leer", modality="m", timestamps=[], channels={})
+        with pytest.raises(ValueError, match="target_hz must be > 0"):
+            synchronize_streams([empty], 0.0)
+
+    def test_empty_stream_with_huge_grid_raises_size_guard(self):
+        # 24 h @ 1000 Hz ≈ 86 Mio. Rasterpunkte: auch der Leere-Stream-Zweig
+        # (leerer Stream zuerst) muss den Größen-Guard auslösen, bevor das
+        # Raster tatsächlich materialisiert wird.
+        from src.models.experiment_records import SensorStreamRecord as SSR
+
+        empty = SSR(source="leer", modality="m", timestamps=[], channels={"y": []})
+        live = _stream([0.0, 86_400_000.0], {"v": [1.0, 2.0]})  # 24 h Spanne
+        with pytest.raises(ValueError, match="Rasterpunkte"):
+            synchronize_streams([empty, live], 1000.0)
+
+
 class TestUnsortedTimestamps:
     """Bug 4: unsortierte Timestamps müssen korrekt verarbeitet werden."""
 

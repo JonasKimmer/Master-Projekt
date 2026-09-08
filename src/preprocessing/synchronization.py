@@ -20,6 +20,34 @@ import numpy as np
 
 from src.models.experiment_records import SensorStreamRecord, TrialRecord
 
+# Obergrenze für Rasterpunkte pro Resampling-Durchlauf (Speicherschutz:
+# z. B. 24 h @ 1000 Hz wären ~86 Mio. Punkte à mehrere Kanäle).
+_MAX_GRID_POINTS = 5_000_000
+
+
+def _uniform_grid(grid_start: float, grid_end: float, target_hz: float) -> np.ndarray:
+    """
+    Gemeinsames uniformes Raster inkl. aller Guards.
+
+    Prüft ``target_hz > 0`` (sonst ZeroDivisionError statt sauberem
+    ValueError) und begrenzt die Rastergröße auf _MAX_GRID_POINTS.
+    Wird von resample_stream UND vom Leere-Stream-Zweig der
+    synchronize_streams verwendet — keine Aufrufstelle darf die Guards
+    umgehen können.
+    """
+    if target_hz <= 0:
+        raise ValueError(f"target_hz must be > 0, got {target_hz}")
+    step_ms = 1000.0 / target_hz
+    n_grid = int((grid_end - grid_start) / step_ms) + 1
+    if n_grid > _MAX_GRID_POINTS:
+        raise ValueError(
+            f"Resampling würde {n_grid:,} Rasterpunkte erzeugen "
+            f"(Spanne {grid_end - grid_start:.0f} ms @ {target_hz} Hz). "
+            "target_hz senken oder Zeitbereich einschränken."
+        )
+    return np.arange(grid_start, grid_end + step_ms / 2.0, step_ms)
+
+
 # Channel prefix → modality label for split_fusion_stream()
 _PREFIX_MODALITIES: dict[str, str] = {
     "shimmer": "shimmer_physio",   # GSR / PPG / IMU (Shimmer3)
@@ -100,14 +128,7 @@ def resample_stream(
     if max_gap_ms is None:
         max_gap_ms = 2.0 * step_ms
 
-    n_grid = int((grid_end - grid_start) / step_ms) + 1
-    if n_grid > 5_000_000:
-        raise ValueError(
-            f"Resampling würde {n_grid:,} Rasterpunkte erzeugen "
-            f"(Spanne {grid_end - grid_start:.0f} ms @ {target_hz} Hz). "
-            "target_hz senken oder Zeitbereich einschränken."
-        )
-    grid = np.arange(grid_start, grid_end + step_ms / 2.0, step_ms)
+    grid = _uniform_grid(grid_start, grid_end, target_hz)
 
     new_channels: dict[str, list] = {}
     for name, values in stream.channels.items():
@@ -174,6 +195,10 @@ def synchronize_streams(
     """
     if not streams:
         return []
+    # Guards gelten auch für den Leere-Stream-Zweig unten: target_hz=0
+    # muss hier als ValueError auffallen, bevor irgendein Raster gebaut wird.
+    if target_hz <= 0:
+        raise ValueError(f"target_hz must be > 0, got {target_hz}")
     live = [s for s in streams if s.timestamps]
     if not live:
         return streams
@@ -193,9 +218,11 @@ def synchronize_streams(
         if not s.timestamps:
             # Leere Streams erhalten ebenfalls das gemeinsame Raster (alle
             # Kanäle None), damit der Vertrag 'alle Rückgaben tragen
-            # identische Timestamps' ohne Ausnahme gilt.
-            step_ms = 1000.0 / target_hz
-            grid = np.arange(grid_start, grid_end + step_ms / 2.0, step_ms)
+            # identische Timestamps' ohne Ausnahme gilt. _uniform_grid
+            # stellt sicher, dass derselbe Größen-Guard greift wie in
+            # resample_stream — eine leere Modalität darf nicht plötzlich
+            # ein Raster mit Millionen Punkten erzeugen.
+            grid = _uniform_grid(grid_start, grid_end, target_hz)
             result.append(SensorStreamRecord(
                 source=s.source, modality=s.modality,
                 timestamps=[round(float(t), 6) for t in grid],
