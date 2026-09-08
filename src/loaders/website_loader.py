@@ -30,14 +30,22 @@ from src.models.web_records import PageRecord, WebsiteRecord
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _load_json_safe(path: Path) -> Any | None:
-    """Return parsed JSON or None if file absent / invalid."""
+def _load_json_safe(path: Path, errors: dict[str, str] | None = None) -> Any | None:
+    """Return parsed JSON or None if file absent.
+
+    Bei vorhandenem, aber unlesbarem/korruptem File wird None geliefert
+    UND — wenn ein errors-Dict übergeben wird — der Artefaktname mit der
+    Fehlerursache vermerkt. Ein korruptes Artefakt darf nicht still als
+    'nicht gecrawlt' (Nullwert) durchgehen (s. Paper 2, 5.2).
+    """
     if not path.exists():
         return None
     try:
         with open(path, encoding="utf-8") as fh:
             return json.load(fh)
-    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError) as ex:
+        if errors is not None:
+            errors[path.name] = f"{type(ex).__name__}: {ex}"
         return None
 
 
@@ -54,11 +62,12 @@ def _find_raw_html(page_dir: Path) -> str | None:
 def _load_page(page_dir: Path) -> PageRecord:
     page_id = page_dir.name
 
-    visible_text = _load_json_safe(page_dir / "visible_text.json")
-    links_raw    = _load_json_safe(page_dir / "links.json")
-    forms_raw    = _load_json_safe(page_dir / "forms.json")
-    media_raw    = _load_json_safe(page_dir / "media.json")
-    dom          = _load_json_safe(page_dir / "dom.json")
+    load_errors: dict[str, str] = {}
+    visible_text = _load_json_safe(page_dir / "visible_text.json", load_errors)
+    links_raw    = _load_json_safe(page_dir / "links.json", load_errors)
+    forms_raw    = _load_json_safe(page_dir / "forms.json", load_errors)
+    media_raw    = _load_json_safe(page_dir / "media.json", load_errors)
+    dom          = _load_json_safe(page_dir / "dom.json", load_errors)
 
     # Normalise: ensure lists even if the file holds a dict wrapper
     def _to_list(val: Any) -> list[dict[str, Any]]:
@@ -94,6 +103,7 @@ def _load_page(page_dir: Path) -> PageRecord:
         dom=dom if isinstance(dom, dict) else None,
         screenshot_path=str(screenshot.resolve()) if screenshot.exists() else None,
         raw_html_path=_find_raw_html(page_dir),
+        load_errors=load_errors,
     )
 
 

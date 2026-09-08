@@ -211,13 +211,23 @@ class TestWebsiteLoader:
         f = page_features(p1)
         assert f["link_count"] == 4 and f["text_length"] > 0 and f["dom_depth"] >= 1
 
-    def test_corrupt_json_treated_as_missing(self, tmp_path):
+    def test_corrupt_json_flagged_not_silent(self, tmp_path):
+        # Korruptes Artefakt wird als Fehler vermerkt statt still als 0 durchzugehen
         self._make_site(tmp_path)
         (tmp_path / "W" / "pages" / "1" / "links.json").write_text("{kaputt", encoding="utf-8")
         sites = __import__("src.loaders.website_loader", fromlist=["load_websites_from_dir"]) \
             .load_websites_from_dir(str(tmp_path))
         p1 = next(p for p in sites[0].pages if p.page_id == "1")
-        assert p1.link_count == 0  # korruptes JSON → None → 0 (bekannte Grenze)
+        assert p1.load_errors == {"links.json": p1.load_errors["links.json"]}
+        assert "JSONDecodeError" in p1.load_errors["links.json"]
+        from src.feature_engineering.web_features import page_features
+        assert page_features(p1)["link_count"] == 0  # Wert bleibt 0, aber ausgewiesen
+
+    def test_intact_site_has_no_load_errors(self, tmp_path):
+        self._make_site(tmp_path)
+        sites = __import__("src.loaders.website_loader", fromlist=["load_websites_from_dir"]) \
+            .load_websites_from_dir(str(tmp_path))
+        assert all(p.load_errors == {} for p in sites[0].pages)
 
 
 # ── tabular_loader ───────────────────────────────────────────────────────────

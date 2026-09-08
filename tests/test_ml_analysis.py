@@ -38,3 +38,23 @@ class TestPrepareFeaturesContract:
         out, names = prepare_features(df)
         assert names == ["a"]
         assert out.shape == (1, 1)
+
+
+class TestNaNTargetHandling:
+    def test_nan_targets_dropped_not_trained(self):
+        from src.analysis.ml_analysis import run_classification
+        rng = np.random.default_rng(3)
+        df = pd.DataFrame({
+            "a": rng.normal(size=40),
+            "ziel": ["x"] * 15 + ["y"] * 15 + [None] * 10,  # 10 Zeilen ohne Ziel
+        })
+        res = run_classification(df, "ziel")
+        assert "error" not in res
+        assert res["n_dropped_nan_targets"] == 10
+        assert "nan" not in res["classes"] and set(res["classes"]) == {"x", "y"}
+
+    def test_all_targets_nan_returns_error_or_empty(self):
+        from src.analysis.ml_analysis import run_classification
+        df = pd.DataFrame({"a": [1.0, 2.0], "ziel": [None, None]})
+        res = run_classification(df, "ziel")
+        assert "error" in res or res.get("n_dropped_nan_targets") == 2

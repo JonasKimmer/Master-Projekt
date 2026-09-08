@@ -125,11 +125,11 @@ mehrfach reviewt (Code, Paper-Inhalt, Reproduzierbarkeit):
 
 ## Tests und Qualitätssicherung
 
-- `tests/` — 132 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
+- `tests/` — 143 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
   ohne `data/` selbst). Abgedeckt: Synchronisation, Segmentierung,
   Trial-/Alias-Verträge, Quality-Checks, ML-Vertragskern, UI-Pfade
   (Tabular-Filter, Missing-Report, Windows-Tab/Definitionsladen),
-  App-Module (windowing, sensor_features, web_features, Loader) sowie
+  App-Module (windowing, sensor_features, web_features, Loader, reporting, statistics) sowie
   alle vier Analyse-Skripte (inkl. Determinismus).
 - Neun Review-Runden über Code und Papers; alle gefundenen Crash-Bugs
   behoben, letzte offene Punkte siehe unten.
@@ -138,8 +138,7 @@ mehrfach reviewt (Code, Paper-Inhalt, Reproduzierbarkeit):
 
 ## Verbleibende Punkte (nice-to-have, nicht abgabe-blockierend)
 
-- Testabdeckung für `reporting` und `styles` — reine Darstellungs-/Export-
-  Pfade ohne Paper-Bezug
+- Testabdeckung für `styles` — reine CSS-Injektion ohne Logik
 - Klärung mit der Ursprungserhebung (nur vom Datenbesitzer möglich):
   TLX-Scoring-Richtung der Dimension 'Leistung', Aufgaben-Texte/-Antwort-
   format, Item-Anker, Geräte-Modelle (Tobii/Shimmer-Konfiguration)

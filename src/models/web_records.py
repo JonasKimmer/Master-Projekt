@@ -28,6 +28,7 @@ class PageRecord:
 
     screenshot_path: str | None = None      # absolute path to screenshot.png
     raw_html_path: str | None = None        # absolute path to raw.html / raw_html.json
+    load_errors: dict[str, str] = field(default_factory=dict)  # Artefakt → Fehlerursache (korrupt statt still 0)
 
     meta: dict[str, Any] = field(default_factory=dict)
 

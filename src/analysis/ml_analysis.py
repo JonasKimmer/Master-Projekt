@@ -68,6 +68,18 @@ def run_classification(df: pd.DataFrame, target_col: str) -> dict:
         return {"error": "No numeric feature columns left after excluding the target."}
     y_raw = df[target_col]
 
+    # Zeilen ohne Zielwert werden sichtbar verworfen statt als Klasse
+    # "nan" mitzutrainieren (NaN/nNone als String würde eine echte
+    # Modellklasse daraus machen).
+    nan_mask = y_raw.isna() | y_raw.astype(str).isin(("", "nan", "None"))
+    n_dropped = int(nan_mask.sum())
+    if n_dropped:
+        X, y_raw = X[~nan_mask], y_raw[~nan_mask]
+    if len(y_raw) == 0:
+        return {"error": f"Alle {n_dropped} Zeile(n) haben fehlende Zielwerte "
+                         f"in '{target_col}' — nichts trainierbar.",
+                "n_dropped_nan_targets": n_dropped}
+
     le = LabelEncoder()
     y = le.fit_transform(y_raw.astype(str))
 
@@ -83,6 +95,7 @@ def run_classification(df: pd.DataFrame, target_col: str) -> dict:
         "report": classification_report(y_test, y_pred, labels=sorted(set(y_test)), target_names=[le.classes_[i] for i in sorted(set(y_test))], output_dict=True, zero_division=0),
         "top_features": top_features,
         "classes": list(le.classes_),
+        "n_dropped_nan_targets": n_dropped,
     }
 
 

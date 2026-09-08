@@ -20,6 +20,17 @@ def render_website_tab() -> None:
     selected_id = st.selectbox("Website auswählen", website_ids, key="web_select")
     website = next(w for w in websites if w.website_id == selected_id)
 
+    # Korrupte statt fehlende Artefakte sichtbar machen — Nullwerte aus
+    # unlesbaren Dateien dürfen nicht als 'nicht gecrawlt' durchgehen
+    broken = {p.page_id: p.load_errors for p in website.pages if p.load_errors}
+    if broken:
+        with st.expander(f"⚠️ {len(broken)} Seite(n) mit unlesbaren Artefakten", expanded=False):
+            for page_id, errs in broken.items():
+                st.markdown(f"**Seite {page_id}**: " + ", ".join(
+                    f"`{name}` ({reason})" for name, reason in errs.items()))
+            st.caption("Diese Merkmale werden als 0 gezählt, obwohl die Datei "
+                       "existiert — Ursache prüfen statt als 'nicht gecrawlt' lesen.")
+
     inner_tab1, inner_tab2, inner_tab3 = st.tabs(["Seiten-Übersicht", "Features", "Screenshots"])
 
     # ── Page overview ─────────────────────────────────────────────────────────
