@@ -13,6 +13,23 @@ Bearbeitungszeit gilt in Usability-Studien häufig als Proxy für kognitive Bean
 
 ---
 
+## Abbildungsverzeichnis
+
+- **Abbildung 1** — NASA-TLX-Dimensionen nach Domäne (Boxplots, Abschnitt 4.1)
+- **Abbildung 2** — Kumulierte Bearbeitungszeit × Frustration / Mentale Anforderung (Abschnitt 4.3)
+
+## Tabellenverzeichnis
+
+- **Tabelle 1** — NASA-TLX-Scores nach Domäne (Abschnitt 4.1)
+- **Tabelle 2** — Bearbeitungszeit nach Domäne (Abschnitt 4.2)
+- **Tabelle 2b** — Bearbeitungszeit nach Aufgabenposition / Visualisierungstyp (Abschnitt 4.2)
+- **Tabelle 3** — Pearson-Korrelationen Bearbeitungszeit × NASA-TLX inkl. Korrekturverfahren (Abschnitt 4.3)
+- **Tabelle 4** — Deskriptive Statistik ausgewählter Sensorkanäle (Abschnitt 4.4)
+- **Tabelle 5** — Baseline-zentrierte Domänen-Deltas (Abschnitt 4.4)
+
+
+---
+
 ## 1. Einleitung
 
 ### 1.1 Motivation und Problemstellung

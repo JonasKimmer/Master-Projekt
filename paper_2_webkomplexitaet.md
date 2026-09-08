@@ -13,6 +13,25 @@ Automatisierte Verfahren zur Einschätzung von Website-Komplexität beschränken
 
 ---
 
+## Abbildungsverzeichnis
+
+- **Abbildung 1** — Merkmalsverteilungen über alle 47 Seiten (Abschnitt 4.1)
+- **Abbildung 2** — DOM-Tiefe × Linkanzahl nach Cluster (Abschnitt 4.2)
+
+## Tabellenverzeichnis
+
+- **Tabelle 1** — Merkmalsverteilung, N = 47 Seiten (Abschnitt 4.1)
+- **Tabelle 2** — Cluster-Charakteristika (Abschnitt 4.2)
+- **Tabelle 3** — Cluster-Verteilung nach Website (Abschnitt 4.2)
+- **Tabelle 4** — Klassifikationsgenauigkeit: Einzel-Split vs. Cross-Validation (Abschnitt 4.3)
+- **Tabelle 5** — Feature-Importance: MDI vs. Permutation (Abschnitt 4.3)
+- **Tabelle 6** — Merkmals-Mittelwerte je Website (Abschnitt 4.4)
+- **Tabelle 7** — Korrelation Antwortzeit × Strukturmerkmale (Abschnitt 4.6)
+- **Tabelle 8** — Antwortzeit nach Cluster und Website (Abschnitt 4.6)
+
+
+---
+
 ## 1. Einleitung
 
 ### 1.1 Motivation und Problemstellung
