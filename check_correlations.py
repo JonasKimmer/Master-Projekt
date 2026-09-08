@@ -238,6 +238,69 @@ def make_tlx_boxplot(data_dir: Path | str = DATA_DIR,
     plt.close(fig)
 
 
+TLX_DIMS = ("mentale", "koerperliche", "zeitliche", "leistung",
+            "anstrengung", "frustration")
+
+
+def tlx_table1(data_dir: Path | str = DATA_DIR) -> dict[str, dict[str, tuple[float, float]]]:
+    """Tabelle 1 (Paper 1): NASA-TLX-Mittel und Stichproben-SD je Domäne."""
+    import numpy as np
+
+    scores: dict[str, list[dict]] = {}
+    for trial in load_trials_from_dir(str(data_dir)):
+        for e in trial.events:
+            if e.label.lower() == "tlx:submit":
+                d = e.meta.get("domain")
+                s = e.meta.get("scores")
+                if d and isinstance(s, dict):
+                    scores.setdefault(d, []).append(s)
+    out: dict[str, dict[str, tuple[float, float]]] = {}
+    for d, lst in scores.items():
+        out[d] = {}
+        for dim in TLX_DIMS:
+            vals = np.array([s[dim] for s in lst
+                             if isinstance(s.get(dim), (int, float))], dtype=float)
+            out[d][dim] = (float(vals.mean()), float(vals.std(ddof=1)))
+    return out
+
+
+def familiarity_means(data_dir: Path | str = DATA_DIR) -> dict[str, tuple[float, float, int]]:
+    """Selbst eingeschätzte Domänenvertrautheit aus final:submit-Payload
+    (Paper 1, 3.1): {Domäne: (M, SD, n)}."""
+    import numpy as np
+
+    keys = {"gaming": "sa_gaming", "health": "sa_health", "city": "sa_smartcity"}
+    vals: dict[str, list[float]] = {k: [] for k in keys}
+    for trial in load_trials_from_dir(str(data_dir)):
+        for e in trial.events:
+            if e.label.lower() == "final:submit" and isinstance(e.meta.get("payload"), dict):
+                p = e.meta["payload"]
+                for d, key in keys.items():
+                    if isinstance(p.get(key), (int, float)):
+                        vals[d].append(float(p[key]))
+    return {d: (float(np.mean(v)), float(np.std(v, ddof=1)), len(v))
+            for d, v in vals.items() if v}
+
+
+def domain_order_balance(data_dir: Path | str = DATA_DIR) -> dict[int, dict[str, int]]:
+    """Lateinisches-Quadrat-Check (Paper 1, 3.1): Häufigkeit jeder Domäne
+    an jeder Blockposition laut domainOrder der trial:start-Events."""
+    import ast
+    from collections import Counter, defaultdict
+
+    per_trial: dict[str, list[str]] = {}
+    for trial in load_trials_from_dir(str(data_dir)):
+        for e in trial.events:
+            if e.label == "trial:start" and e.meta.get("domainOrder"):
+                per_trial.setdefault(trial.trial_id, e.meta["domainOrder"])
+    counts: dict[int, Counter] = defaultdict(Counter)
+    for do in per_trial.values():
+        doms = ast.literal_eval(do) if isinstance(do, str) else do
+        for pos, d in enumerate(doms[:3]):
+            counts[pos][d] += 1
+    return {pos + 1: dict(c) for pos, c in counts.items()}
+
+
 def _require_data() -> bool:
     if not DATA_DIR.exists():
         print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
@@ -253,6 +316,18 @@ def main() -> None:
     import numpy as np
     s, e = task_event_counts()
     print(f"task:start/-end gesamt: {s}/{e}")
+
+    print("\nTabelle 1 (NASA-TLX je Domäne, M (SD)):")
+    t1 = tlx_table1()
+    for dim in TLX_DIMS:
+        cells = [f"{t1[d][dim][0]:5.1f} ({t1[d][dim][1]:4.1f})"
+                 for d in ("gaming", "health", "city")]
+        print(f"  {dim:13} gaming {cells[0]} | health {cells[1]} | city {cells[2]}")
+
+    fam = familiarity_means()
+    print("\nVertrautheit (final:submit): " + ", ".join(
+        f"{d}: M={v[0]:.1f} (SD {v[1]:.1f}, n={v[2]})" for d, v in fam.items()))
+    print(f"DomainOrder-Balance: {domain_order_balance()}")
 
     print("\nTabelle 2-Nachbau (FIFO, aufgabenebene, Artefakte >600 s ausgeschlossen):")
     for d, row in sorted(task_level_table2().items()):

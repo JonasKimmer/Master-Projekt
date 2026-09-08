@@ -23,10 +23,10 @@ Bearbeitungszeit gilt in Usability-Studien häufig als Proxy für kognitive Bean
 - **Tabelle 1** — NASA-TLX-Scores nach Domäne (Abschnitt 4.1)
 - **Tabelle 2** — Bearbeitungszeit nach Domäne (Abschnitt 4.2)
 - **Tabelle 2b** — Bearbeitungszeit nach Aufgabenposition / Visualisierungstyp (Abschnitt 4.2)
-- **Tabelle 3** — Pearson-Korrelationen Bearbeitungszeit × NASA-TLX inkl. Korrekturverfahren (Abschnitt 4.3)
+- **Tabelle 3** — Pearson-Korrelationen Bearbeitungszeit × NASA-TLX (Abschnitt 4.3)
+- **Tabelle 3b** — Absicherung gegen Pseudoreplikation: Zentrierung, Bootstrap, Mixed-Model (Abschnitt 4.3)
 - **Tabelle 4** — Deskriptive Statistik ausgewählter Sensorkanäle (Abschnitt 4.4)
 - **Tabelle 5** — Baseline-zentrierte Domänen-Deltas (Abschnitt 4.4)
-
 
 ---
 
@@ -178,6 +178,8 @@ Abbildung 2 liefert einen Hinweis, der über die reinen r-Werte hinausgeht: Im l
 
 Um den Frustrations-Effekt gegen Pseudoreplikation abzusichern, wurde er zusätzlich innerhalb der Personen zentriert (Abzug des jeweiligen Personen-Mittelwerts von Dauer und Dimension) und per personen-geclustertem Bootstrap (5.000 Resamples, fester Seed; gezogen werden dabei Personen mitsamt aller ihrer Domänendurchläufe, mit Zurücklegen) sowie einem Mixed-Model (Random Intercept pro Person, statsmodels `MixedLM`) geprüft (Reproduktion: `check_mixed_model.py`):
 
+**Tabelle 3b: Absicherung gegen Pseudoreplikation — Zentrierung, Bootstrap und Mixed-Model**
+
 | Dimension | r (unkorrigiert) | 95 %-CI (Fisher-z) | r (zentriert) | 95 %-CI (Bootstrap) | Mixed-Model Slope [95 %-CI] | p |
 |---|---|---|---|---|---|---|
 | Frustration | 0,56 | [0,34, 0,72] | **0,52** | **[0,36, 0,70]** | 0,133 [0,074, 0,192] | **< 0,0001** |
@@ -254,7 +256,7 @@ Für die Forschung folgt ein doppelter Bedarf: eine Replikation mit größerer, 
 
 ## Daten- und Analyse-Verfügbarkeit
 
-Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. **Alle Kennzahlen und beide Abbildungen sind über die im Projekt versionskontrollierten Skripte reproduzierbar:** `check_correlations.py` (Korrelationen, Abbildungen 1 und 2, Tabellen 2 und 2b, Start-/End-Zählungen), `check_mixed_model.py` (Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabellen 4 und 5, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung; zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert.
+Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. **Alle Kennzahlen und beide Abbildungen sind über die im Projekt versionskontrollierten Skripte reproduzierbar:** `check_correlations.py` (Korrelationen, Abbildungen 1 und 2, Tabellen 1, 2 und 2b, Vertrautheitsmittel, DomainOrder-Balance, Start-/End-Zählungen), `check_mixed_model.py` (Tabelle 3b: Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabellen 4 und 5, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung; zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert.
 
 ---
 
