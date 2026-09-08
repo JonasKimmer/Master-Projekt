@@ -4,124 +4,168 @@ Gibt r-Werte aus und speichert zwei Scatterplots im Projekt-Root:
   paper1_scatter_frustration.png und paper1_scatter_mentale.png
 (Hinweis: figures/paper1_abb2_scatter_duration_tlx.png stammt aus einer
 älteren Analyseversion und wird von diesem Skript nicht geschrieben.)
+
+Event-Parsing läuft über den trial_loader-Vertrag (dieselben Timestamp-
+Aliase wie ts/timestamp/timestamp_ms/… und Label-Keys wie type/event/
+label/… wie in der gesamten App) — keine eigene Importlogik mehr, die
+bei Alias-Daten still leere Ergebnisse liefert.
+
+Bewusste Abweichung von der segmentation-FIFO-Paarung: Dauern werden
+mit 'neuester offener Start gewinnt' gerechnet (Restart-Annahme). Ein
+verwaister Start ohne End (z. B. T-3/city: 824 s Lücke vor dem ersten
+task:end) wird so verworfen statt der Taskdauer zugeschlagen. Das ist
+die Semantik, mit der die in Paper 1 berichteten Werte (r = 0,56 /
+0,03) berechnet wurden — Umstellen auf build_timeline würde diese
+Zahlen verschieben (r = 0,43 / -0,11).
 """
 
-import json
-import os
+from __future__ import annotations
+
 from pathlib import Path
-from scipy import stats
-import numpy as np
-import matplotlib.pyplot as plt
+
 import matplotlib
-matplotlib.rcParams['font.family'] = 'DejaVu Sans'
+matplotlib.use("Agg")  # Headless: Skript erzeugt Dateien, kein Fenster
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+from src.loaders.trial_loader import load_trials_from_dir
 
 DATA_DIR = Path("data")
 DOMAIN_MAP = {"gaming": "Gaming", "health": "Gesundheit", "city": "Stadtplanung"}
 COLORS = {"gaming": "#4C72B0", "health": "#55A868", "city": "#C44E52"}
 
-records = []
 
-for trial_dir in sorted(DATA_DIR.iterdir()):
-    events_file = trial_dir / "events.ndjson"
-    if not events_file.exists():
-        continue
+def collect_records(data_dir: Path | str = DATA_DIR) -> list[dict]:
+    """Pro Trial und Domain: kumulierte Taskdauer + TLX-Scores.
 
-    events = []
-    with open(events_file, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                try:
-                    events.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
+    Parsing über load_trials_from_dir (Alias-Vertrag). Nur Domains mit
+    sowohl Dauer (mindestens einem vollständigen Start/End-Paar) als
+    auch TLX-Submit landen im Ergebnis.
+    """
+    records: list[dict] = []
+    for trial in load_trials_from_dir(str(data_dir)):
+        # Taskdauer pro Domain; ein neuer task:start derselben Domain
+        # ersetzt einen noch offenen Start (Restart, siehe Modul-Docstring)
+        task_starts: dict[object, float] = {}
+        task_durations: dict[object, float] = {}
+        for e in trial.events:
+            domain = e.meta.get("domain")
+            if not domain:
+                continue
+            label = e.label.lower()
+            if label == "task:start":
+                task_starts[domain] = e.timestamp
+            elif label == "task:end" and domain in task_starts:
+                task_durations[domain] = (
+                    task_durations.get(domain, 0.0)
+                    + (e.timestamp - task_starts[domain]) / 1000.0
+                )
+                del task_starts[domain]
 
-    # TLX scores per domain
-    tlx = {}
-    for e in events:
-        if e.get("type") == "tlx:submit":
-            domain = e.get("domain")
-            if domain and "scores" in e:
-                tlx[domain] = e["scores"]
+        tlx: dict[object, dict] = {}
+        for e in trial.events:
+            if e.label.lower() == "tlx:submit":
+                domain = e.meta.get("domain")
+                scores = e.meta.get("scores")
+                if domain and isinstance(scores, dict):
+                    tlx[domain] = scores
 
-    # Task durations per domain (sum of all task segments)
-    task_starts = {}
-    task_durations = {}
-    for e in events:
-        domain = e.get("domain")
-        if not domain:
+        for domain, scores in tlx.items():
+            if domain in task_durations:
+                records.append({
+                    "trial": trial.trial_id,
+                    "domain": domain,
+                    "duration_s": task_durations[domain],
+                    "frustration": scores.get("frustration"),
+                    "mentale": scores.get("mentale"),
+                })
+    return records
+
+
+def complete_records(records: list[dict]) -> list[dict]:
+    """Nur Datensätze mit numerischen TLX-Werten (als float).
+
+    Fehlende Werte (None) oder nicht-numerische Einträge würden pearsonr
+    mit object-Arrays crashen bzw. still nan liefern — sie werden hier
+    sichtbar gefiltert statt mitzurechnen.
+    """
+    out: list[dict] = []
+    for r in records:
+        try:
+            frust, mentale = float(r["frustration"]), float(r["mentale"])
+        except (TypeError, ValueError):
             continue
-        if e.get("type") == "task:start":
-            task_starts[domain] = e["ts"]
-        elif e.get("type") == "task:end" and domain in task_starts:
-            dur = (e["ts"] - task_starts[domain]) / 1000  # ms → s
-            task_durations[domain] = task_durations.get(domain, 0) + dur
-            del task_starts[domain]
+        out.append({**r, "frustration": frust, "mentale": mentale})
+    return out
 
-    for domain in tlx:
-        if domain in task_durations:
-            records.append({
-                "trial": trial_dir.name,
-                "domain": domain,
-                "duration_s": task_durations[domain],
-                "frustration": tlx[domain].get("frustration"),
-                "mentale": tlx[domain].get("mentale"),
-            })
 
-print(f"Datenpunkte gesamt: {len(records)}")
+def main() -> None:
+    records = complete_records(collect_records(DATA_DIR))
+    print(f"Datenpunkte gesamt (mit vollständigen TLX-Werten): {len(records)}")
+    if len(records) < 2:
+        print("Zu wenige Datenpunkte für Korrelation — Abbruch.")
+        return
 
-durations = np.array([r["duration_s"] for r in records])
-frustrations = np.array([r["frustration"] for r in records])
-mentale = np.array([r["mentale"] for r in records])
+    durations = np.array([r["duration_s"] for r in records])
+    frustrations = np.array([r["frustration"] for r in records])
+    mentale = np.array([r["mentale"] for r in records])
 
-# Ausreißer entfernen (> 3 SD bei Dauer)
-mean_d, std_d = durations.mean(), durations.std()
-mask = np.abs(durations - mean_d) <= 3 * std_d
-print(f"Ausreißer entfernt: {(~mask).sum()}")
+    # Ausreißer entfernen (> 3 SD bei Dauer)
+    mean_d, std_d = durations.mean(), durations.std()
+    if std_d == 0:
+        mask = np.ones(len(durations), dtype=bool)
+    else:
+        mask = np.abs(durations - mean_d) <= 3 * std_d
+    print(f"Ausreißer entfernt: {(~mask).sum()}")
 
-d_clean = durations[mask]
-f_clean = frustrations[mask]
-m_clean = mentale[mask]
+    d_clean = durations[mask]
+    f_clean = frustrations[mask]
+    m_clean = mentale[mask]
 
-r_frust, p_frust = stats.pearsonr(d_clean, f_clean)
-r_mental, p_mental = stats.pearsonr(d_clean, m_clean)
+    r_frust, p_frust = stats.pearsonr(d_clean, f_clean)
+    r_mental, p_mental = stats.pearsonr(d_clean, m_clean)
 
-print(f"\nPearson r (Dauer × Frustration): r = {r_frust:.3f}, p = {p_frust:.4f}")
-print(f"Pearson r (Dauer × Mentale Last): r = {r_mental:.3f}, p = {p_mental:.4f}")
+    print(f"\nPearson r (Dauer × Frustration): r = {r_frust:.3f}, p = {p_frust:.4f}")
+    print(f"Pearson r (Dauer × Mentale Last): r = {r_mental:.3f}, p = {p_mental:.4f}")
 
-# ── Plot: zwei separate Bilder ────────────────────────────────────────────────
-domains_clean = [r["domain"] for r, m in zip(records, mask) if m]
+    # ── Plot: zwei separate Bilder ────────────────────────────────────────
+    domains_clean = [r["domain"] for r, m in zip(records, mask) if m]
 
-plots = [
-    ("frustration", "Frustration (0--100)", r_frust, "paper1_scatter_frustration.png"),
-    ("mentale",     "Mentale Anforderung (0--100)", r_mental, "paper1_scatter_mentale.png"),
-]
+    plots = [
+        ("frustration", "Frustration (0--100)", r_frust, "paper1_scatter_frustration.png"),
+        ("mentale",     "Mentale Anforderung (0--100)", r_mental, "paper1_scatter_mentale.png"),
+    ]
 
-for tlx_key, label, r_val, filename in plots:
-    fig, ax = plt.subplots(figsize=(8, 6))
-    scores_clean = np.array([r[tlx_key] for r, m in zip(records, mask) if m])
+    for tlx_key, label, r_val, filename in plots:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        scores_clean = np.array([r[tlx_key] for r, m in zip(records, mask) if m])
 
-    for domain, color in COLORS.items():
-        idx = [i for i, d in enumerate(domains_clean) if d == domain]
-        ax.scatter(d_clean[idx], scores_clean[idx],
-                   color=color, alpha=0.7, s=60, label=DOMAIN_MAP[domain])
-        if len(idx) >= 2:
-            m_fit, b_fit = np.polyfit(d_clean[idx], scores_clean[idx], 1)
-            x_line = np.linspace(d_clean[idx].min(), d_clean[idx].max(), 100)
-            ax.plot(x_line, m_fit * x_line + b_fit, color=color, alpha=0.5, linewidth=1.5)
+        for domain, color in COLORS.items():
+            idx = [i for i, d in enumerate(domains_clean) if d == domain]
+            ax.scatter(d_clean[idx], scores_clean[idx],
+                       color=color, alpha=0.7, s=60, label=DOMAIN_MAP[domain])
+            if len(idx) >= 2:
+                m_fit, b_fit = np.polyfit(d_clean[idx], scores_clean[idx], 1)
+                x_line = np.linspace(d_clean[idx].min(), d_clean[idx].max(), 100)
+                ax.plot(x_line, m_fit * x_line + b_fit, color=color, alpha=0.5, linewidth=1.5)
 
-    m_tot, b_tot = np.polyfit(d_clean, scores_clean, 1)
-    x_all = np.linspace(d_clean.min(), d_clean.max(), 100)
-    ax.plot(x_all, m_tot * x_all + b_tot, "k--", linewidth=2,
-            label=f"Gesamt (r = {r_val:.2f})")
+        m_tot, b_tot = np.polyfit(d_clean, scores_clean, 1)
+        x_all = np.linspace(d_clean.min(), d_clean.max(), 100)
+        ax.plot(x_all, m_tot * x_all + b_tot, "k--", linewidth=2,
+                label=f"Gesamt (r = {r_val:.2f})")
 
-    ax.set_xlabel("Kumul. Aufgabendauer (s)", fontsize=12)
-    ax.set_ylabel(label, fontsize=12)
-    ax.legend(fontsize=10)
-    ax.grid(True, linestyle="--", alpha=0.4)
-    ax.set_title(f"Taskdauer x {label.split(' ')[0]}  (N = {mask.sum()})", fontsize=12)
+        ax.set_xlabel("Kumul. Aufgabendauer (s)", fontsize=12)
+        ax.set_ylabel(label, fontsize=12)
+        ax.legend(fontsize=10)
+        ax.grid(True, linestyle="--", alpha=0.4)
+        ax.set_title(f"Taskdauer x {label.split(' ')[0]}  (N = {mask.sum()})", fontsize=12)
 
-    plt.tight_layout()
-    plt.savefig(filename, dpi=150, bbox_inches="tight")
-    print(f"Gespeichert: {filename}")
-    plt.close()
+        plt.tight_layout()
+        plt.savefig(filename, dpi=150, bbox_inches="tight")
+        print(f"Gespeichert: {filename}")
+        plt.close(fig)
+
+
+if __name__ == "__main__":
+    main()
