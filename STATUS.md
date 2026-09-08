@@ -80,18 +80,72 @@ Drei Slots, erweiterbar ohne Umbau:
 
 ---
 
-## Offene Arbeitspakete
+## Arbeitspakete — Gesamtstand
 
 | AP | Titel | Status |
 |---|---|---|
+| AP1 | Bestehende App modularisieren | ✅ abgeschlossen |
 | AP3 | Gemeinsames internes Datenmodell | ✅ abgeschlossen |
 | AP4 | Flexible Importschicht (Trials & Websites) | ✅ abgeschlossen |
 | AP5 | Task- und Segmentlogik für Experimente | ✅ abgeschlossen |
-| AP6 | Zeitfenster-Manager | ✅ abgeschlossen |
+| AP6 | Zeitfenster-Manager (versionierbar, AP6-Store) | ✅ abgeschlossen |
 | AP7 | Sensorfusion und zeitliche Verdichtung | ✅ abgeschlossen |
 | AP8 | Qualitätsprüfungen für multimodale Daten | ✅ abgeschlossen |
-| AP9 | Webcrawler-Modul integrieren | ✅ abgeschlossen |
+| AP9 | Webcrawler-Modul integriert (`mini_crawler.py`, robots.txt-konform) | ✅ abgeschlossen |
 | AP10 | Analysen für Webdaten | ✅ abgeschlossen |
-| AP11 | Neue Tabs in der Oberfläche | ✅ abgeschlossen |
-| AP12 | Export- und Reporting-Funktionen | ✅ abgeschlossen |
-| AP13 | Optionales ML-Modul | ⬜ niedrige Prio |
+| AP11 | Tabs der Oberfläche (Import · Inventar · Tabellarisch · Trials · Zeitfenster · Websites · Reporting · ML) | ✅ abgeschlossen |
+| AP12 | Export- und Reporting-Funktionen (CSV/Excel/JSON/Markdown) | ✅ abgeschlossen |
+| AP13 | Optionales ML-Modul (`src/ui/ml_tab.py`, `src/analysis/ml_analysis.py`) | ✅ umgesetzt (KMeans · IsolationForest · RandomForest-Klassifikation/-Regression) |
+
+Alle Arbeitspakete des Projektplans sind umgesetzt; Details zu AP1 und AP3 siehe oben.
+
+---
+
+## Papers und Analyse-Skripte
+
+Beide im Projektplan geforderten ~10-Seiten-Papers liegen vor und sind
+mehrfach reviewt (Code, Paper-Inhalt, Reproduzierbarkeit):
+
+- **`paper_1_kognitive_last.md`** — Kognitive Beanspruchung bei der
+  Exploration interaktiver Datenvisualisierungen. Alle Kennzahlen
+  reproduzierbar über `check_correlations.py` (Korrelationen, Abbildung 2,
+  Dauern je Aufgabenposition), `check_mixed_model.py` (Zentrierung,
+  personen-geclusterter Bootstrap, MixedLM) und `check_sensor_deltas.py`
+  (baseline-zentrierte Sensor-Deltas, Tabelle 4/5, Messraten). Benötigt
+  lokale `data/` (Datenschutz, s. Verfügbarkeitsstatement im Paper).
+- **`paper_2_webkomplexitaet.md`** — Strukturelle Webkomplexität gecrawlter
+  Webseiten. Vollständig aus dem Repo reproduzierbar über
+  `check_web_analysis.py` (Tabellen 1–6, k-Scan, Baseline,
+  Dekorrelations-Analyse, Feature-Importance, CV/Split, Bootstrap,
+  Cluster-Stabilität, beide Abbildungen; dokumentierte Seeds). Nicht
+  reproduzierbar: HTTP-Antwortzeit-Tabellen 7/8 (Messdaten nicht archiviert,
+  im Paper gekennzeichnet).
+
+---
+
+## Tests und Qualitätssicherung
+
+- `tests/` — 105 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
+  ohne `data/` selbst). Abgedeckt: Synchronisation, Segmentierung,
+  Trial-/Alias-Verträge, Quality-Checks, ML-Vertragskern, UI-Pfade
+  (Tabular-Filter, Missing-Report, Windows-Tab/Definitionsladen) sowie
+  alle vier Analyse-Skripte (inkl. Determinismus).
+- Neun Review-Runden über Code und Papers; alle gefundenen Crash-Bugs
+  behoben, letzte offene Punkte siehe unten.
+
+---
+
+## Verbleibende Punkte (nice-to-have, nicht abgabe-blockierend)
+
+- Testabdeckung für `windowing`, `sensor_features`, `web_features`,
+  `reporting` und die ungetesteten Loader (`website_loader`,
+  `tabular_loader`) — betrifft App-Pfade, nicht die Paper-Ergebnisse
+- pandas-4-Migration: `pd.api.types.is_categorical_dtype` in
+  `tabular_tab.py` ist deprecated (löst Warnung aus, Aufruf funktioniert noch)
+- Paper 2, optional: StratifiedKFold-/Log-Transform-Robustheitsvarianten
+  und balancierte Klassifikationsmetriken nachreichen
+- Paper 1: kein erzeugendes Skript für Abbildung 1 (`figures/
+  paper1_abb1_tlx_boxplot.png`) — im Paper nicht als reproduzierbar
+  deklariert
+- Repo-Hygiene: verwaiste `worktree-agent-*`-Branches, `figures/old/`,
+  `app.md` (veraltete Plan-Kopie)
