@@ -208,7 +208,7 @@ Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die h�
 
 k = 3 liefert nicht den höchsten Score, k = 6 schneidet besser ab. Die Wahl ist primär durch Vergleichbarkeit mit der dreiteiligen Datenbasis motiviert, nicht durch datengetriebene Optimierung. Diese Einschränkung wird hier explizit gemacht statt verschwiegen.
 
-**Cluster-Stabilität:** Über 50 Wiederholungen mit dokumentierten Zufallssaaten (aus `default_rng(0)`) ergibt sich ein mittlerer ARI von 0,986 (Minimum 0,717). Die Lösung ist algorithmisch sehr stabil und, anders als die k-Wahl, kein Zufallsartefakt. (Frühere Angaben von 0,997/0,935 beruhten auf undokumentierten Saaten; die Werte sind seed-abhängig, berichtet wird die reproduzierbare Variante.)
+**Cluster-Stabilität:** Über 50 Wiederholungen mit dokumentierten Zufallssaaten (aus `default_rng(0)`) ergibt sich ein mittlerer ARI von 0,986 (Minimum 0,717). Die Lösung ist algorithmisch sehr stabil und, anders als die k-Wahl, kein Zufallsartefakt; die Werte sind seed-abhängig, durch die dokumentierten Saaten aber reproduzierbar.
 
 **Silhouette-Bootstrap:** 1.000 Resamples ergeben einen Mittelwert von 0,472, 95%-CI [0,380, 0,566]. Der Punktschätzer 0,433 liegt am unteren Rand. Die „gut"-Schwelle von 0,5 wird auch im Bootstrap-Mittel nicht sicher erreicht.
 
@@ -222,7 +222,7 @@ k = 3 liefert nicht den höchsten Score, k = 6 schneidet besser ab. Die Wahl ist
 
 Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erklären. Das ist ein internes Gütekriterium. Als unabhängige Gegenprobe wurde die HTTP-Antwortzeit aller 47 Seiten gemessen und gegen Strukturmerkmale und Clusterzugehörigkeit getestet.
 
-*Provenienz-Hinweis: Die Einzelmessungen (3 Wiederholungen je Seite, Median) wurden seinerzeit nicht als Datei archiviert und sind nicht mehr auffindbar; die folgenden Werte stammen aus der verlorenen Messung und lassen sich aus dem Projektstand nicht erneut prüfen. Sie werden der Vollständigkeit halber berichtet und als nicht reproduzierbar gekennzeichnet (vgl. Verfügbarkeitsstatement).*
+*Provenienz-Hinweis: Die Einzelmessungen (3 Wiederholungen je Seite, Median) wurden nicht als Datei archiviert und sind nicht mehr auffindbar; die folgenden Werte stammen aus der verlorenen Messung und lassen sich aus dem Projektstand nicht erneut prüfen. Sie werden der Vollständigkeit halber berichtet und als nicht reproduzierbar gekennzeichnet (vgl. Verfügbarkeitsstatement).*
 
 **Tabelle 7: Korrelation Antwortzeit × Strukturmerkmale**
 
@@ -266,7 +266,7 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 ### 5.3 Einschränkungen
 
-**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale; seine Einzelmessungen wurden zudem nicht archiviert (4.6) und es deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility, Nutzereinschätzung fehlen). Insbesondere die *wahrgenommene* Komplexität, die Tuch et al. (2012) und Miniukovich und De Angeli (2014) als eigenständige, verhaltensrelevante Dimension belegen, wurde nicht erhoben — ob die strukturellen Merkmale abbilden, was Nutzende unter Komplexität verstehen, bleibt damit offen. Mit nur 3 Websites (47 Beobachtungen, die in drei Websites genestet statt unabhängig sind, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
+**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale und deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility, Nutzereinschätzung fehlen; zur verlorenen Messdatenkette s. 4.6). Insbesondere die *wahrgenommene* Komplexität, die Tuch et al. (2012) und Miniukovich und De Angeli (2014) als eigenständige, verhaltensrelevante Dimension belegen, wurde nicht erhoben — ob die strukturellen Merkmale abbilden, was Nutzende unter Komplexität verstehen, bleibt damit offen. Mit nur 3 Websites (47 Beobachtungen, die in drei Websites genestet statt unabhängig sind, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
 
 **Stichprobenauswahl:** Die drei Websites wurden nach unproblematischer robots.txt-Erlaubnis ausgewählt, eine Positivselektion, die restriktiver geschützte, oft strukturell komplexere Websites systematisch ausschließt (zu den in 5.2 diskutierten Erfassungslücken bei `media_count`/`form_count` vgl. 3.1). Zur datenoptimalen k-Wahl und ihrer bewussten Abweichung siehe 4.5.
 
