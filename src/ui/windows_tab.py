@@ -66,6 +66,7 @@ def render_windows_tab() -> None:
                 # längst geladenen Label folgt.
                 st.session_state.pop("win_task_label", None)
                 st.session_state.pop("_win_pending_task_label", None)
+                st.session_state.pop("_win_task_label_trial", None)
             st.info(
                 f"Definition '{loaded.window_id}' geladen "
                 f"(Modus {loaded.mode}, {int(loaded.duration_ms)} ms)."
@@ -120,12 +121,21 @@ def render_windows_tab() -> None:
             if seg_options:
                 option_labels = [f"{lbl} [{dom}]" if dom else lbl
                                  for lbl, dom in seg_options]
+                # Stale Task-Auswahl beim Trial-Wechsel zurücksetzen — nicht
+                # nur bei gespeicherten Definitionen: das Label des vorher
+                # gewählten Trials kann für den neuen ungültig (nicht in
+                # option_labels) oder schlicht falsch sein. Der Marker merkt
+                # sich, für welchen Trial die aktuelle Auswahl gilt.
+                if st.session_state.get("_win_task_label_trial") != trial_id:
+                    st.session_state.pop("win_task_label", None)
+                    st.session_state["_win_task_label_trial"] = trial_id
                 # Gespeichertes Task-Label validieren: existiert es im
                 # aktuell gewählten Trial überhaupt? Sonst zurücksetzen.
                 pending_label = st.session_state.pop("_win_pending_task_label", None)
                 if pending_label is not None:
                     if pending_label in option_labels:
                         st.session_state.win_task_label = pending_label
+                        st.session_state["_win_task_label_trial"] = trial_id
                     else:
                         st.session_state.pop("win_task_label", None)
                         st.info(

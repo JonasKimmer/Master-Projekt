@@ -12,8 +12,15 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.models.experiment_records import WindowDefinition  # noqa: E402
+from src.models.experiment_records import (  # noqa: E402
+    EventRecord,
+    EventType,
+    TrialRecord,
+    WindowDefinition,
+)
 from src.preprocessing.window_store import WindowDefinitionStore  # noqa: E402
+
+from conftest import make_fusion_stream, make_trial  # noqa: E402
 
 
 class TestWindowStoreVersioning:
@@ -194,3 +201,103 @@ class TestWindowsTabLoadDefinition:
         # Selectbox muss einen gültigen Wert zeigen (nicht das Geister-Label)
         valid = {"task [gaming]", "task [health]", "baseline"}
         assert at.selectbox(key="win_task_label").value in valid
+
+
+class TestTrialSwitchResetsTaskLabel:
+    """Review3 #2: beim Wechsel von Trial A zu Trial B muss die Task-Auswahl
+    zurückgesetzt werden — nicht nur beim Laden gespeicherter Definitionen.
+    Das Label von A kann für B ungültig oder schlicht falsch sein."""
+
+    def _trial_b(self) -> TrialRecord:
+        # T-B teilt EIN Label mit T-SYN ('task [gaming]') und hat ein
+        # eigenes ('task [city]'). Genau bei solchen Overlaps bleibt eine
+        # stale Auswahl unauffällig gültig — Streamlit resettet nur Werte,
+        # die in den Optionen des neuen Trials gar nicht existieren.
+        events = [
+            EventRecord(0.0, EventType.BASELINE_START, "baseline:start", {}),
+            EventRecord(500.0, EventType.BASELINE_END, "baseline:end", {}),
+            EventRecord(600.0, EventType.TASK_START, "task:start",
+                        {"domain": "city"}),
+            EventRecord(1400.0, EventType.TASK_END, "task:end",
+                        {"domain": "city"}),
+            EventRecord(1500.0, EventType.TASK_START, "task:start",
+                        {"domain": "gaming"}),
+            EventRecord(2900.0, EventType.TASK_END, "task:end",
+                        {"domain": "gaming"}),
+        ]
+        return TrialRecord("T-B", "/syn", events=events,
+                           streams=[make_fusion_stream()])
+
+    def test_switching_trial_resets_stale_task_selection(
+        self, tmp_path, monkeypatch
+    ):
+        monkeypatch.chdir(tmp_path)
+        from streamlit.testing.v1 import AppTest
+
+        at = AppTest.from_file(str(PROJECT_ROOT / "app.py"), default_timeout=120)
+        at.session_state["trials"] = [make_trial(), self._trial_b()]
+        at.run()
+        assert not at.exception
+
+        # Task-Modus aktivieren und bewusst ein Label von Trial A wählen
+        at.radio(key="win_mode").set_value("task")
+        at.run()
+        at.selectbox(key="win_task_label").set_value("task [gaming]")
+        at.run()
+        assert at.selectbox(key="win_task_label").value == "task [gaming]"
+
+        # Trial wechseln — die Auswahl von A darf nicht kleben bleiben,
+        # auch wenn 'task [gaming]' in T-B ebenfalls existiert
+        at.selectbox(key="win_trial").set_value("T-B")
+        at.run()
+        assert not at.exception, f"Trial-Wechsel crashte die App: {at.exception}"
+        stale = at.session_state["win_task_label"]
+        assert stale != "task [gaming]", \
+            f"Stale Task-Label von Trial A blieb im Session-State: {stale!r}"
+        assert at.selectbox(key="win_task_label").value == stale
+
+    def test_switching_trial_with_disjoint_labels_shows_valid_default(
+        self, tmp_path, monkeypatch
+    ):
+        # Labels von T-B existieren in T-A gar nicht: Auswahl muss auf
+        # einen gültigen Default von T-B fallen (kein Crash, kein Ghost).
+        monkeypatch.chdir(tmp_path)
+        from streamlit.testing.v1 import AppTest
+
+        trial_b = TrialRecord("T-B", "/syn", events=[
+            EventRecord(0.0, EventType.BASELINE_START, "baseline:start", {}),
+            EventRecord(900.0, EventType.BASELINE_END, "baseline:end", {}),
+        ], streams=[make_fusion_stream()])
+
+        at = AppTest.from_file(str(PROJECT_ROOT / "app.py"), default_timeout=120)
+        at.session_state["trials"] = [make_trial(), trial_b]
+        at.run()
+        at.radio(key="win_mode").set_value("task")
+        at.run()
+        at.selectbox(key="win_task_label").set_value("task [health]")
+        at.run()
+
+        at.selectbox(key="win_trial").set_value("T-B")
+        at.run()
+        assert not at.exception, f"Trial-Wechsel crashte die App: {at.exception}"
+        assert at.session_state["win_task_label"] == "baseline"
+        assert at.selectbox(key="win_task_label").value == "baseline"
+
+    def test_selection_survives_reruns_within_same_trial(
+        self, tmp_path, monkeypatch
+    ):
+        # Gegenprobe: innerhalb desselben Trials darf der Reset die
+        # manuelle Auswahl nicht bei jedem Rerun wegwerfen.
+        monkeypatch.chdir(tmp_path)
+        from streamlit.testing.v1 import AppTest
+
+        at = AppTest.from_file(str(PROJECT_ROOT / "app.py"), default_timeout=120)
+        at.session_state["trials"] = [make_trial()]
+        at.run()
+        at.radio(key="win_mode").set_value("task")
+        at.run()
+        at.selectbox(key="win_task_label").set_value("task [health]")
+        at.run()
+        at.run()  # erneuter Rerun ohne Interaktion
+        assert at.selectbox(key="win_task_label").value == "task [health]", \
+            "Auswahl wurde innerhalb desselben Trials zurückgesetzt"
