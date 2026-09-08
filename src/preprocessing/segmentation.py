@@ -36,11 +36,18 @@ _TYPE_MAP: dict[EventType, str] = {
 
 
 def _domain_of(meta: dict | None) -> str | None:
-    """Domain aus Event-Meta; leere Strings/Whitespace gelten als None."""
+    """Domain aus Event-Meta; leere Strings/Whitespace gelten als None.
+
+    Nicht-stringartige Werte (z. B. numerische Domains wie 1 und 2 aus
+    offenen Start-Events) werden zu Text normalisiert statt zu None —
+    sonst wären verschiedene Domains nicht unterscheidbar und ein Ende
+    könnte mit dem falschen Start gepaart werden.
+    """
     d = (meta or {}).get("domain")
-    if isinstance(d, str) and d.strip():
-        return d.strip()
-    return None
+    if d is None:
+        return None
+    text = d.strip() if isinstance(d, str) else str(d).strip()
+    return text or None
 
 
 def _base_label(label: str) -> str:

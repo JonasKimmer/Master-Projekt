@@ -87,6 +87,71 @@ class TestDomainPairing:
         assert tl.segments[0].domain == "gaming"
 
 
+class TestNumericDomainPairing:
+    """Review3 #3: nicht-stringartige Domains (z. B. 1 und 2 bei offenen
+    Starts) dürfen nicht wie fehlende Domains (None) behandelt werden,
+    sonst paart ein Ende fälschlich mit dem ersten fremden Start."""
+
+    def test_numeric_domains_do_not_cross_pair(self):
+        # Vorher: beide Starts wurden zu Domain None normalisiert → das END
+        # für Domain 2 paarte mit dem ältesten Start (Domain 1).
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": 1}),
+            _ev(50, EventType.TASK_START, "task:start", {"domain": 2}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": 2}),
+            _ev(150, EventType.TASK_END, "task:end", {"domain": 1}),
+        ]
+        tl = build_timeline("X", ev)
+        segs = sorted((s.start_ms, s.domain, s.is_complete) for s in tl.segments)
+        assert segs == [
+            (0, "1", True),    # END 150 gehört zu Start mit Domain 1
+            (50, "2", True),   # END 100 gehört zu Start mit Domain 2
+        ], f"Fehlpaarung numerischer Domains: {segs}"
+        # Verschachtelte Paarungen überlappen zeitlich zwangsläufig — die
+        # Overlap-Meldung ist korrekt; entscheidend ist, dass KEIN Event
+        # verwaist oder ungepaart bleibt.
+        assert not any("Orphaned" in i or "Missing END" in i
+                       for i in tl.quality_issues), tl.quality_issues
+
+    def test_numeric_domain_not_treated_as_missing(self):
+        # Ein END mit Domain 2 darf einen START ohne Domain nicht mehr
+        # beanspruchen, wenn ein START mit Domain 2 wartet.
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {}),        # keine Domain
+            _ev(50, EventType.TASK_START, "task:start", {"domain": 2}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": 2}),
+        ]
+        tl = build_timeline("X", ev)
+        segs = sorted((s.start_ms, s.domain, s.is_complete) for s in tl.segments)
+        assert segs == [(0, None, False), (50, "2", True)], \
+            f"START ohne Domain hat den END von Domain 2 gestohlen: {segs}"
+
+    def test_falsy_numeric_domain_zero_is_preserved(self):
+        # 0 ist ein gültiger Domain-Wert und darf nicht wie 'fehlend' wirken
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": 0}),
+            _ev(50, EventType.TASK_START, "task:start", {"domain": 7}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": 0}),
+        ]
+        tl = build_timeline("X", ev)
+        segs = sorted((s.start_ms, s.domain, s.is_complete) for s in tl.segments)
+        assert segs == [(0, "0", True), (50, "7", False)], \
+            f"Domain 0 wurde wie None behandelt: {segs}"
+
+    def test_numeric_and_string_domain_mixed_do_not_collide(self):
+        # Numerisch 1 und String "2" sind verschiedene Domains und dürfen
+        # nicht ineinander paarweise vermischt werden.
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": 1}),
+            _ev(50, EventType.TASK_START, "task:start", {"domain": "2"}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": "2"}),
+            _ev(150, EventType.TASK_END, "task:end", {"domain": 1}),
+        ]
+        tl = build_timeline("X", ev)
+        segs = sorted((s.start_ms, s.domain, s.is_complete) for s in tl.segments)
+        assert segs == [(0, "1", True), (50, "2", True)]
+
+
 class TestEventDensity:
     """Bug 9: Grenzereignisse dürfen nicht doppelt gezählt werden."""
 
