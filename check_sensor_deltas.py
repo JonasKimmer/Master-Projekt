@@ -77,6 +77,31 @@ def sensor_deltas(data_dir: Path | str = DATA_DIR) -> dict[str, dict[str, np.nda
     return {k: {d: np.array(v) for d, v in doms.items()} for k, doms in result.items()}
 
 
+def pooled_descriptives(data_dir: Path | str = DATA_DIR) -> dict[str, dict[str, float]]:
+    """Pooled deskriptive Statistik je Kanal über alle nicht-leeren Samples
+    aller Trials (Paper 1, Tabelle 4) — Pupillen je Auge getrennt."""
+    table4_channels = {
+        "Pupillendurchmesser links (mm)": "gaze.LeftPupilDiamMm",
+        "Pupillendurchmesser rechts (mm)": "gaze.RightPupilDiamMm",
+        "Hautleitwert (µS)": "shimmer.GsrConductanceUS",
+        "PPG-Rohsignal (mV)": "shimmer.PpgmV",
+    }
+    samples: dict[str, list[float]] = {k: [] for k in table4_channels}
+    for trial in load_trials_from_dir(str(data_dir)):
+        if not trial.streams:
+            continue
+        stream = trial.streams[0]
+        for label, c in table4_channels.items():
+            if c in stream.channels:
+                samples[label].extend(
+                    v for v in stream.channels[c] if v is not None)
+    return {
+        label: {"M": float(np.mean(v)), "SD": float(np.std(v, ddof=1)),
+                "min": float(np.min(v)), "max": float(np.max(v)), "n": len(v)}
+        for label, v in samples.items() if v
+    }
+
+
 def main() -> None:
     deltas = sensor_deltas(DATA_DIR)
     print(f"{'Kanal':26} {'Gaming Δ (SD)':>18} {'Gesundheit Δ (SD)':>20} {'Stadt Δ (SD)':>16}")
@@ -87,6 +112,11 @@ def main() -> None:
             cells.append(f"{v.mean():+.2f} ({v.std(ddof=1):.2f})" if len(v) else "–")
         ns = {d: len(doms.get(d, [])) for d in DOMAINS}
         print(f"{label:26} {cells[0]:>18} {cells[1]:>20} {cells[2]:>16}  n={ns}")
+
+    print("\nPooled deskriptive Statistik (alle gültigen Samples, alle Trials):")
+    for label, s in pooled_descriptives(DATA_DIR).items():
+        print(f"  {label:28} M={s['M']:8.2f} SD={s['SD']:6.2f} "
+              f"min={s['min']:7.2f} max={s['max']:7.2f} n={s['n']}")
 
 
 if __name__ == "__main__":
