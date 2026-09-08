@@ -91,6 +91,12 @@ def _timestamp_key_and_value(obj: dict[str, Any]) -> tuple[str | None, float | N
     return None, None
 
 
+def _is_timestamp_alias(key: str) -> bool:
+    """True, wenn der Schlüssel ein Timestamp-Alias ist (exakt oder in
+    normalisierter Form wie timestamp_ms / ts_ms / TimeMs)."""
+    return key in _TS_KEYS or _normalize_key(key) in _TS_KEYS_NORMALIZED
+
+
 def _extract_timestamp(obj: dict[str, Any]) -> float | None:
     return _timestamp_key_and_value(obj)[1]
 
@@ -107,15 +113,16 @@ def _extract_label(obj: dict[str, Any]) -> str:
 def _parse_events(path: str) -> list[EventRecord]:
     events: list[EventRecord] = []
     for obj in _read_ndjson(path):
-        ts_key, ts = _timestamp_key_and_value(obj)
+        ts = _extract_timestamp(obj)
         if ts is None:
             continue
         label = _extract_label(obj)
-        # Der tatsächlich konsumierte Timestamp-Schlüssel (auch in
-        # normalisierter Form wie timestamp_ms) wird aus meta entfernt —
-        # nicht nur die exakt geschriebenen _TS_KEYS.
+        # ALLE vorhandenen Timestamp-Aliase werden aus meta entfernt — auch
+        # die nicht ausgewählten (z. B. gleichzeitig 'ts' und 'timestamp_ms'
+        # in einer Zeile), und auch solche, deren Wert nicht konvertierbar
+        # war und deshalb einen anderen Alias zur Timestamp-Quelle machte.
         meta = {k: v for k, v in obj.items()
-                if k != ts_key and k not in ("event", "type", "label", "name")}
+                if not _is_timestamp_alias(k) and k not in ("event", "type", "label", "name")}
         events.append(EventRecord(
             timestamp=ts,
             event_type=_classify(label),

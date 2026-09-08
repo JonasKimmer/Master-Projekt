@@ -15,6 +15,7 @@ import pytest
 from src.loaders.trial_loader import (
     _extract_timestamp,
     _is_skippable,
+    _is_timestamp_alias,
     _parse_events,
     _parse_sensor_stream,
     load_trials_from_dir,
@@ -101,6 +102,52 @@ class TestTimestampKeys:
             os.unlink(path)
         assert len(events) == 2, "Events mit timestamp_ms-Schlüssel dürfen nicht verworfen werden"
         assert events[0].timestamp == 1000.0
+
+
+class TestMultipleTimestampAliases:
+    """Review3 #4: sind mehrere Timestamp-Aliase gleichzeitig vorhanden
+    (z. B. 'ts' UND 'timestamp_ms'), müssen ALLE aus EventRecord.meta
+    entfernt werden — nicht nur der tatsächlich ausgewählte Key."""
+
+    def test_simultaneous_aliases_both_removed_from_meta(self):
+        path = _write_ndjson([
+            {"ts": 1000, "timestamp_ms": 1000, "type": "task:start",
+             "domain": "gaming"},
+        ])
+        try:
+            events = _parse_events(path)
+        finally:
+            os.unlink(path)
+        assert events[0].timestamp == 1000.0
+        assert "ts" not in events[0].meta, \
+            f"nicht ausgewählter Alias 'ts' bleibt in meta: {events[0].meta}"
+        assert "timestamp_ms" not in events[0].meta, \
+            f"nicht ausgewählter Alias 'timestamp_ms' bleibt in meta: {events[0].meta}"
+        assert events[0].meta.get("domain") == "gaming"  # echte Meta bleiben
+
+    def test_invalid_preferred_alias_falls_back_and_cleans_all(self):
+        # 'timestamp' ist der bevorzugte Alias, aber nicht numerisch →
+        # Fallback auf 'ts'. Beide müssen aus meta verschwinden.
+        path = _write_ndjson([
+            {"timestamp": "not-a-number", "ts": 2000, "type": "task:end",
+             "note": "x"},
+        ])
+        try:
+            events = _parse_events(path)
+        finally:
+            os.unlink(path)
+        assert events[0].timestamp == 2000.0
+        assert "timestamp" not in events[0].meta, \
+            f"ungültiger bevorzugter Alias bleibt in meta: {events[0].meta}"
+        assert "ts" not in events[0].meta
+        assert events[0].meta.get("note") == "x"
+
+    def test_is_timestamp_alias_covers_exact_and_normalized_forms(self):
+        for key in ("ts", "t", "time", "timestamp", "Timestamp", "Time",
+                    "timestamp_ms", "timestampMs", "ts_ms", "TimeMs"):
+            assert _is_timestamp_alias(key), f"{key} nicht als Alias erkannt"
+        for key in ("domain", "value", "mytimestamp_signal", "heart_timestamp"):
+            assert not _is_timestamp_alias(key), f"{key} fälschlich als Alias erkannt"
 
 
 class TestRealDataRegression:
