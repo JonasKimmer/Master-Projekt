@@ -190,8 +190,11 @@ def synchronize_streams(
                    earliest end)
 
     All returned streams carry *identical* timestamps, so index-wise
-    comparison/merging is safe. Streams without timestamps are passed
-    through unchanged.
+    comparison/merging is safe. Streams without timestamps also receive
+    the shared grid (all channels None, meta flag
+    "empty_stream_grid_aligned") — the identical-timestamps contract
+    holds without exception. target_hz is validated up front, and the
+    grid-size guard applies to every stream, empty ones included.
     """
     if not streams:
         return []

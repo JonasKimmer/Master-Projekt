@@ -151,16 +151,44 @@ class TestEmptyStreamSyncGuards:
         with pytest.raises(ValueError, match="target_hz must be > 0"):
             synchronize_streams([empty], 0.0)
 
-    def test_empty_stream_with_huge_grid_raises_size_guard(self):
-        # 24 h @ 1000 Hz ≈ 86 Mio. Rasterpunkte: auch der Leere-Stream-Zweig
-        # (leerer Stream zuerst) muss den Größen-Guard auslösen, bevor das
-        # Raster tatsächlich materialisiert wird.
+    def test_empty_stream_with_huge_grid_raises_size_guard(self, monkeypatch):
+        # 24 h @ 1000 Hz ≈ 86 Mio. Rasterpunkte: der Leere-Stream-Zweig muss
+        # den Größen-Guard AUS EIGENER KRAFT auslösen. Damit beweisbar ist,
+        # dass nicht der resample_stream-Guard des Live-Streams feuert,
+        # wird resample_stream für diesen Test durch einen ungeschützten
+        # Stub ersetzt — als Fehlerquelle bleibt nur der Leere-Stream-Zweig.
+        # (Gegenprobe: ohne den Stub bestünde der Test auch dann, wenn der
+        # Leere-Stream-Zweig den Guard gar nicht hätte, weil der Live-Stream
+        # dasselbe Raster baut und dann mit ValueError aussteigt.)
         from src.models.experiment_records import SensorStreamRecord as SSR
 
+        def _unguarded_resample(stream, target_hz, **kwargs):
+            return stream  # kein Guard — nur der Leere-Stream-Zweig prüft
+
+        monkeypatch.setattr(
+            "src.preprocessing.synchronization.resample_stream", _unguarded_resample
+        )
         empty = SSR(source="leer", modality="m", timestamps=[], channels={"y": []})
         live = _stream([0.0, 86_400_000.0], {"v": [1.0, 2.0]})  # 24 h Spanne
         with pytest.raises(ValueError, match="Rasterpunkte"):
             synchronize_streams([empty, live], 1000.0)
+
+    def test_empty_stream_hz0_raises_even_with_unguarded_resample(self, monkeypatch):
+        # Dasselbe Isolationsmuster für target_hz=0: die Validierung muss
+        # greifen, bevor irgendein Raster gebaut wird — unabhängig davon,
+        # ob resample_stream selbst validieren würde.
+        from src.models.experiment_records import SensorStreamRecord as SSR
+
+        def _unguarded_resample(stream, target_hz, **kwargs):
+            return stream
+
+        monkeypatch.setattr(
+            "src.preprocessing.synchronization.resample_stream", _unguarded_resample
+        )
+        empty = SSR(source="leer", modality="m", timestamps=[], channels={"y": []})
+        live = _stream([100.0, 200.0], {"x": [1.0, 2.0]})
+        with pytest.raises(ValueError, match="target_hz must be > 0"):
+            synchronize_streams([live, empty], 0.0)
 
 
 class TestUnsortedTimestamps:
