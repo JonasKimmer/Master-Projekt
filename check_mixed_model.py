@@ -90,7 +90,17 @@ def mixed_model(df: pd.DataFrame, dim: str) -> dict:
     }
 
 
+def _require_data() -> bool:
+    if not DATA_DIR.exists():
+        print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
+              "Datenschutzgründen nicht Teil des Repos (s. Paper 1, "
+              "Verfügbarkeitsstatement). Skript wird übersprungen.")
+        return False
+    return True
+
 def main() -> None:
+    if not _require_data():
+        return
     df = build_frame(DATA_DIR)
     print(f"N = {len(df)} Domänendurchläufe von {df['person'].nunique()} Personen\n")
     print(f"{'Dimension':16} {'r':>6} {'CI (Fisher)':>16} {'r (zentriert)':>14} "

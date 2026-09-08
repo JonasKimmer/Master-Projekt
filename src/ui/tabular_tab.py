@@ -308,13 +308,28 @@ def _render_tab4(filtered_df: pd.DataFrame, numeric_df: pd.DataFrame) -> None:
                 if len(cat_cols) > 0:
                     group_col = cat_cols[0]
                     st.write(f"**Missing-Rate (%) gruppiert nach '{group_col}':**")
-                    missing_rates = filtered_df.groupby(group_col).apply(
+                    # dropna=False: Zeilen mit fehlender Gruppenzugehörigkeit
+                    # bilden eine eigene Gruppe statt still zu verschwinden.
+                    missing_rates = filtered_df.groupby(group_col, dropna=False).apply(
                         lambda x: x.isnull().mean() * 100
                     )
-                    st.dataframe(
-                        missing_rates[missing[missing > 0].index].style.format("{:.1f}%"),
-                        use_container_width=True,
-                    )
+                    # Hat die Gruppenspalte selbst fehlende Werte, fehlt sie
+                    # unter pandas 3 als Spalte im groupby-Ergebnis — nur
+                    # tatsächlich vorhandene Spalten anzeigen, statt zu
+                    # crashen. Ihre eigene Fehlerrate steht in der Tabelle
+                    # darüber ('Anzahl fehlend').
+                    show_cols = [c for c in missing[missing > 0].index
+                                 if c in missing_rates.columns]
+                    if show_cols:
+                        st.dataframe(
+                            missing_rates[show_cols].style.format("{:.1f}%"),
+                            use_container_width=True,
+                        )
+                    else:
+                        st.info(
+                            f"Fehlende Werte betreffen nur die Gruppenspalte "
+                            f"'{group_col}' selbst."
+                        )
             else:
                 st.success("Keine fehlenden Werte gefunden.")
 

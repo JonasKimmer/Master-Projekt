@@ -1,9 +1,8 @@
 """
 Berechnet Pearson-Korrelation: Taskdauer vs. NASA-TLX Frustration & Mentale Last.
-Gibt r-Werte aus und speichert zwei Scatterplots im Projekt-Root:
-  paper1_scatter_frustration.png und paper1_scatter_mentale.png
-(Hinweis: figures/paper1_abb2_scatter_duration_tlx.png stammt aus einer
-älteren Analyseversion und wird von diesem Skript nicht geschrieben.)
+Gibt r-Werte aus und speichert zwei Scatterplots im Projekt-Root
+(paper1_scatter_frustration.png, paper1_scatter_mentale.png) sowie die
+kombinierte Zwei-Panel-Abbildung figures/paper1_abb2_scatter_duration_tlx.png.
 
 Event-Parsing läuft über den trial_loader-Vertrag (dieselben Timestamp-
 Aliase wie ts/timestamp/timestamp_ms/… und Label-Keys wie type/event/
@@ -161,7 +160,17 @@ def position_durations(data_dir: Path | str = DATA_DIR) -> dict[str, list[float]
     return durs
 
 
+def _require_data() -> bool:
+    if not DATA_DIR.exists():
+        print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
+              "Datenschutzgründen nicht Teil des Repos (s. Paper 1, "
+              "Verfügbarkeitsstatement). Skript wird übersprungen.")
+        return False
+    return True
+
 def main() -> None:
+    if not _require_data():
+        return
     # Bearbeitungszeit je Aufgabenposition (= Visualisierungstyp, Tabelle 2b)
     import numpy as np
     durs = position_durations()

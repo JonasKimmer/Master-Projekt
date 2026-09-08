@@ -126,7 +126,17 @@ def effective_rates_and_validity(data_dir: Path | str = DATA_DIR) -> None:
     print(f"Pupillen-Validity == 1: {100.0 * ok / tot:.1f} % von {tot:,} Samples")
 
 
+def _require_data() -> bool:
+    if not DATA_DIR.exists():
+        print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
+              "Datenschutzgründen nicht Teil des Repos (s. Paper 1, "
+              "Verfügbarkeitsstatement). Skript wird übersprungen.")
+        return False
+    return True
+
 def main() -> None:
+    if not _require_data():
+        return
     deltas = sensor_deltas(DATA_DIR)
     print(f"{'Kanal':26} {'Gaming Δ (SD)':>18} {'Gesundheit Δ (SD)':>20} {'Stadt Δ (SD)':>16}")
     for label, doms in deltas.items():
