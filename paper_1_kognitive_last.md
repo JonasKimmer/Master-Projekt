@@ -219,6 +219,8 @@ Studien, die Bearbeitungszeit als kognitive Last interpretieren — und das ist 
 
 **Fehlende Sensor-TLX-Korrelation und Sensordatenqualität:** Die Sensordaten wurden nur baseline-korrigiert pro Domäne verglichen (4.4), nicht mit TLX-Scores korreliert; zudem gingen die Gültigkeitsflags der Pupillenmessung (16,5 % der Samples ungültig, s. 3.3) und Bewegungsartefakte nicht in die Bereinigung ein, und die 120 in 3.3 dokumentierten negativen Hautleitwert-Samples verblieben unkorrigiert in den Daten. Die effektive Blickpunkt-/Pupillenrate von 9,5 Hz (statt der nativen ~33 Hz) reduziert zusätzlich die zeitliche Auflösung der Augendaten.
 
+**Kein objektiver Aufgabenerfolg:** Ob Aufgaben korrekt gelöst wurden, wurde nicht aufgezeichnet — die Event-Logs enthalten keine Korrekt-/Falsch-Information. Die naheliegende Konfundierung „schwierige Aufgabe → längere Dauer und höhere Frustration" ist damit nicht kontrollierbar; die TLX-Dimension „Leistung" (Selbsteinschätzung) ist die einzige verfügbare Performanz-Indikation. Künftige Erhebungen sollten den Aufgabenerfolg protokollieren.
+
 **Selbstauskunfts-Bias:** Die Domänenvertrautheit wurde nur über Selbsteinschätzung erfasst (Verzerrungsrisiko, z. B. Dunning-Kruger-Effekt).
 
 **Retrospektive Erhebung:** Der NASA-TLX wurde ausschließlich am Ende jedes Domänenblocks erhoben. Kurzfristige Belastungsspitzen einzelner Aufgaben können im Blockmittel untergehen.
