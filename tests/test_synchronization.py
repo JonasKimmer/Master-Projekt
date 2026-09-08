@@ -16,7 +16,8 @@ from src.preprocessing.synchronization import (
     synchronize_streams,
     synchronize_trial,
 )
-from src.loaders.trial_loader import load_trial
+
+from conftest import make_trial
 
 
 def _stream(timestamps, channels, source="s", modality="m"):
@@ -60,9 +61,8 @@ class TestSharedGrid:
         with pytest.raises(ValueError, match="Überlappung"):
             synchronize_streams([a, b], 10.0, base="latest")
 
-    def test_synchronize_trial_modalities_share_grid(self):
-        t = load_trial("data/T-1")
-        parts = synchronize_trial(t, 10.0)
+    def test_synchronize_trial_modalities_share_grid(self, synthetic_trial):
+        parts = synchronize_trial(synthetic_trial, 10.0)
         assert len(parts) == 2
         assert parts[0].timestamps == parts[1].timestamps
 

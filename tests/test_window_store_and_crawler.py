@@ -100,13 +100,12 @@ class TestWindowsTabLoadDefinition:
     """Bug 5: Laden gespeicherter Definitionen darf keine
     StreamlitAPIException auslösen und muss die Werte anwenden."""
 
-    def test_save_and_load_via_app(self, tmp_path, monkeypatch):
+    def test_save_and_load_via_app(self, tmp_path, monkeypatch, synthetic_trial):
         monkeypatch.chdir(tmp_path)  # window_definitions.json ins tmp_dir
         from streamlit.testing.v1 import AppTest
-        from src.loaders.trial_loader import load_trial
 
         at = AppTest.from_file(str(PROJECT_ROOT / "app.py"), default_timeout=120)
-        at.session_state["trials"] = [load_trial(str(PROJECT_ROOT / "data/T-1"))]
+        at.session_state["trials"] = [synthetic_trial]
         at.run()
         assert not at.exception
 

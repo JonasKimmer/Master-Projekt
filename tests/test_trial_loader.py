@@ -20,6 +20,8 @@ from src.loaders.trial_loader import (
     load_trials_from_dir,
 )
 
+from conftest import DATA_DIR, requires_project_data
+
 
 def _write_ndjson(lines: list[dict]) -> str:
     fd, path = tempfile.mkstemp(suffix=".ndjson")
@@ -76,8 +78,9 @@ class TestTimestampKeys:
 
 
 class TestRealDataRegression:
+    @requires_project_data
     def test_18_trials_load_without_timestamp_channels(self):
-        trials = load_trials_from_dir("data")
+        trials = load_trials_from_dir(str(DATA_DIR))
         assert len(trials) == 18
         for t in trials:
             for s in t.streams:
