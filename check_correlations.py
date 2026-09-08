@@ -79,6 +79,7 @@ def collect_records(data_dir: Path | str = DATA_DIR) -> list[dict]:
                     "duration_s": task_durations[domain],
                     "frustration": scores.get("frustration"),
                     "mentale": scores.get("mentale"),
+                    "anstrengung": scores.get("anstrengung"),
                 })
     return records
 
@@ -90,14 +91,44 @@ def complete_records(records: list[dict]) -> list[dict]:
     mit object-Arrays crashen bzw. still nan liefern — sie werden hier
     sichtbar gefiltert statt mitzurechnen.
     """
+    dims = ("frustration", "mentale", "anstrengung")
     out: list[dict] = []
     for r in records:
         try:
-            frust, mentale = float(r["frustration"]), float(r["mentale"])
-        except (TypeError, ValueError):
+            coerced = {d: float(r[d]) for d in dims}
+        except (TypeError, ValueError, KeyError):
             continue
-        out.append({**r, "frustration": frust, "mentale": mentale})
+        out.append({**r, **coerced})
     return out
+
+
+def _scatter_panel(ax, records: list[dict], mask: np.ndarray, tlx_key: str,
+                   label: str, r_val: float) -> None:
+    """Ein Streudiagramm-Panel: Dauer × TLX-Dimension, farbig nach Domäne,
+    Regressionsgeraden je Domäne und gesamt."""
+    d_clean = np.array([r["duration_s"] for r, m in zip(records, mask) if m])
+    scores = np.array([r[tlx_key] for r, m in zip(records, mask) if m])
+    domains = [r["domain"] for r, m in zip(records, mask) if m]
+
+    for domain, color in COLORS.items():
+        idx = [i for i, d in enumerate(domains) if d == domain]
+        ax.scatter(d_clean[idx], scores[idx],
+                   color=color, alpha=0.7, s=60, label=DOMAIN_MAP[domain])
+        if len(idx) >= 2:
+            m_fit, b_fit = np.polyfit(d_clean[idx], scores[idx], 1)
+            x_line = np.linspace(d_clean[idx].min(), d_clean[idx].max(), 100)
+            ax.plot(x_line, m_fit * x_line + b_fit, color=color, alpha=0.5, linewidth=1.5)
+
+    m_tot, b_tot = np.polyfit(d_clean, scores, 1)
+    x_all = np.linspace(d_clean.min(), d_clean.max(), 100)
+    ax.plot(x_all, m_tot * x_all + b_tot, "k--", linewidth=2,
+            label=f"Gesamt (r = {r_val:.2f})")
+
+    ax.set_xlabel("Kumul. Aufgabendauer (s)", fontsize=12)
+    ax.set_ylabel(label, fontsize=12)
+    ax.legend(fontsize=10)
+    ax.grid(True, linestyle="--", alpha=0.4)
+    ax.set_title(f"Taskdauer x {label.split(' ')[0]}  (N = {int(mask.sum())})", fontsize=12)
 
 
 def main() -> None:
@@ -130,41 +161,31 @@ def main() -> None:
     print(f"Pearson r (Dauer × Mentale Last): r = {r_mental:.3f}, p = {p_mental:.4f}")
 
     # ── Plot: zwei separate Bilder ────────────────────────────────────────
-    domains_clean = [r["domain"] for r, m in zip(records, mask) if m]
-
-    plots = [
+    panels = [
         ("frustration", "Frustration (0--100)", r_frust, "paper1_scatter_frustration.png"),
         ("mentale",     "Mentale Anforderung (0--100)", r_mental, "paper1_scatter_mentale.png"),
     ]
 
-    for tlx_key, label, r_val, filename in plots:
+    for tlx_key, label, r_val, filename in panels:
         fig, ax = plt.subplots(figsize=(8, 6))
-        scores_clean = np.array([r[tlx_key] for r, m in zip(records, mask) if m])
-
-        for domain, color in COLORS.items():
-            idx = [i for i, d in enumerate(domains_clean) if d == domain]
-            ax.scatter(d_clean[idx], scores_clean[idx],
-                       color=color, alpha=0.7, s=60, label=DOMAIN_MAP[domain])
-            if len(idx) >= 2:
-                m_fit, b_fit = np.polyfit(d_clean[idx], scores_clean[idx], 1)
-                x_line = np.linspace(d_clean[idx].min(), d_clean[idx].max(), 100)
-                ax.plot(x_line, m_fit * x_line + b_fit, color=color, alpha=0.5, linewidth=1.5)
-
-        m_tot, b_tot = np.polyfit(d_clean, scores_clean, 1)
-        x_all = np.linspace(d_clean.min(), d_clean.max(), 100)
-        ax.plot(x_all, m_tot * x_all + b_tot, "k--", linewidth=2,
-                label=f"Gesamt (r = {r_val:.2f})")
-
-        ax.set_xlabel("Kumul. Aufgabendauer (s)", fontsize=12)
-        ax.set_ylabel(label, fontsize=12)
-        ax.legend(fontsize=10)
-        ax.grid(True, linestyle="--", alpha=0.4)
-        ax.set_title(f"Taskdauer x {label.split(' ')[0]}  (N = {mask.sum()})", fontsize=12)
-
+        _scatter_panel(ax, records, mask, tlx_key, label, r_val)
         plt.tight_layout()
         plt.savefig(filename, dpi=150, bbox_inches="tight")
         print(f"Gespeichert: {filename}")
         plt.close(fig)
+
+    # ── Kombinierte Zwei-Panel-Abbildung (Paper 1, Abbildung 2) ───────────
+    # figures/paper1_abb2_scatter_duration_tlx.png wird von diesem Skript
+    # erzeugt (früher: verwaistes Artefakt einer älteren Analyseversion).
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    _scatter_panel(ax1, records, mask, "frustration", "Frustration (0--100)", r_frust)
+    _scatter_panel(ax2, records, mask, "mentale", "Mentale Anforderung (0--100)", r_mental)
+    plt.tight_layout()
+    out = Path("figures") / "paper1_abb2_scatter_duration_tlx.png"
+    out.parent.mkdir(exist_ok=True)
+    plt.savefig(out, dpi=150, bbox_inches="tight")
+    print(f"Gespeichert: {out}")
+    plt.close(fig)
 
 
 if __name__ == "__main__":

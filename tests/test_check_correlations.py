@@ -81,18 +81,25 @@ class TestCompleteRecords:
     def test_none_scores_are_filtered(self):
         records = [
             {"trial": "A", "domain": "gaming", "duration_s": 60.0,
-             "frustration": 55, "mentale": 70},
+             "frustration": 55, "mentale": 70, "anstrengung": 40},
             {"trial": "B", "domain": "health", "duration_s": 30.0,
-             "frustration": None, "mentale": 40},   # fehlender TLX-Wert
+             "frustration": None, "mentale": 40, "anstrengung": 30},  # fehlender TLX-Wert
             {"trial": "C", "domain": "city", "duration_s": 45.0,
-             "frustration": 20, "mentale": None},
+             "frustration": 20, "mentale": None, "anstrengung": 30},
         ]
         complete = cc.complete_records(records)
         assert [r["trial"] for r in complete] == ["A"]
 
+    def test_missing_dimension_filters_record(self):
+        # Ein Record ohne 'anstrengung' ist unvollständig und fällt raus
+        records = [{"trial": "A", "domain": "gaming", "duration_s": 60.0,
+                    "frustration": 55, "mentale": 70}]
+        assert cc.complete_records(records) == []
+
     def test_numeric_strings_are_coerced(self):
         records = [{"trial": "A", "domain": "gaming", "duration_s": 60.0,
-                    "frustration": "55", "mentale": 70.5}]
+                    "frustration": "55", "mentale": 70.5, "anstrengung": "30"}]
         complete = cc.complete_records(records)
         assert complete[0]["frustration"] == 55.0
         assert complete[0]["mentale"] == 70.5
+        assert complete[0]["anstrengung"] == 30.0
