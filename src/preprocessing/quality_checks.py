@@ -17,6 +17,13 @@ _PLAUSIBILITY: dict[str, tuple[float, float]] = {
     "eda":              (0.0,   100.0),
     "gaze_x":           (-0.2,  1.2),     # normalised 0–1, allow slight overshoot
     "gaze_y":           (-0.2,  1.2),
+    # Neurons fused streams name the channels LeftX/RightX/LeftY/RightY;
+    # matching runs on the lowercased, separator-stripped channel name
+    # ("gaze.LeftX" → "gazeleftx"), so these keys must be substring-exact.
+    "leftx":            (-0.2,  1.2),
+    "rightx":           (-0.2,  1.2),
+    "lefty":            (-0.2,  1.2),
+    "righty":           (-0.2,  1.2),
     "pupil":            (1.0,   10.0),    # mm realistic pupil diameter
     "temperature":      (20.0,  45.0),    # °C skin
 }

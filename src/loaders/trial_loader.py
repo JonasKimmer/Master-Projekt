@@ -113,12 +113,20 @@ def _flatten(obj: dict[str, Any], prefix: str = "") -> dict[str, Any]:
     return result
 
 
-_SKIP_KEYS = {"rate_hz", "fresh_shimmer", "fresh_gaze", "ts_iso", "trialId", "FusionConf"}
+_SKIP_KEYS = {"rate_hz", "fresh_shimmer", "fresh_gaze", "ts_iso", "trialid", "fusionconf"}
+
+# Leaf names that are timestamps, not sensor signals (compared case-insensitively)
+_TIMESTAMP_SUFFIXES = ("timestampms", "timestamp", "ts_ms")
 
 
 def _is_skippable(key: str) -> bool:
-    base = key.split(".")[-1]  # last segment for skip-check
-    return key in _TS_KEYS or base in _TS_KEYS or base in _SKIP_KEYS
+    base = key.split(".")[-1].lower()  # last segment for skip-check
+    return (
+        key in _TS_KEYS
+        or base in _TS_KEYS
+        or base in _SKIP_KEYS
+        or base.endswith(_TIMESTAMP_SUFFIXES)
+    )
 
 
 def _parse_sensor_stream(path: str) -> SensorStreamRecord:
