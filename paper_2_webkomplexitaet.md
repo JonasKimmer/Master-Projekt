@@ -68,8 +68,8 @@ Das Analyse-Tool ist in Python implementiert (Streamlit-Oberfläche), liest Webs
 
 | Merkmal | Beschreibung |
 |---|---|
-| link_count | Anzahl ausgehender Links |
-| form_count | Anzahl Formularelemente |
+| link_count | Anzahl aller Link-Elemente (`<a href>`) der Seite, inkl. interner Navigation |
+| form_count | Anzahl `<form>`-Elemente |
 | media_count | Anzahl Medienelemente (Bilder, Videos) |
 | text_length | Zeichenanzahl des sichtbaren Texts |
 | dom_depth | Maximale Tiefe des DOM-Baums |
@@ -112,7 +112,7 @@ Das Analyse-Tool ist in Python implementiert (Streamlit-Oberfläche), liest Webs
 
 *Mittelwert ± SD der sechs Merkmale (text_length ÷ 100, dom_nodes ÷ 10 für Darstellbarkeit).*
 
-Abbildung 1 veranschaulicht die in Tabelle 1 berichteten Streuungsunterschiede grafisch. Die Fehlerbalken von `link_count` und `text_length` überdecken einen Großteil des Wertebereichs, während `dom_depth` sichtbar kompakt bleibt. Die Verteilungen zeigen extreme Rechtsschiefe bei `link_count` und `text_length`, denn einzelne Übersichtsseiten von bpb.de (bis zu 1.187 Links, das Maximum in Tabelle 1) treiben Mittelwert und SD deutlich über das Niveau der übrigen Seiten. `form_count` liegt nahe null (Ø 0,19), eine Folge des Formular-Erfassungsproblems bei wiesbaden.de (3.1). `media_count` ist dagegen durch den bpb.de-Artefakt (durchgängig 0) nach unten verzerrt, der Mittelwert von 6,02 stammt praktisch vollständig von hs-rm.de.
+Abbildung 1 veranschaulicht die in Tabelle 1 berichteten Streuungsunterschiede grafisch. Die Fehlerbalken von `link_count` und `text_length` überdecken einen Großteil des Wertebereichs, während `dom_depth` sichtbar kompakt bleibt. Die Verteilungen zeigen extreme Rechtsschiefe bei `link_count` und `text_length`, denn einzelne Übersichtsseiten von bpb.de (bis zu 1.187 Links, das Maximum in Tabelle 1) treiben Mittelwert und SD deutlich über das Niveau der übrigen Seiten. `form_count` liegt nahe null (M 0,19), eine Folge des Formular-Erfassungsproblems bei wiesbaden.de (3.1). `media_count` ist dagegen durch den bpb.de-Artefakt (durchgängig 0) nach unten verzerrt, der Mittelwert von 6,02 stammt praktisch vollständig von hs-rm.de.
 
 ### 4.2 Clustering: Automatisch identifizierte Seitentypen
 
@@ -127,7 +127,7 @@ Die K-Means-Analyse (k = 3) ergab drei Cluster mit einem Silhouette-Score von 0,
 | 1 | 6 | 395,0 | 15,7 | 28.589,2 | 0,0 | Hub-/Übersichtsseiten |
 | 2 | 11 | 217,3 | 15,3 | 10.831,3 | 19,6 | Medienreiche Seiten |
 
-Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriffe zu verstehen, nicht als validierte Kategorien. Es ergibt sich kein Cluster mit hohem `form_count`, eine direkte Folge des Formular-Erfassungsartefakts. Zur Website-Komposition der Cluster siehe Tabelle 3; sie ist bei der Interpretation aller Cluster-Charakteristika zu berücksichtigen.
+Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriffe zu verstehen, nicht als validierte Kategorien. Da `link_count` auch interne Navigation enthält (3.2), können hohe Werte sowohl inhaltliche Vielfalt als auch umfangreiche Navigations-/Footer-Strukturen abbilden — die Typisierung „Hub-/Übersichtsseiten" trägt diese Mehrdeutigkeit mit. Es ergibt sich kein Cluster mit hohem `form_count`, eine direkte Folge des Formular-Erfassungsartefakts. Zur Website-Komposition der Cluster siehe Tabelle 3; sie ist bei der Interpretation aller Cluster-Charakteristika zu berücksichtigen.
 
 **Tabelle 3: Cluster-Verteilung nach Website**
 

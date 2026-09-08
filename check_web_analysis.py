@@ -155,15 +155,18 @@ def make_figures(df: pd.DataFrame, labels, out_dir: Path = Path("figures")) -> N
     plt.close(fig)
 
     # Abbildung 2: DOM-Tiefe × Links nach Cluster mit Zentren
-    X = StandardScaler().fit_transform(df[FEATS])
+    scaler = StandardScaler()
+    X = scaler.fit_transform(df[FEATS])
     km = KMeans(n_clusters=3, random_state=SEED_KMEANS, n_init=10).fit(X)
+    # Zentren zurück in Roheinheiten transformieren — im z-Raum geplottet
+    # lägen die Sterne bei ~0 und damit weit außerhalb der Punktwolken
+    centers_raw = scaler.inverse_transform(km.cluster_centers_)
     fig, ax = plt.subplots(figsize=(8, 6))
     for c in range(3):
         m = labels == c
         ax.scatter(df.loc[m, "dom_depth"], df.loc[m, "link_count"],
                    s=45, alpha=0.75, label=f"Cluster {c}")
-    centers = km.cluster_centers_
-    ax.scatter(centers[:, FEATS.index("dom_depth")], centers[:, FEATS.index("link_count")],
+    ax.scatter(centers_raw[:, FEATS.index("dom_depth")], centers_raw[:, FEATS.index("link_count")],
                marker="*", s=350, color="black", label="Zentrum")
     ax.set_xlabel("dom_depth")
     ax.set_ylabel("link_count")
