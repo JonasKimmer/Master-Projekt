@@ -97,6 +97,8 @@ Alle berichteten Analysen sind über die Skripte `check_correlations.py`, `check
 
 Die **mentale Anforderung** liegt in allen Domänen auf nahezu identischem Niveau. Die Differenz (Δ = 1,7) ist angesichts der Streuung (SD ≈ 22–26) klein und ohne Signifikanztest nicht von Rauschen zu unterscheiden. **Frustration** weist die stärkste domänenabhängige Variation auf (Gaming vs. Stadt: Δ = 10,6). Die übrigen Dimensionen zeigen ähnliche Muster über alle Domänen und werden nicht weiter differenziert.
 
+Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchste Frustration** (M = 47,4) — allerdings rein deskriptiv und ohne Inferenztest. Die zweite Nebenfrage (Zusammenhang Dauer × TLX-Dimensionen) beantwortet Abschnitt 4.3.
+
 **Abbildung 1: NASA-TLX-Dimensionen nach Domäne**
 
 ![Abbildung 1: NASA-TLX-Boxplot](figures/paper1_abb1_tlx_boxplot.png)
