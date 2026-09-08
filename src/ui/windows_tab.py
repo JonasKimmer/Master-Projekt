@@ -53,11 +53,19 @@ def render_windows_tab() -> None:
             st.session_state.win_step = int(loaded.step_ms) if loaded.step_ms else 1000
             st.session_state.win_offset_start = int(loaded.offset_start_ms)
             st.session_state.win_offset_end = int(loaded.offset_end_ms)
-            if loaded.task_label:
+            if loaded.mode == "task" and loaded.task_label:
+                # Task-Label erst validieren, wenn die Segment-Optionen des
+                # aktuell gewählten Trials bekannt sind (siehe Task-Modus).
                 label = loaded.task_label
                 if loaded.task_domain:
                     label = f"{label} [{loaded.task_domain}]"
-                st.session_state.win_task_label = label
+                st.session_state["_win_pending_task_label"] = label
+            else:
+                # Fixed-/Sliding-Definition: veraltete Task-Auswahl
+                # zurücksetzen, damit der Task-Modus später nicht einem
+                # längst geladenen Label folgt.
+                st.session_state.pop("win_task_label", None)
+                st.session_state.pop("_win_pending_task_label", None)
             st.info(
                 f"Definition '{loaded.window_id}' geladen "
                 f"(Modus {loaded.mode}, {int(loaded.duration_ms)} ms)."
@@ -110,9 +118,23 @@ def render_windows_tab() -> None:
                 (s.label, s.domain or "") for s in task_timeline.segments
             })
             if seg_options:
+                option_labels = [f"{lbl} [{dom}]" if dom else lbl
+                                 for lbl, dom in seg_options]
+                # Gespeichertes Task-Label validieren: existiert es im
+                # aktuell gewählten Trial überhaupt? Sonst zurücksetzen.
+                pending_label = st.session_state.pop("_win_pending_task_label", None)
+                if pending_label is not None:
+                    if pending_label in option_labels:
+                        st.session_state.win_task_label = pending_label
+                    else:
+                        st.session_state.pop("win_task_label", None)
+                        st.info(
+                            f"Gespeichertes Task-Label '{pending_label}' kommt "
+                            "im gewählten Trial nicht vor — Auswahl zurückgesetzt."
+                        )
                 sel = st.selectbox(
                     "Task-Label",
-                    [f"{lbl} [{dom}]" if dom else lbl for lbl, dom in seg_options],
+                    option_labels,
                     key="win_task_label",
                 )
                 task_label, _, dom_part = sel.partition(" [")

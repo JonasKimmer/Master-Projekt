@@ -35,6 +35,14 @@ _TYPE_MAP: dict[EventType, str] = {
 }
 
 
+def _domain_of(meta: dict | None) -> str | None:
+    """Domain aus Event-Meta; leere Strings/Whitespace gelten als None."""
+    d = (meta or {}).get("domain")
+    if isinstance(d, str) and d.strip():
+        return d.strip()
+    return None
+
+
 def _base_label(label: str) -> str:
     """Strip start/end suffix to get a matchable base label."""
     lower = label.lower()
@@ -75,10 +83,10 @@ def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
 
     def _find_match(queue: list[EventRecord], end_domain) -> int | None:
         for i, s in enumerate(queue):
-            if s.meta.get("domain") == end_domain:
+            if _domain_of(s.meta) == end_domain:
                 return i
         for i, s in enumerate(queue):
-            if s.meta.get("domain") is None:
+            if _domain_of(s.meta) is None:
                 return i
         if end_domain is None and queue:
             return 0
@@ -92,7 +100,7 @@ def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
             pending_starts[base].append(event)
 
         elif event.event_type in _END_TYPES:
-            match_idx = _find_match(pending_starts[base], event.meta.get("domain"))
+            match_idx = _find_match(pending_starts[base], _domain_of(event.meta))
             if match_idx is not None:
                 start_event = pending_starts[base].pop(match_idx)
                 timeline.segments.append(Segment(
@@ -103,7 +111,7 @@ def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
                     start_event=start_event,
                     end_event=event,
                     # Domain bevorzugt vom Start-Event, sonst vom End-Event
-                    domain=(start_event.meta.get("domain") or event.meta.get("domain")),
+                    domain=(_domain_of(start_event.meta) or _domain_of(event.meta)),
                 ))
             else:
                 timeline.quality_issues.append(
@@ -121,7 +129,7 @@ def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
                 end_ms=None,
                 start_event=start_event,
                 end_event=None,
-                domain=start_event.meta.get("domain"),
+                domain=_domain_of(start_event.meta),
             ))
             timeline.quality_issues.append(
                 f"Missing END for segment '{base}' started at t={start_event.timestamp:.0f} ms"

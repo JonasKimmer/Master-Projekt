@@ -57,6 +57,35 @@ class TestDomainPairing:
         tl = build_timeline("X", ev)
         assert [(s.is_complete) for s in tl.segments] == [True]
 
+    def test_empty_domain_string_behaves_like_none(self):
+        # Review2 #7: "" / " " sind semantisch 'keine Domain' und müssen
+        # mit einem Ende mit echter Domain paaren können.
+        for empty in ("", "   "):
+            ev = [
+                _ev(0, EventType.TASK_START, "task:start", {"domain": empty}),
+                _ev(100, EventType.TASK_END, "task:end", {"domain": "gaming"}),
+            ]
+            tl = build_timeline("X", ev)
+            assert [(s.domain, s.is_complete) for s in tl.segments] == \
+                [("gaming", True)], f"domain={empty!r} wurde nicht wie None behandelt"
+            assert tl.quality_issues == []
+
+    def test_empty_domain_on_end_pairs_with_domain_start(self):
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": "gaming"}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": " "}),
+        ]
+        tl = build_timeline("X", ev)
+        assert [(s.domain, s.is_complete) for s in tl.segments] == [("gaming", True)]
+
+    def test_domain_values_are_trimmed(self):
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": "  gaming  "}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": "gaming"}),
+        ]
+        tl = build_timeline("X", ev)
+        assert tl.segments[0].domain == "gaming"
+
 
 class TestEventDensity:
     """Bug 9: Grenzereignisse dürfen nicht doppelt gezählt werden."""

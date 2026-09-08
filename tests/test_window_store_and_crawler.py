@@ -129,3 +129,68 @@ class TestWindowsTabLoadDefinition:
             f"Laden löste Exception aus: {at.exception}"
         assert at.radio(key="win_mode").value == "fixed"
         assert at.number_input(key="win_duration").value == 5000
+
+    def test_loading_non_task_definition_clears_stale_task_label(
+        self, tmp_path, monkeypatch, synthetic_trial
+    ):
+        """Review2 #6: eine Fixed-/Sliding-Definition muss eine vorherige
+        Task-Auswahl zurücksetzen, sonst klebt sie im UI-State fest."""
+        monkeypatch.chdir(tmp_path)
+        from streamlit.testing.v1 import AppTest
+
+        at = AppTest.from_file(str(PROJECT_ROOT / "app.py"), default_timeout=120)
+        at.session_state["trials"] = [synthetic_trial]
+        at.run()
+
+        # Task-Modus wählen → win_task_label wird gebunden und gesetzt
+        at.radio(key="win_mode").set_value("task")
+        at.run()
+        assert not at.exception
+        assert "win_task_label" in at.session_state
+
+        # Fixed-Definition speichern und laden
+        at.radio(key="win_mode").set_value("fixed")
+        at.text_input(key="win_def_name").set_value("fixeddef")
+        at.run()
+        at.button(key="win_def_save").click()
+        at.run()
+        at.button(key="win_def_load").click()
+        at.run()
+        assert not at.exception
+        assert "win_task_label" not in at.session_state, \
+            "Veraltete Task-Auswahl blieb nach Laden einer Fixed-Definition im State"
+
+    def test_loading_task_definition_with_unknown_label_resets(
+        self, tmp_path, monkeypatch, synthetic_trial
+    ):
+        """Review2 #6: Task-Definition, deren Label im Trial nicht existiert,
+        darf nicht crashen und muss die Auswahl zurücksetzen."""
+        monkeypatch.chdir(tmp_path)
+        import json as _json
+        # Store-Datei direkt mit einer Task-Definition für ein unbekanntes
+        # Label/Domain anlegen
+        (tmp_path / "window_definitions.json").write_text(_json.dumps({
+            "next_id": 2,
+            "definitions": [{
+                "id": 1, "name": "ghost", "version": 1,
+                "created_at": "2026-09-08T12:00:00",
+                "params": {"window_id": "ghost", "mode": "task", "duration_ms": 1000.0,
+                           "step_ms": None, "task_label": "task",
+                           "task_domain": "does-not-exist",
+                           "offset_start_ms": 0.0, "offset_end_ms": 0.0, "meta": {}},
+            }],
+        }), encoding="utf-8")
+
+        from streamlit.testing.v1 import AppTest
+        at = AppTest.from_file(str(PROJECT_ROOT / "app.py"), default_timeout=120)
+        at.session_state["trials"] = [synthetic_trial]
+        at.run()
+        assert not at.exception
+
+        at.button(key="win_def_load").click()  # einzige Definition auswählen & laden
+        at.run()
+        assert not at.exception, f"Unbekanntes Task-Label crashte die App: {at.exception}"
+        assert at.radio(key="win_mode").value == "task"
+        # Selectbox muss einen gültigen Wert zeigen (nicht das Geister-Label)
+        valid = {"task [gaming]", "task [health]", "baseline"}
+        assert at.selectbox(key="win_task_label").value in valid
