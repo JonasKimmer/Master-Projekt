@@ -64,6 +64,32 @@ class TestTimestampKeys:
         assert not _is_skippable("gaze.LeftX")           # echte Signale bleiben
         assert not _is_skippable("shimmer.GsrKOhm")
 
+    def test_signal_channels_with_timestamp_like_names_survive(self):
+        # Review2 #4: Suffix-Heuristik war zu aggressiv — Kanäle, die nur
+        # zufällig auf 'timestamp' enden, sind Signale und bleiben erhalten.
+        for keep in ("heart_timestamp", "beat.timestamp_ms_quality",
+                     "mytimestamp_signal"):
+            assert not _is_skippable(keep), f"{keep} fälschlich als Uhrfeld gefiltert"
+        # Compound-Uhrfelder bekannter Quellen bleiben gefiltert:
+        for skip in ("sample.timestamp_ms", "device.TimestampMs",
+                     "system.timestamp", "event.timestamp"):
+            assert _is_skippable(skip), f"{skip} sollte als Uhrfeld gefiltert werden"
+
+    def test_consumed_timestamp_key_removed_from_event_meta(self):
+        # Review2 #5: normalisierte Aliase müssen auch aus meta verschwinden
+        path = _write_ndjson([
+            {"timestamp_ms": 1000, "type": "task:start", "domain": "gaming"},
+            {"ts": 2000, "type": "task:end"},
+        ])
+        try:
+            events = _parse_events(path)
+        finally:
+            os.unlink(path)
+        assert "timestamp_ms" not in events[0].meta, \
+            f"timestamp_ms bleibt in meta: {events[0].meta}"
+        assert events[0].meta.get("domain") == "gaming"   # echte Meta bleiben
+        assert "ts" not in events[1].meta
+
     def test_events_file_with_only_timestamp_ms_key(self):
         path = _write_ndjson([
             {"timestamp_ms": 1000, "type": "task:start"},

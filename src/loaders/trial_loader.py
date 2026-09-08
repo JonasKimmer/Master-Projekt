@@ -71,22 +71,28 @@ def _normalize_key(key: str) -> str:
     return key.lower().replace("_", "").replace("-", "")
 
 
+def _timestamp_key_and_value(obj: dict[str, Any]) -> tuple[str | None, float | None]:
+    """
+    Liefert (Schlüssel, Wert) des Record-Timestamps einer Zeile.
+    Exakte Treffer zuerst (bestehende Priorität), danach normalisierte
+    Varianten wie timestamp_ms / timestampMs. Der Schlüssel wird mit
+    zurückgegeben, damit er konsistent aus meta entfernt werden kann.
+    """
+    candidates = [k for k in _TS_KEYS if k in obj]
+    candidates += [
+        k for k in obj
+        if k not in _TS_KEYS and _normalize_key(k) in _TS_KEYS_NORMALIZED
+    ]
+    for key in candidates:
+        try:
+            return key, float(obj[key])
+        except (TypeError, ValueError):
+            pass
+    return None, None
+
+
 def _extract_timestamp(obj: dict[str, Any]) -> float | None:
-    # Exakte Treffer zuerst (bestehende Priorität), danach normalisierte
-    # Varianten wie timestamp_ms / timestampMs.
-    for key in _TS_KEYS:
-        if key in obj:
-            try:
-                return float(obj[key])
-            except (TypeError, ValueError):
-                pass
-    for key in obj:
-        if _normalize_key(key) in _TS_KEYS_NORMALIZED and key not in _TS_KEYS:
-            try:
-                return float(obj[key])
-            except (TypeError, ValueError):
-                pass
-    return None
+    return _timestamp_key_and_value(obj)[1]
 
 
 def _extract_label(obj: dict[str, Any]) -> str:
@@ -101,12 +107,15 @@ def _extract_label(obj: dict[str, Any]) -> str:
 def _parse_events(path: str) -> list[EventRecord]:
     events: list[EventRecord] = []
     for obj in _read_ndjson(path):
-        ts = _extract_timestamp(obj)
+        ts_key, ts = _timestamp_key_and_value(obj)
         if ts is None:
             continue
         label = _extract_label(obj)
+        # Der tatsächlich konsumierte Timestamp-Schlüssel (auch in
+        # normalisierter Form wie timestamp_ms) wird aus meta entfernt —
+        # nicht nur die exakt geschriebenen _TS_KEYS.
         meta = {k: v for k, v in obj.items()
-                if k not in _TS_KEYS and k not in ("event", "type", "label", "name")}
+                if k != ts_key and k not in ("event", "type", "label", "name")}
         events.append(EventRecord(
             timestamp=ts,
             event_type=_classify(label),
@@ -131,9 +140,28 @@ def _flatten(obj: dict[str, Any], prefix: str = "") -> dict[str, Any]:
 
 _SKIP_KEYS = {"rate_hz", "fresh_shimmer", "fresh_gaze", "ts_iso", "trialid", "fusionconf"}
 
-# Leaf names that are timestamps, not sensor signals (case-insensitive und
-# separator-normalisiert: timestamp_ms/timestampMs/TimestampMs …)
-_TIMESTAMP_SUFFIXES = ("timestampms", "timestamp", "tsms", "timems")
+# Blattnamen, die genau einem Timestamp-Alias entsprechen (normalisiert):
+# ts, t, time, timestamp, timestamp_ms, ts_ms, timeMs, …
+_TS_LEAF_EXACT: set[str] = set(_TS_KEYS_NORMALIZED)
+
+# Zusammengesetzte Uhrfelder bekannter Quellen: <prefix>timestamp(ms).
+# Nur diese Präfixe gelten als Clock-Feld — Kanäle wie 'heart_timestamp'
+# sind Signale und bleiben erhalten.
+_TS_CLOCK_PREFIXES: tuple[str, ...] = (
+    "app", "system", "sample", "sensor", "frame", "record", "event",
+    "device", "capture", "unix", "epoch", "server", "client", "log",
+    "source", "sent", "receive",
+)
+
+
+def _is_clock_field(compact_leaf: str) -> bool:
+    if compact_leaf in _TS_LEAF_EXACT:
+        return True
+    return any(
+        compact_leaf == f"{prefix}{suffix}"
+        for prefix in _TS_CLOCK_PREFIXES
+        for suffix in ("timestampms", "timestamp")
+    )
 
 
 def _is_skippable(key: str) -> bool:
@@ -143,7 +171,7 @@ def _is_skippable(key: str) -> bool:
         key in _TS_KEYS
         or base in _TS_KEYS
         or base in _SKIP_KEYS
-        or compact.endswith(_TIMESTAMP_SUFFIXES)
+        or _is_clock_field(compact)
     )
 
 
