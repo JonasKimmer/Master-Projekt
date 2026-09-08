@@ -74,6 +74,7 @@ class Segment:
     end_ms: float | None                     # None if end event is missing
     start_event: EventRecord
     end_event: EventRecord | None = None
+    domain: str | None = None                # e.g. "gaming"/"health"/"city", from event meta
 
     @property
     def duration_ms(self) -> float | None:
@@ -118,6 +119,7 @@ class WindowDefinition:
     duration_ms: float
     step_ms: float | None = None            # sliding only
     task_label: str | None = None           # task mode only
+    task_domain: str | None = None          # task mode only: further restrict by domain
     offset_start_ms: float = 0.0           # shift relative to anchor
     offset_end_ms: float = 0.0
     meta: dict[str, Any] = field(default_factory=dict)

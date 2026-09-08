@@ -11,8 +11,9 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from src.analysis.reporting import window_features_to_dataframe
 from src.analysis.statistics import notable_windows
-from src.models.experiment_records import WindowDefinition
+from src.models.experiment_records import WindowDefinition, WindowFeatureRecord
 from src.preprocessing.segmentation import build_timeline_from_trial
 from src.preprocessing.synchronization import split_fusion_stream, resample_stream
 from src.preprocessing.window_store import WindowDefinitionStore
@@ -74,14 +75,24 @@ def render_windows_tab() -> None:
 
         step = None
         task_label = None
+        task_domain = None
         task_timeline = None
         if mode == "sliding":
             step = st.number_input("Schrittweite (ms)", min_value=100, value=1000, step=100, key="win_step")
         elif mode == "task":
             task_timeline = build_timeline_from_trial(trial)
-            labels_seg = list({s.label for s in task_timeline.segments})
-            if labels_seg:
-                task_label = st.selectbox("Task-Label", labels_seg, key="win_task_label")
+            # Segmente als "label [domain]" anbieten — Domain-Info aus Event-Meta
+            seg_options = sorted({
+                (s.label, s.domain or "") for s in task_timeline.segments
+            })
+            if seg_options:
+                sel = st.selectbox(
+                    "Task-Label",
+                    [f"{lbl} [{dom}]" if dom else lbl for lbl, dom in seg_options],
+                    key="win_task_label",
+                )
+                task_label, _, dom_part = sel.partition(" [")
+                task_domain = dom_part.rstrip("]") or None
             else:
                 st.warning("Trial hat keine Segmente (keine Events oder keine erkennbaren Start/End-Paare) — Task-Modus benötigt Event-Daten.")
 
@@ -102,6 +113,7 @@ def render_windows_tab() -> None:
                     duration_ms=float(duration),
                     step_ms=float(step) if step else None,
                     task_label=task_label,
+                    task_domain=task_domain,
                     offset_start_ms=float(offset_start),
                     offset_end_ms=float(offset_end),
                 )
@@ -126,7 +138,10 @@ def render_windows_tab() -> None:
                     st.session_state.win_offset_start = int(loaded.offset_start_ms)
                     st.session_state.win_offset_end = int(loaded.offset_end_ms)
                     if loaded.task_label:
-                        st.session_state.win_task_label = loaded.task_label
+                        label = loaded.task_label
+                        if loaded.task_domain:
+                            label = f"{label} [{loaded.task_domain}]"
+                        st.session_state.win_task_label = label
                     st.rerun()
 
     with col2:
@@ -139,6 +154,7 @@ def render_windows_tab() -> None:
                 duration_ms=float(duration),
                 step_ms=float(step) if step else None,
                 task_label=task_label,
+                task_domain=task_domain,
                 offset_start_ms=float(offset_start),
                 offset_end_ms=float(offset_end),
             )
@@ -152,10 +168,22 @@ def render_windows_tab() -> None:
                 st.warning("Keine Fenster generiert.")
             else:
                 st.info(f"{len(windows)} Fenster generiert.")
+                # WindowFeatureRecord je Fenster — das zentrale Modell (AP3),
+                # Export über reporting.window_features_to_dataframe
+                records: list[WindowFeatureRecord] = []
                 all_rows = []
                 for i, (start, end) in enumerate(windows):
                     sliced = slice_stream(stream, start, end)
                     feats = compute_window_features(sliced)
+                    if feats:
+                        records.append(WindowFeatureRecord(
+                            window_id=definition.window_id,
+                            trial_id=trial_id,
+                            modality=stream.modality,
+                            start_ms=start,
+                            end_ms=end,
+                            features=feats,
+                        ))
                     for ch, ch_feats in feats.items():
                         row = {"window": i, "start_ms": round(start), "end_ms": round(end), "channel": ch}
                         row.update(ch_feats)
@@ -176,12 +204,25 @@ def render_windows_tab() -> None:
                         )
                         df["reason"] = df["reason"].fillna("")
 
-                    st.download_button(
-                        "Features CSV",
-                        data=df.to_csv(index=False).encode(),
-                        file_name=f"{trial_id}_windows.csv",
-                        mime="text/csv",
-                        key=f"win_features_csv_{trial_id}",
-                    )
+                    # Breite Feature-Tabelle (eine Zeile pro Fenster) für
+                    # nachgelagerte Statistik / ML exportieren
+                    df_wide = window_features_to_dataframe(records)
+                    dl1, dl2 = st.columns(2)
+                    with dl1:
+                        st.download_button(
+                            "Features CSV (lang, mit Flags)",
+                            data=df.to_csv(index=False).encode(),
+                            file_name=f"{trial_id}_windows.csv",
+                            mime="text/csv",
+                            key=f"win_features_csv_{trial_id}",
+                        )
+                    with dl2:
+                        st.download_button(
+                            "Features CSV (breit, 1 Zeile/Fenster)",
+                            data=df_wide.to_csv(index=False).encode(),
+                            file_name=f"{trial_id}_windows_wide.csv",
+                            mime="text/csv",
+                            key=f"win_features_wide_csv_{trial_id}",
+                        )
                 else:
                     st.warning("Keine numerischen Merkmale berechenbar.")

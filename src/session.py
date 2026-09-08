@@ -15,11 +15,13 @@ import pandas as pd
 import streamlit as st
 
 from src.models.experiment_records import TrialRecord
+from src.models.records import DatasetRecord
 from src.models.web_records import WebsiteRecord
 
 _DEFAULT_FACTORIES: dict[str, Any] = {
     "tabular_df": lambda: None,
     "tabular_raw_json": lambda: None,
+    "tabular_record": lambda: None,
     "trials": list,
     "websites": list,
 }
@@ -33,10 +35,26 @@ def _init() -> None:
 
 # ── Tabular ──────────────────────────────────────────────────────────────────
 
-def set_tabular(df: pd.DataFrame, raw_json: Any = None) -> None:
+def set_tabular(df: pd.DataFrame, raw_json: Any = None, source_name: str = "") -> None:
     _init()
     st.session_state.tabular_df = df
     st.session_state.tabular_raw_json = raw_json
+    # DatasetRecord als typisierte Beschreibung des Uploads (AP3-Modell,
+    # DataFrame bleibt separat im Session-State wegen Serialisierung)
+    st.session_state.tabular_record = DatasetRecord(
+        name=source_name or "upload",
+        meta={
+            "n_rows": int(df.shape[0]),
+            "n_cols": int(df.shape[1]),
+            "columns": list(df.columns),
+            "has_raw_json": raw_json is not None,
+        },
+    )
+
+
+def get_tabular_record() -> DatasetRecord | None:
+    _init()
+    return st.session_state.tabular_record
 
 
 def get_tabular() -> tuple[pd.DataFrame | None, Any]:

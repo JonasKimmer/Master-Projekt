@@ -65,7 +65,7 @@ def _parse_raw_json(raw_bytes: bytes) -> object:
 if uploaded_file is not None:
     raw_json = _parse_raw_json(uploaded_file.getvalue()) if is_json_file(uploaded_file) else None
     df = load_data(uploaded_file)
-    set_tabular(df, raw_json)
+    set_tabular(df, raw_json, source_name=uploaded_file.name)
 
 # ── Main tabs ─────────────────────────────────────────────────────────────────
 (tab_tabular, tab_import, tab_inventory,

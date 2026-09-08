@@ -1,6 +1,9 @@
 """
 Berechnet Pearson-Korrelation: Taskdauer vs. NASA-TLX Frustration & Mentale Last.
-Gibt r-Werte aus und speichert neues Scatterplot unter figures/paper1_abb2_scatter_duration_tlx.png
+Gibt r-Werte aus und speichert zwei Scatterplots im Projekt-Root:
+  paper1_scatter_frustration.png und paper1_scatter_mentale.png
+(Hinweis: figures/paper1_abb2_scatter_duration_tlx.png stammt aus einer
+älteren Analyseversion und wird von diesem Skript nicht geschrieben.)
 """
 
 import json

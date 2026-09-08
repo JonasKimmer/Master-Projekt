@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from src.session import get_trials, get_websites, has_tabular, get_tabular
+from src.session import get_tabular_record, get_trials, get_websites, has_tabular, get_tabular
 
 
 def render_inventory_tab() -> None:
@@ -15,7 +15,11 @@ def render_inventory_tab() -> None:
     st.markdown("#### Tabellarische Daten")
     if has_tabular():
         df, _ = get_tabular()
+        record = get_tabular_record()
         st.success(f"1 Datei geladen — {df.shape[0]} Zeilen, {df.shape[1]} Spalten")
+        if record is not None:
+            with st.expander(f"DatasetRecord: {record.name}"):
+                st.json(record.meta)
     else:
         st.info("Keine tabellarischen Daten geladen.")
 

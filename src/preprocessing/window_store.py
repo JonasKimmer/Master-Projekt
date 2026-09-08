@@ -29,7 +29,7 @@ from src.models.experiment_records import WindowDefinition
 
 DEFAULT_STORE_PATH = Path("window_definitions.json")
 
-_FIELDS = ("window_id", "mode", "duration_ms", "step_ms", "task_label",
+_FIELDS = ("window_id", "mode", "duration_ms", "step_ms", "task_label", "task_domain",
            "offset_start_ms", "offset_end_ms", "meta")
 
 
@@ -51,6 +51,7 @@ def definition_from_dict(data: dict[str, Any]) -> WindowDefinition:
         duration_ms=float(data["duration_ms"]),
         step_ms=float(data["step_ms"]) if data.get("step_ms") is not None else None,
         task_label=data.get("task_label"),
+        task_domain=data.get("task_domain"),
         offset_start_ms=float(data.get("offset_start_ms") or 0.0),
         offset_end_ms=float(data.get("offset_end_ms") or 0.0),
         meta=data.get("meta") or {},

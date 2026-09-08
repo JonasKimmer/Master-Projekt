@@ -113,27 +113,39 @@ def check_stream(trial_id: str, stream: SensorStreamRecord, gap_threshold_ms: fl
         if n_missing > 0:
             ch_issues.append(f"{n_missing} missing value(s)")
 
-        # Channel outage: long consecutive identical values
+        # Channel outage: long consecutive identical non-null values.
+        # None-Runs zählen NICHT als Outage (sie sind schon in n_missing
+        # erfasst) – hier geht es um konstante, aber vorhandene Werte.
         # Skip binary channels (only 0/1) – validity flags are expected to be constant
         unique_vals = set(str(v) for v in values if v is not None)
         is_binary = unique_vals <= {"0", "1", "0.0", "1.0"}
         if not is_binary:
-            streak = 1
-            max_streak = 1
-            for i in range(1, len(values)):
-                if values[i] == values[i - 1]:
-                    streak += 1
-                    max_streak = max(max_streak, streak)
+            sentinel = object()
+            prev: object = sentinel
+            run = 0
+            max_streak = 0
+            for v in values:
+                if v is None:
+                    run = 0            # Lücke: kein Outage, zählt als n_missing
+                elif v == prev:
+                    run += 1
+                    max_streak = max(max_streak, run)
                 else:
-                    streak = 1
+                    run = 1
+                    max_streak = max(max_streak, run)
+                prev = v
             # Only flag if streak covers >5% of total samples and is at least 50 samples
             # (avoids false positives from sensor fusion at mismatched rates)
             outage_threshold = max(50, int(len(values) * 0.05))
             if max_streak >= outage_threshold:
                 ch_issues.append(f"Constant-value streak of {max_streak} samples (possible outage)")
 
-        # Duplicate count within channel (timestamps already checked globally)
-        n_dups = len(values) - len(set(str(v) for v in values))
+        # Duplicate Werte innerhalb des Kanals (ohne None — das ist n_missing);
+        # Hinweis: bei langsamen, gerundeten Signalen sind Wiederholungen normal,
+        # daher nur ein Metrik-Wert, kein Issue.
+        n_dups = len([v for v in values if v is not None]) - len(
+            set(str(v) for v in values if v is not None)
+        )
 
         report.channels.append(ChannelQuality(
             channel=ch_name,

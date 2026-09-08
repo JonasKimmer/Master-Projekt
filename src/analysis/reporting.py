@@ -21,6 +21,7 @@ def timeline_to_dataframe(timeline: TrialTimeline) -> pd.DataFrame:
         rows.append({
             "trial_id":     timeline.trial_id,
             "label":        seg.label,
+            "domain":       seg.domain or "",
             "type":         seg.segment_type,
             "start_ms":     seg.start_ms,
             "end_ms":       seg.end_ms,
