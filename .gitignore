@@ -13,3 +13,7 @@ __pycache__/
 
 # Fensterdefinitionen (AP6-Persistenz, nutzergeneriert)
 window_definitions.json
+.pytest_cache/
+
+# Claude Code Sitzungsdaten
+.claude/

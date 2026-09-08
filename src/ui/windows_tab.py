@@ -39,6 +39,30 @@ def render_windows_tab() -> None:
         st.info("Keine Trials geladen. → Tab 'Import'")
         return
 
+    # Gespeicherte Definition anwenden, BEVOR die Widgets erzeugt werden:
+    # Widget-gebundene Session-State-Keys dürfen nur vor der Instanziierung
+    # des Widgets gesetzt werden, sonst wirft Streamlit eine
+    # StreamlitAPIException. Der Load-Button setzt daher nur ein Flag
+    # (_win_pending_load) und löst einen Rerun aus; hier wird es angewandt.
+    pending_id = st.session_state.pop("_win_pending_load", None)
+    if pending_id is not None:
+        loaded = WindowDefinitionStore().load(pending_id)
+        if loaded is not None:
+            st.session_state.win_mode = loaded.mode
+            st.session_state.win_duration = int(loaded.duration_ms)
+            st.session_state.win_step = int(loaded.step_ms) if loaded.step_ms else 1000
+            st.session_state.win_offset_start = int(loaded.offset_start_ms)
+            st.session_state.win_offset_end = int(loaded.offset_end_ms)
+            if loaded.task_label:
+                label = loaded.task_label
+                if loaded.task_domain:
+                    label = f"{label} [{loaded.task_domain}]"
+                st.session_state.win_task_label = label
+            st.info(
+                f"Definition '{loaded.window_id}' geladen "
+                f"(Modus {loaded.mode}, {int(loaded.duration_ms)} ms)."
+            )
+
     st.subheader("Zeitfenster-Manager")
 
     col1, col2 = st.columns([1, 2])
@@ -130,19 +154,10 @@ def render_windows_tab() -> None:
             }
             sel_entry = st.selectbox("Gespeicherte Definitionen", list(entry_labels), key="win_def_sel")
             if st.button("Definition laden", key="win_def_load"):
-                loaded = store.load(entry_labels[sel_entry])
-                if loaded is not None:
-                    st.session_state.win_mode = loaded.mode
-                    st.session_state.win_duration = int(loaded.duration_ms)
-                    st.session_state.win_step = int(loaded.step_ms) if loaded.step_ms else 1000
-                    st.session_state.win_offset_start = int(loaded.offset_start_ms)
-                    st.session_state.win_offset_end = int(loaded.offset_end_ms)
-                    if loaded.task_label:
-                        label = loaded.task_label
-                        if loaded.task_domain:
-                            label = f"{label} [{loaded.task_domain}]"
-                        st.session_state.win_task_label = label
-                    st.rerun()
+                # Nur Flag setzen + Rerun — angewandt wird die Definition am
+                # Anfang des nächsten Runs, bevor die Widgets existieren.
+                st.session_state["_win_pending_load"] = entry_labels[sel_entry]
+                st.rerun()
 
     with col2:
         st.markdown("#### Ergebnisse")

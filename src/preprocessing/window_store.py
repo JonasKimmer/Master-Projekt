@@ -91,11 +91,12 @@ class WindowDefinitionStore:
         """
         if not name.strip():
             raise ValueError("Name für Fensterdefinition darf nicht leer sein.")
+        name = name.strip()  # Suche und Speicherung verwenden denselben Namen
         data = self._read()
         versions = [e["version"] for e in data["definitions"] if e["name"] == name]
         entry = {
             "id": data["next_id"],
-            "name": name.strip(),
+            "name": name,
             "version": max(versions, default=0) + 1,
             "created_at": datetime.now().isoformat(timespec="seconds"),
             "params": definition_to_dict(definition),
@@ -109,6 +110,7 @@ class WindowDefinitionStore:
         """All stored entries, newest first; optionally filtered by name."""
         entries = self._read()["definitions"]
         if name is not None:
+            name = name.strip()
             entries = [e for e in entries if e["name"] == name]
         return sorted(entries, key=lambda e: (-e["version"], -e["id"]))
 

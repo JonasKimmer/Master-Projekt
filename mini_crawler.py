@@ -27,12 +27,21 @@ import json
 import time
 import hashlib
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlsplit, urlunsplit, parse_qsl, urlencode
 import requests
 from bs4 import BeautifulSoup
 
 MAX_ASSET_DOWNLOADS = 20      # Obergrenze für shared_assets/-Downloads
 MAX_ASSET_BYTES = 5 * 1024 * 1024  # 5 MB pro Asset
+
+
+def normalize_url(url):
+    """Kanonische Form für De-duplizierung: Fragment entfernt, Query-
+    Parameter sortiert (a=1&b=2 == b=2&a=1), leerer Pfad → '/'."""
+    parts = urlsplit(url)
+    query = urlencode(sorted(parse_qsl(parts.query, keep_blank_values=True)))
+    path = parts.path or "/"
+    return urlunsplit((parts.scheme, parts.netloc, path, query, ""))
 
 
 def same_domain(url, root_domain):
@@ -246,7 +255,7 @@ def crawl(start_url, output_dir, max_pages=25, delay=1.0,
     pages_dir.mkdir(parents=True, exist_ok=True)
 
     visited = set()
-    queue = [start_url]
+    queue = [normalize_url(start_url)]
     page_num = 0
     results = []
     asset_refs = {}       # url -> {"type": ..., "pages": set()}
@@ -312,12 +321,9 @@ def crawl(start_url, output_dir, max_pages=25, delay=1.0,
             print(f"  [{page_num}] {url}  links={len(links)} forms={len(forms)} media={len(media)} text={len(text)}")
 
             for l in links:
-                href = l["href"]
+                href = normalize_url(l["href"])
                 if same_domain(href, root_domain) and href not in visited and href not in queue:
-                    # keep it simple: strip fragments/query for de-dup
-                    clean = href.split("#")[0]
-                    if clean not in visited and clean not in queue:
-                        queue.append(clean)
+                    queue.append(href)
 
             time.sleep(delay)
     finally:
