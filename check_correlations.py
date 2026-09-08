@@ -205,7 +205,6 @@ def make_tlx_boxplot(data_dir: Path | str = DATA_DIR,
                      out_path: Path = Path("figures/paper1_abb1_tlx_boxplot.png")) -> None:
     """Abbildung 1 (Paper 1): Boxplots der sechs NASA-TLX-Dimensionen je
     Domäne."""
-    import matplotlib.axes
     from src.loaders.trial_loader import load_trials_from_dir
 
     dims = ["mentale", "koerperliche", "zeitliche", "leistung", "anstrengung", "frustration"]

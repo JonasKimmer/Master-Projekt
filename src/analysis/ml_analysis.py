@@ -19,7 +19,6 @@ def prepare_features(df: pd.DataFrame, drop_cols: list[str] | None = None) -> tu
     zurückgegebene Liste muss exakt den Spalten der Matrix entsprechen,
     sonst verrutscht jede Index-Zuordnung (Feature-Importances etc.).
     """
-    exclude = set(drop_cols or [])
     numeric = df.select_dtypes(include="number").drop(
         columns=[c for c in (drop_cols or []) if c in df.columns], errors="ignore"
     )

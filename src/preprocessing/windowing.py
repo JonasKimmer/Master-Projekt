@@ -5,7 +5,6 @@ from __future__ import annotations
 import numpy as np
 
 from src.models.experiment_records import (
-    Segment,
     SensorStreamRecord,
     TrialTimeline,
     WindowDefinition,

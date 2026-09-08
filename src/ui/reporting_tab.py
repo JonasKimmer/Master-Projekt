@@ -17,7 +17,7 @@ from src.analysis.reporting import (
 from src.feature_engineering.web_features import pages_to_dataframe
 from src.preprocessing.quality_checks import check_trial
 from src.preprocessing.segmentation import build_timeline_from_trial
-from src.session import get_trials, get_websites, has_tabular, get_tabular
+from src.session import get_trials, get_websites
 
 
 def render_reporting_tab() -> None:
