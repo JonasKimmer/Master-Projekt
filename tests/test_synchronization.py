@@ -66,6 +66,42 @@ class TestSharedGrid:
         assert len(parts) == 2
         assert parts[0].timestamps == parts[1].timestamps
 
+    def test_synchronize_trial_multiple_source_streams_share_grid(self):
+        # Review2 #2: mehrere Trial-Streams mit unterschiedlichen Zeit-
+        # bereichen müssen auf EIN gemeinsames Raster, nicht pro Quell-
+        # Stream separat synchronisiert werden.
+        from src.models.experiment_records import TrialRecord
+        from conftest import make_fusion_stream
+
+        stream_a = make_fusion_stream(11, start_ms=0.0)      # 0–1000 ms
+        stream_b = make_fusion_stream(11, start_ms=500.0)    # 500–1500 ms
+        trial = TrialRecord("T2", "/syn", events=[], streams=[stream_a, stream_b])
+        parts = synchronize_trial(trial, 10.0)
+        assert len(parts) == 4  # 2 Streams × 2 Modalitäten
+        grids = {tuple(p.timestamps) for p in parts}
+        assert len(grids) == 1, f"Raster weichen ab: {[p.timestamps[:3] for p in parts]}"
+        assert parts[0].timestamps[0] == 0.0     # früher Start beider Quellen
+        assert parts[0].timestamps[-1] == 1500.0  # spätes Ende beider Quellen
+
+    def test_empty_stream_gets_shared_grid(self):
+        # Review2 #3: leere Streams dürfen den Shared-Grid-Vertrag nicht
+        # brechen — sie erhalten das gemeinsame Raster mit None-Kanälen.
+        from src.models.experiment_records import SensorStreamRecord as SSR
+
+        live = _stream([100.0, 200.0], {"x": [1.0, 2.0]})
+        empty = SSR(source="leer", modality="m", timestamps=[],
+                    channels={"y": []})
+        sa, sb = synchronize_streams([live, empty], 10.0)
+        assert sa.timestamps == sb.timestamps, \
+            "Leerer Stream hat kein gemeinsames Raster erhalten"
+        assert sb.channels["y"] == [None] * len(sb.timestamps)
+        assert sb.meta.get("empty_stream_grid_aligned") is True
+
+    def test_all_empty_streams_returns_empty_grid(self):
+        from src.models.experiment_records import SensorStreamRecord as SSR
+        empty = SSR(source="leer", modality="m", timestamps=[], channels={})
+        assert synchronize_streams([empty], 10.0)[0].timestamps == []
+
 
 class TestGapBoundaries:
     """Bug 2: echte Messpunkte an Lückengrenzen müssen erhalten bleiben."""

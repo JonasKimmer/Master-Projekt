@@ -191,7 +191,18 @@ def synchronize_streams(
     result: list[SensorStreamRecord] = []
     for s in streams:
         if not s.timestamps:
-            result.append(s)
+            # Leere Streams erhalten ebenfalls das gemeinsame Raster (alle
+            # Kanäle None), damit der Vertrag 'alle Rückgaben tragen
+            # identische Timestamps' ohne Ausnahme gilt.
+            step_ms = 1000.0 / target_hz
+            grid = np.arange(grid_start, grid_end + step_ms / 2.0, step_ms)
+            result.append(SensorStreamRecord(
+                source=s.source, modality=s.modality,
+                timestamps=[round(float(t), 6) for t in grid],
+                channels={c: [None] * len(grid) for c in s.channels},
+                sampling_rate_hz=target_hz,
+                meta={**s.meta, "empty_stream_grid_aligned": True},
+            ))
             continue
         result.append(resample_stream(
             s, target_hz, method=method,
@@ -206,11 +217,11 @@ def synchronize_trial(
     split_modalities: bool = True,
 ) -> list[SensorStreamRecord]:
     """
-    Convenience wrapper: split a trial's fusion stream(s) into modalities
-    and align them onto one shared uniform grid at ``target_hz``.
+    Convenience wrapper: split ALL of the trial's fusion stream(s) into
+    modalities and align them together onto ONE shared uniform grid —
+    also across multiple source streams with different time ranges.
     """
-    out: list[SensorStreamRecord] = []
+    parts: list[SensorStreamRecord] = []
     for s in trial.streams:
-        parts = split_fusion_stream(s) if split_modalities else [s]
-        out.extend(synchronize_streams(parts, target_hz))
-    return out
+        parts.extend(split_fusion_stream(s) if split_modalities else [s])
+    return synchronize_streams(parts, target_hz)
