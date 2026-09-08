@@ -37,7 +37,7 @@ Nebenfragestellungen: Welche Domäne erzeugt die höchste Frustration? Wie häng
 
 ### 2.1 Kognitive Last und subjektive Messung
 
-Sweller (1988) belegt anhand von Problemlöseexperimenten, dass die begrenzte Kapazität des Arbeitsgedächtnisses konventionelle Lösungsstrategien (z. B. Means-Ends-Analyse) mit dem Aufbau von Schemata konkurrieren lässt. Die heute gebräuchliche Unterscheidung in intrinsische, extrinsische und lernbezogene ("germane") kognitive Last wurde erst in der Weiterentwicklung der Theorie eingeführt (Paas et al., 2003). Für Datenvisualisierungen ist vor allem die extrinsische Last relevant: Ein unübersichtliches Dashboard zwingt Nutzende, mehr Ressourcen in die Entschlüsselung der Darstellung zu investieren. Der NASA-TLX (Hart & Staveland, 1988) ist das meistgenutzte Instrument zur subjektiven Workload-Erfassung; die vorliegende Studie verwendet dessen ungewichtete Roh-Version (Raw TLX, s. 3.2).
+Sweller (1988) belegt anhand von Problemlöseexperimenten, dass die begrenzte Kapazität des Arbeitsgedächtnisses konventionelle Lösungsstrategien (z. B. Means-Ends-Analyse) mit dem Aufbau von Schemata konkurrieren lässt. Die heute gebräuchliche Unterscheidung in intrinsische, extrinsische und lernbezogene ("germane") kognitive Last wurde erst in der Weiterentwicklung der Theorie eingeführt (Paas et al., 2003). Für Datenvisualisierungen ist vor allem die extrinsische Last relevant: Ein unübersichtliches Dashboard zwingt Nutzende, mehr Ressourcen in die Entschlüsselung der Darstellung zu investieren. Der NASA-TLX (Hart & Staveland, 1988) ist das meistgenutzte Instrument zur subjektiven Workload-Erfassung. In einer Retrospektive von 20 Jahren Nutzung dokumentiert Hart (2006), dass ein erheblicher Teil der Anwendungen die ungewichtete Roh-Version (Raw TLX) verwendet, die ohne die paarweisen Gewichtsvergleiche auskommt; die vorliegende Studie folgt dieser Konvention (s. 3.2).
 
 ### 2.2 Evaluation in der Informationsvisualisierung
 
@@ -45,7 +45,7 @@ Wie in der Informationsvisualisierung evaluiert wird, ist selbst Gegenstand syst
 
 ### 2.3 Physiologische Indikatoren
 
-Drei physiologische Messverfahren gelten als etablierte kontinuierliche Indikatoren kognitiver Beanspruchung: Pupillometrie, Hautleitwert und Herzrate via Photoplethysmographie (PPG). Hautleitwert misst die elektrische Leitfähigkeit der Haut, die mit Erregung steigt. PPG misst Blutvolumenänderungen über Lichtabsorption. Erste Arbeiten übertragen Pupillometrie bereits in den Visualisierungskontext: Toker und Conati (2017) zeigen in einer Vorstudie, dass Pupillendilatation kognitive Workload beim Lösen von Diagrammaufgaben (Balkendiagramme) abbilden kann. Alle drei Verfahren erfordern jedoch eine gesonderte Validierung gegenüber NASA-TLX-Scores; zudem ist die Pupille ein nur bedingt verlässlicher Indikator, solange mentale Anstrengung und allgemeine Erregung nicht getrennt werden können.
+Drei physiologische Messverfahren gelten als etablierte kontinuierliche Indikatoren kognitiver Beanspruchung (Beatty, 1982; Dawson et al., 2007): Pupillometrie, Hautleitwert und Herzrate via Photoplethysmographie (PPG). Hautleitwert misst die elektrische Leitfähigkeit der Haut, die mit Erregung steigt. PPG misst Blutvolumenänderungen über Lichtabsorption. Erste Arbeiten übertragen Pupillometrie bereits in den Visualisierungskontext: Toker und Conati (2017) zeigen in einer Vorstudie, dass Pupillendilatation kognitive Workload beim Lösen von Diagrammaufgaben (Balkendiagramme) abbilden kann. Alle drei Verfahren erfordern jedoch eine gesonderte Validierung gegenüber NASA-TLX-Scores; zudem ist die Pupille nach Mathôt (2018) ein nur bedingt verlässlicher Indikator, solange mentale Anstrengung und allgemeine Erregung nicht getrennt werden können.
 
 ### 2.4 Domänenvertrautheit
 
@@ -201,7 +201,7 @@ Die mentale Anforderung bleibt über alle Domänen praktisch konstant (Δ = 1,7 
 
 Frustration verhält sich gegenläufig zu dieser Stabilität und folgt auch nicht der erwarteten Vertrautheits-Logik: Gaming-Aufgaben erzeugten die höchste Frustration bei gleichzeitig höchster subjektiver Vertrautheit, Stadt-Aufgaben die niedrigste bei geringster Vertrautheit. Hohe Domänenvertrautheit schützt demnach nicht vor Frustration. Als alternative Erklärungen kommen mindestens drei Mechanismen in Betracht, die diese Daten nicht trennen können: (a) unterschiedliche Aufgabenschwierigkeit zwischen den Domänen, die nicht unabhängig validiert wurde; (b) emotional andere Besetztheit der Domäneninhalte (Spielerstatistiken vs. Patientendaten); (c) frustrationstreibende Interaktionseigenschaften gerade der Gaming-Darstellungen. Bemerkenswert ist zudem, dass die TLX-Dimension „Leistung" den stärksten Domänenunterschied aller Dimensionen aufweist (M = 49,7 in Stadt vs. 41,4/41,8) — gilt die Original-Konvention (hoher Wert = schlechtere Selbsteinschätzung, vgl. 3.2), geht die niedrigste Frustration also nicht mit der besten Leistungseinschätzung einher. Frustration und mentale Anforderung erweisen sich damit als empirisch trennbare Konstrukte, die nicht synonym als „kognitive Last" behandelt werden sollten.
 
-Das physiologische Nullergebnis aus 4.4 (keine domänenspezifischen Deltas für Pupille und Hautleitwert) kontrastiert mit Befunden wie denen von Toker und Conati (2017), die Pupillendilatation als Workload-Indikator bei Diagrammaufgaben in Ansätzen validierten. Ein naheliegender Grund für die Diskrepanz liegt in der Aggregation: Domänen-Blockmittel glätten kurzfristige Belastungsspitzen, und die vorliegende Erhebung kontrolliert weder Beleuchtung (Pupillometrie) noch Bewegungsartefakte (Handgelenk-GSR) — beide sind bekannte Störgrößen dieser Verfahren. Der gleichförmige Hautleitwert-Anstieg unter Aufgabe gegenüber der Baseline (+1,3 bis +1,8 µS in allen Domänen, Tabelle 5) ist zwar mit einem allgemeinen Erregungsanstieg konsistent, jedoch ohne Kontrollbedingung kausal nicht interpretierbar.
+Das physiologische Nullergebnis aus 4.4 (keine domänenspezifischen Deltas für Pupille und Hautleitwert) kontrastiert mit Befunden wie denen von Toker und Conati (2017), die Pupillendilatation als Workload-Indikator bei Diagrammaufgaben in Ansätzen validierten. Ein naheliegender Grund für die Diskrepanz liegt in der Aggregation: Domänen-Blockmittel glätten kurzfristige Belastungsspitzen, und die vorliegende Erhebung kontrolliert weder Beleuchtung (Pupillometrie) noch Bewegungsartefakte (Handgelenk-GSR) — beide sind bekannte Störgrößen dieser Verfahren (Dawson et al., 2007; Mathôt, 2018). Der gleichförmige Hautleitwert-Anstieg unter Aufgabe gegenüber der Baseline (+1,3 bis +1,8 µS in allen Domänen, Tabelle 5) ist zwar mit einem allgemeinen Erregungsanstieg konsistent, jedoch ohne Kontrollbedingung kausal nicht interpretierbar.
 
 ### 5.2 Bearbeitungszeit als partieller Belastungsindikator
 
@@ -217,7 +217,7 @@ Studien, die Bearbeitungszeit als kognitive Last interpretieren — und das ist 
 
 **Ausreißermanagement:** Die berichteten Korrelationen hängen vom Ausschlussentscheid ab (Robustheitsvermerk in Tabelle 3): Der Frustrations-Zusammenhang schwankt zwischen r = 0,43 und r = 0,56, je nachdem, welcher Ausreißer entfernt wird. Das Kriterium (>3 SD auf den Dauern) wurde nachträglich auf die Daten angewandt, nicht vorab festgelegt.
 
-**Fehlende Sensor-TLX-Korrelation und Sensordatenqualität:** Die Sensordaten wurden nur baseline-korrigiert pro Domäne verglichen (4.4), nicht mit TLX-Scores korreliert; zudem gingen die Gültigkeitsflags der Pupillenmessung (16,5 % der Samples ungültig, s. 3.3) und Bewegungsartefakte nicht in die Bereinigung ein, und die 120 in 3.3 dokumentierten negativen Hautleitwert-Samples verblieben unkorrigiert in den Daten. Die effektive Blickpunkt-/Pupillenrate von 9,5 Hz (statt der nativen ~33 Hz) reduziert zusätzlich die zeitliche Auflösung der Augendaten.
+**Fehlende Sensor-TLX-Korrelation und Sensordatenqualität:** Die Sensordaten wurden nur baseline-korrigiert pro Domäne verglichen (4.4), nicht mit TLX-Scores korreliert; zudem gingen die Gültigkeitsflags der Pupillenmessung (16,5 % der Samples ungültig, s. 3.3) und Bewegungsartefakte nicht in die Bereinigung ein, und die 120 in 3.3 dokumentierten negativen Hautleitwert-Samples verblieben unkorrigiert in den Daten — gemessen an den Publikationsstandards für elektrodermale Messungen (Boucsein et al., 2012) erfüllt die Sekundärdatenanalyse deren Anforderungen an Elektroden- und Artefaktdokumentation nicht. Die effektive Blickpunkt-/Pupillenrate von 9,5 Hz (statt der nativen ~33 Hz) reduziert zusätzlich die zeitliche Auflösung der Augendaten.
 
 **Kein objektiver Aufgabenerfolg:** Ob Aufgaben korrekt gelöst wurden, wurde nicht aufgezeichnet — die Event-Logs enthalten keine Korrekt-/Falsch-Information. Die naheliegende Konfundierung „schwierige Aufgabe → längere Dauer und höhere Frustration" ist damit nicht kontrollierbar; die TLX-Dimension „Leistung" (Selbsteinschätzung) ist die einzige verfügbare Performanz-Indikation. Künftige Erhebungen sollten den Aufgabenerfolg protokollieren.
 
@@ -243,13 +243,23 @@ Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligun
 
 ## Literatur
 
+Beatty, J. (1982). Task-evoked pupillary responses, processing load, and the structure of processing resources. *Psychological Bulletin, 91*(2), 276–292.
+
+Boucsein, W., Fowles, D. C., Grimnes, S., Ben-Shakhar, G., Roth, W. T., Dawson, M. E., & Filion, D. L. (2012). Publication recommendations for electrodermal measurements. *Psychophysiology, 49*(8), 1017–1034.
+
 Cohen, J. (1988). *Statistical Power Analysis for the Behavioral Sciences* (2nd ed.). Lawrence Erlbaum Associates.
+
+Dawson, M. E., Schell, A. M., & Filion, D. L. (2007). The electrodermal system. In *Handbook of psychophysiology* (3rd ed., pp. 159–181). Cambridge University Press.
+
+Hart, S. G. (2006). NASA-Task Load Index (NASA-TLX); 20 years later. *Proceedings of the Human Factors and Ergonomics Society Annual Meeting, 50*(9), 904–908.
 
 Hart, S. G., & Staveland, L. E. (1988). Development of NASA-TLX. *Advances in Psychology, 52*, 139–183.
 
 Isenberg, T., Isenberg, P., Chen, J., Sedlmair, M., & Möller, T. (2013). A systematic review on the practice of evaluating visualization. *IEEE Transactions on Visualization and Computer Graphics, 19*(12), 2818–2827.
 
 Lam, H., Bertini, E., Isenberg, P., Plaisant, C., & Carpendale, S. (2012). Empirical studies in information visualization: Seven scenarios. *IEEE Transactions on Visualization and Computer Graphics, 18*(9), 1520–1536.
+
+Mathôt, S. (2018). Pupillometry: Psychology, physiology, and function. *Journal of Cognition, 1*(1), Artikel 16.
 
 Paas, F., Renkl, A., & Sweller, J. (2003). Cognitive load theory and instructional design. *Educational Psychologist, 38*(1), 1–4.
 
