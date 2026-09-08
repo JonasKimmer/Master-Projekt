@@ -17,9 +17,10 @@ _PLAUSIBILITY: dict[str, tuple[float, float]] = {
     "eda":              (0.0,   100.0),
     "gaze_x":           (-0.2,  1.2),     # normalised 0–1, allow slight overshoot
     "gaze_y":           (-0.2,  1.2),
-    # Neurons fused streams name the channels LeftX/RightX/LeftY/RightY;
-    # matching runs on the lowercased, separator-stripped channel name
-    # ("gaze.LeftX" → "gazeleftx"), so these keys must be substring-exact.
+    # Neurons fused streams name the channels LeftX/RightX/LeftY/RightY.
+    # Matching ist EXAKT auf dem normalisierten Punkt-Segment des Kanal-
+    # namens ("gaze.LeftX" → Segment "leftx"), siehe
+    # _plausibility_for_channel — nicht per Substring über den Gesamtnamen.
     "leftx":            (-0.2,  1.2),
     "rightx":           (-0.2,  1.2),
     "lefty":            (-0.2,  1.2),
@@ -27,6 +28,28 @@ _PLAUSIBILITY: dict[str, tuple[float, float]] = {
     "pupil":            (1.0,   10.0),    # mm realistic pupil diameter
     "temperature":      (20.0,  45.0),    # °C skin
 }
+
+# Normalisierte Key-Form (klein, ohne '_'/'-') für exaktes Matching
+_PLAUSIBILITY_NORM: dict[str, tuple[float, float]] = {
+    k.replace("_", "").replace("-", ""): v for k, v in _PLAUSIBILITY.items()
+}
+
+
+def _plausibility_for_channel(ch_name: str) -> tuple[float, float] | None:
+    """
+    Plausibilitäts-Range für einen Kanalnamen, oder None.
+
+    Ein Kanal passt, wenn eines seiner Punkt-Segmente (normalisiert:
+    klein, ohne '_'/'-') EXAKT einem Key entspricht — 'gaze.LeftX' →
+    'leftx', 'heart_rate' → 'heartrate'. Bewusst kein Substring-Matching:
+    'hr' würde sonst auch 'hrv' (RMSSD in ms) und 'threshold' (Bool-Flag)
+    treffen und korrekte Daten als außerhalb der Range markieren.
+    """
+    for seg in ch_name.split("."):
+        norm = seg.lower().replace("_", "").replace("-", "").strip()
+        if norm in _PLAUSIBILITY_NORM:
+            return _PLAUSIBILITY_NORM[norm]
+    return None
 
 
 @dataclass
@@ -102,10 +125,9 @@ def check_stream(trial_id: str, stream: SensorStreamRecord, gap_threshold_ms: fl
         n_missing = sum(1 for v in values if v is None)
         n_out = 0
 
-        ch_lower = ch_name.lower().replace(".", "").replace("_", "")
-        plausible_key = next((k for k in _PLAUSIBILITY if k.replace("_", "") in ch_lower), None)
-        if plausible_key:
-            lo, hi = _PLAUSIBILITY[plausible_key]
+        plausible_range = _plausibility_for_channel(ch_name)
+        if plausible_range:
+            lo, hi = plausible_range
             n_out = sum(1 for v in values if v is not None and not (lo <= float(v) <= hi))
             if n_out > 0:
                 ch_issues.append(f"{n_out} value(s) outside plausible range [{lo}, {hi}]")
