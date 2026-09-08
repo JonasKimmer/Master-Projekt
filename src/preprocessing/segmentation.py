@@ -6,6 +6,7 @@ paired Segment objects. Handles missing end events gracefully.
 
 from __future__ import annotations
 
+import math
 import re
 from collections import defaultdict
 
@@ -42,12 +43,30 @@ def _domain_of(meta: dict | None) -> str | None:
     offenen Start-Events) werden zu Text normalisiert statt zu None —
     sonst wären verschiedene Domains nicht unterscheidbar und ein Ende
     könnte mit dem falschen Start gepaart werden.
+
+    Zahlenwertige Domains werden zusätzlich KANONISIERT, damit dieselbe
+    Domain unabhängig von der Schreibweise paarbar bleibt: 1, 1.0, "1",
+    "1.0", "01" und "1e0" fallen alle auf "1"; 1.5, "1.50" und "1.5"
+    auf "1.5". Nicht-numerische Strings bleiben unverändert (gaming ≠
+    health), NaN/Inf likewise.
     """
     d = (meta or {}).get("domain")
     if d is None:
         return None
-    text = d.strip() if isinstance(d, str) else str(d).strip()
-    return text or None
+    if isinstance(d, bool):
+        return str(d)  # True/False sind keine Zahlen-Domains
+    if isinstance(d, int):
+        return str(d)  # int direkt, ohne float-Umweg (Präzision erhalten)
+    text = str(d).strip()
+    if not text:
+        return None
+    try:
+        f = float(text)
+    except ValueError:
+        return text
+    if math.isnan(f) or math.isinf(f):
+        return text
+    return str(int(f)) if f.is_integer() else repr(f)
 
 
 def _base_label(label: str) -> str:

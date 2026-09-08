@@ -152,6 +152,73 @@ class TestNumericDomainPairing:
         assert segs == [(0, "1", True), (50, "2", True)]
 
 
+class TestDomainNumericCanonicalization:
+    """Review4: dieselbe Domain muss unabhängig von der Zahlendarstellung
+    paarbar bleiben — int 1, float 1.0, "1", "1.0", "01", "1e0" sind alle
+    Domain 1; 1.5, "1.50" sind Domain 1.5."""
+
+    CASES = [
+        (1, 1.0, "1"),
+        (1, "1", "1"),
+        ("1", 1.0, "1"),
+        ("1.0", 1, "1"),
+        ("01", 1.0, "1"),
+        ("1e0", 1, "1"),
+        (1.5, "1.50", "1.5"),
+        (-1, "-1.0", "-1"),
+        (-2.5, -2.5, "-2.5"),
+        ("1e3", 1000, "1000"),
+    ]
+
+    def test_equivalent_representations_pair(self):
+        from src.preprocessing.segmentation import _domain_of
+        for a, b, expected in self.CASES:
+            got_a, got_b = _domain_of({"domain": a}), _domain_of({"domain": b})
+            assert got_a == got_b == expected, \
+                f"{a!r} und {b!r} normalisieren unterschiedlich: {got_a!r} vs {got_b!r}"
+
+    def test_int_and_float_domain_pair_in_timeline(self):
+        # Der konkrete Review-Fall: Start mit int 1, Ende mit float 1.0
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": 1}),
+            _ev(50, EventType.TASK_START, "task:start", {"domain": 2.0}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": 2.0}),
+            _ev(150, EventType.TASK_END, "task:end", {"domain": 1.0}),
+        ]
+        tl = build_timeline("X", ev)
+        segs = sorted((s.start_ms, s.domain, s.is_complete) for s in tl.segments)
+        assert segs == [(0, "1", True), (50, "2", True)], \
+            f"int/float-Domains paaren nicht: {segs}"
+
+    def test_distinct_numeric_domains_stay_distinct(self):
+        # Kanonisierung darf nicht über das Ziel hinausschießen
+        from src.preprocessing.segmentation import _domain_of
+        for a, b in [(1, 2), (1, 1.5), ("1", "2"), (-1, 1), (1.5, 1.501)]:
+            assert _domain_of({"domain": a}) != _domain_of({"domain": b}), \
+                f"{a!r} und {b!r} wurden fälschlich gleich normalisiert"
+
+    def test_non_numeric_and_special_strings_untouched(self):
+        from src.preprocessing.segmentation import _domain_of
+        assert _domain_of({"domain": "gaming"}) == "gaming"
+        assert _domain_of({"domain": "nan"}) == "nan"
+        assert _domain_of({"domain": "inf"}) == "inf"
+        assert _domain_of({"domain": True}) == "True"
+        assert _domain_of({"domain": "  "}) is None
+        assert _domain_of({}) is None
+
+    def test_scientific_notation_pairing_end_to_end(self):
+        ev = [
+            _ev(0, EventType.TASK_START, "task:start", {"domain": 300}),
+            _ev(50, EventType.TASK_START, "task:start", {"domain": 4}),
+            _ev(100, EventType.TASK_END, "task:end", {"domain": "3e2"}),
+            _ev(150, EventType.TASK_END, "task:end", {"domain": 4}),
+        ]
+        tl = build_timeline("X", ev)
+        segs = sorted((s.start_ms, s.domain, s.is_complete) for s in tl.segments)
+        assert segs == [(0, "300", True), (50, "4", True)], \
+            f"'3e2' paart nicht mit 300: {segs}"
+
+
 class TestEventDensity:
     """Bug 9: Grenzereignisse dürfen nicht doppelt gezählt werden."""
 
