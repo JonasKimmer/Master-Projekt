@@ -35,11 +35,13 @@ Nebenfragestellungen: Welche Merkmale sind die stärksten Komplexitätsindikator
 
 Webkomplexität ist kein einheitlich definiertes Konzept. Ivory und Hearst (2002) untersuchten dazu 157 quantitative Maße, u. a. zu Text-, Link- und Grafikelementen, Formatierung sowie Seiten- und Site-Architektur, und belegen, dass sich solche automatisiert berechenbaren Seitenmerkmale als Prädiktoren für die von Expert:innen wahrgenommene Seitenqualität eignen. Für die vorliegende Arbeit sind davon vor allem strukturelle Merkmale wie DOM-Tiefe und Elementanzahl relevant, da sie direkt aus dem HTML-Quelltext extrahierbar sind. Das Document Object Model (DOM) repräsentiert die Baumstruktur eines HTML-Dokuments. DOM-Tiefe und Knotenanzahl lassen sich durch rekursives Traversieren effizient berechnen und gelten als zentrale Indikatoren struktureller Komplexität.
 
-Die automatische Klassifikation von Webseiten nach Typ oder Funktion ist ein bekanntes Anwendungsfeld im Web Mining. Unüberwachte Verfahren wie K-Means-Clustering eignen sich besonders, wenn Seitentypen erst aus den Daten heraus identifiziert werden sollen.
+Die automatische Klassifikation von Webseiten nach Typ oder Funktion ist ein etabliertes Anwendungsfeld im Web Mining; Qi und Davison (2009) geben einen Überblick über die dabei verwendeten Merkmalsfamilien (Inhalt, Links, Struktur, URL) und Verfahren. Unüberwachte Verfahren wie K-Means-Clustering eignen sich besonders, wenn Seitentypen erst aus den Daten heraus identifiziert werden sollen.
 
 Random-Forest-Klassifikatoren haben sich für tabellarische Feature-Matrizen als robuste Methode bewährt (Breiman, 2001). Ihre Feature-Importance lässt Rückschlüsse darauf zu, welche Merkmale die Klassifikation primär tragen. Werden die Labels jedoch durch ein vorheriges Clustering erzeugt, quantifiziert die Importance nur die interne Konsistenz der Clusterstruktur, nicht die externe Validität gegenüber einer unabhängigen Zielvariable. Zudem ist die Standard-Feature-Importance von Random Forests (Mean Decrease Impurity) bekanntermaßen zugunsten kontinuierlicher Merkmale mit vielen eindeutigen Werten verzerrt. Permutation-Importance gilt als robusteres Gegenstück (vgl. 4.3).
 
-Messwertbasierte Arbeiten zur Website-Komplexität sind der direkteste Bezugspunkt dieser Studie: Butkiewicz et al. (2011) entwickelten aus Messungen realer Seiten Metriken für Inhalts- und Strukturkomplexität und untersuchten deren Zusammenhang mit der Ladeperformance — genau die Kombination aus Strukturmerkmalen und Außenkriterium, die in 4.6 geprüft wird. Ihre Befunde legen nahe, dass Seitenkomplexität mehrdimensional erfasst werden sollte; ob die hier gewählten sechs DOM-Merkmale diesen Anspruch einlösen, ist eine empirische Frage der Abschnitte 4.5 und 4.6.
+Messwertbasierte Arbeiten zur Website-Komplexität sind der direkteste Bezugspunkt dieser Studie: Butkiewicz et al. (2011) entwickelten aus Messungen realer Seiten Metriken für Inhalts- und Strukturkomplexität und untersuchten deren Zusammenhang mit der Ladeperformance — genau die Kombination aus Strukturmerkmalen und Außenkriterium, die in 4.6 geprüft wird. Ihre Befunde legen nahe, dass Seitenkomplexität mehrdimensional erfasst werden sollte; ob die hier gewählten sechs DOM-Merkmale diesen Anspruch einlösen, ist eine empirische Frage der Abschnitte 4.5 und 4.6. Chen (2018) nutzt demgegenüber den Outdegree einer Seite als alleiniges Komplexitätsmaß und optimiert Website-Struktur durch Link-Reduktion — ein Einzelmetrik-Ansatz, gegen den das hier geprüfte mehrdimensionale Modell direkt anzutreten hat.
+
+Jenseits der Strukturmerkmale untersucht die HCI-Forschung die *wahrgenommene* Komplexität: Tuch et al. (2012) zeigen experimentell, dass visuelle Komplexität und Prototypikalität die Ersturteile von Nutzenden prägen, und Miniukovich und De Angeli (2014) operationalisieren visuelle Komplexität rechnerisch. Struktur- und Wahrnehmungsmaße laufen damit nebenläufig — ob sie dieselbe zugrundeliegende Dimension erfassen, ist ohne Erhebung von Nutzurteilen nicht entscheidbar (vgl. 5.3). Schließlich ist das Web selbst hochdynamisch: Ntoulas et al. (2004) messen, dass ein erheblicher Teil der Seiten wöchentlich neu entsteht oder sich wesentlich verändert — jede strukturelle Erhebung, auch die vorliegende, ist damit prinzipiell eine Momentaufnahme (vgl. 5.3).
 
 ---
 
@@ -254,7 +256,7 @@ Eine einfaktorielle ANOVA prüft, ob sich die Mittelwerte mehrerer Gruppen stär
 
 Dass gerade `link_count` und `dom_nodes` die Cluster tragen, passt zum Befund von Ivory und Hearst (2002), dass quantitative Struktur- und Linkmerkmale prädiktiv für die wahrgenommene Seitenqualität sind. Dass zwei andere, unter MDI relevant erscheinende Merkmale sich bei genauerer Prüfung als wertlos erweisen (4.3), zeigt dagegen den eigentlichen methodischen Ertrag dieser Arbeit — eine unreflektierte Feature-Importance-Analyse hätte hier in die Irre geführt. Die Dekorrelations-Analyse (4.5) präzisiert das Bild: Der Informationsgewinn der sechs Merkmale ist in dieser Stichprobe real, aber geringer als ihre Redundanz — drei von sechs messen im Wesentlichen denselben „Umfang". Ein schlankeres Merkmalsset (vier statt sechs, ohne die beiden redundanten Umfangs-Indikatoren) wäre der Ausgangspunkt für ähnliche Analysen — mit dem Vorbehalt aus 4.5, dass gerade diese Vier-Merkmale-Lösung die extremste Seite als Single-Page-Cluster isoliert; die Empfehlung ist damit vorläufig, bis sie an einem größeren Seitenkorpus geprüft ist.
 
-Das Strukturprofil von wiesbaden.de (4.4) — schlank im Umfang, aber die tiefste DOM-Verschachtelung — illustriert zudem, dass „Komplexität" kein eindimensionales Konstrukt ist: Eine Website kann in der Umfangsdimension minimal und in der Verschachtelungstiefe gleichzeitig maximal sein. Genau solche Profile, nicht die Gesamtlage im Umfangsraum, wären der interessante Gegenstand einer Folgestudie mit mehr Websites. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung: Sinnvolle Komplexitätsmessung kombiniert mehrere, voneinander unabhängige Metrikfamilien mit einem Außenkriterium — genau die Kombination, die hier versuchsweise umgesetzt wurde, deren Außenkriterium (Antwortzeit) aber zu grob geriet, um Strukturunterschiede aufzulösen (4.6).
+Das Strukturprofil von wiesbaden.de (4.4) — schlank im Umfang, aber die tiefste DOM-Verschachtelung — illustriert zudem, dass „Komplexität" kein eindimensionales Konstrukt ist: Eine Website kann in der Umfangsdimension minimal und in der Verschachtelungstiefe gleichzeitig maximal sein. Genau solche Profile, nicht die Gesamtlage im Umfangsraum, wären der interessante Gegenstand einer Folgestudie mit mehr Websites. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung: Sinnvolle Komplexitätsmessung kombiniert mehrere, voneinander unabhängige Metrikfamilien mit einem Außenkriterium — genau die Kombination, die hier versuchsweise umgesetzt wurde, deren Außenkriterium (Antwortzeit) aber zu grob geriet, um Strukturunterschiede aufzulösen (4.6). Dass ausgerechnet der Outdegree beziehungsweise `link_count` als Einzelmetrik die tragfähigste Kennzahl bleibt, fügt sich zudem zu Chens (2018) Outdegree-basiertem Ansatz — die Einzelmetrik ist offenbar nicht nur ein statistischer Notbehelf, sondern trägt reale Strukturinformation.
 
 ### 5.2 Grenzen und Verallgemeinerbarkeit
 
@@ -262,13 +264,13 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 ### 5.3 Einschränkungen
 
-**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale; seine Einzelmessungen wurden zudem nicht archiviert (4.6) und es deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility, Nutzereinschätzung fehlen). Mit nur 3 Websites (47 Beobachtungen, die in drei Websites genestet statt unabhängig sind, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
+**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale; seine Einzelmessungen wurden zudem nicht archiviert (4.6) und es deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility, Nutzereinschätzung fehlen). Insbesondere die *wahrgenommene* Komplexität, die Tuch et al. (2012) und Miniukovich und De Angeli (2014) als eigenständige, verhaltensrelevante Dimension belegen, wurde nicht erhoben — ob die strukturellen Merkmale abbilden, was Nutzende unter Komplexität verstehen, bleibt damit offen. Mit nur 3 Websites (47 Beobachtungen, die in drei Websites genestet statt unabhängig sind, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
 
 **Stichprobenauswahl:** Die drei Websites wurden nach unproblematischer robots.txt-Erlaubnis ausgewählt, eine Positivselektion, die restriktiver geschützte, oft strukturell komplexere Websites systematisch ausschließt (zu den in 5.2 diskutierten Erfassungslücken bei `media_count`/`form_count` vgl. 3.1). Zur datenoptimalen k-Wahl und ihrer bewussten Abweichung siehe 4.5.
 
 **Rechtlicher Rahmen:** Die robots.txt-Konformität (3.1) deckt nur die technische Zugriffsebene ab. Nutzungsbedingungen der jeweiligen Website können automatisiertes Crawling unabhängig davon einschränken. Für die hier gecrawlten drei öffentlichen Informations- und Verwaltungsportale wurden ausschließlich frei zugängliche, nicht personenbezogene Inhalte zu Forschungszwecken erfasst. Eine kommerzielle Nutzung der Rohdaten war nicht Gegenstand dieser Arbeit.
 
-**Einzelner Zeitpunkt:** Die Analyse bildet einen Snapshot ab und erlaubt keine Aussage über zeitliche Entwicklung.
+**Einzelner Zeitpunkt:** Die Analyse bildet einen Snapshot ab und erlaubt keine Aussage über zeitliche Entwicklung — angesichts der von Ntoulas et al. (2004) gemessenen Dynamik des Webs (ein erheblicher Teil der Seiten verändert sich wöchentlich wesentlich) keine rein theoretische, sondern eine substanzielle Einschränkung.
 
 ---
 
@@ -292,8 +294,18 @@ Breiman, L. (2001). Random forests. *Machine Learning, 45*(1), 5–32.
 
 Butkiewicz, M., Madhyastha, H. V., & Sekar, V. (2011). Understanding website complexity: Measurements, metrics, and implications. *Proceedings of the 11th ACM SIGCOMM Conference on Internet Measurement (IMC '11)*.
 
+Chen, M. (2018). Improving website structure through reducing information overload. *Decision Support Systems*.
+
 Hubert, L., & Arabie, P. (1985). Comparing partitions. *Journal of Classification, 2*(1), 193–218.
 
 Ivory, M. Y., & Hearst, M. A. (2002). Statistical profiles of highly-rated web sites. *Proceedings of CHI 2002*, 367–374.
 
+Miniukovich, A., & De Angeli, A. (2014). Quantification of interface visual complexity. *Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14)*. ACM.
+
+Ntoulas, A., Cho, J., & Olston, C. (2004). What's new on the web? The evolution of the web from a search engine perspective. *Proceedings of the 13th International Conference on World Wide Web (WWW '04)*.
+
+Qi, X., & Davison, B. D. (2009). Web page classification: Features and algorithms. *ACM Computing Surveys, 41*(2), Artikel 12.
+
 Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation and validation of cluster analysis. *Journal of Computational and Applied Mathematics, 20*, 53–65.
+
+Tuch, A. N., Presslaber, E. E., Stöcklin, M., Opwis, K., & Bargas-Avila, J. A. (2012). The role of visual complexity and prototypicality regarding first impression of websites: Working towards understanding aesthetic judgments. *International Journal of Human–Computer Studies*.
