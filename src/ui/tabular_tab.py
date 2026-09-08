@@ -14,6 +14,36 @@ def _safe_value_counts(series: pd.Series, dropna: bool = True) -> pd.Series:
         return series.astype(str).value_counts(dropna=dropna)
 
 
+def _text_search_mask(df: pd.DataFrame, term: str) -> pd.Series:
+    """Mask der Zeilen, deren Zellen den Suchterm literal enthalten.
+
+    regex=False: Eingaben wie '(' oder '[abc]' sind Suchbegriffe, keine
+    Regex-Muster — mit dem Default (regex=True) crasht str.contains mit
+    re.error und reißt die ganze Ansicht mit.
+    """
+    return (
+        df.astype(str)
+        .apply(lambda x: x.str.contains(term, case=False, regex=False))
+        .any(axis=1)
+    )
+
+
+def _slider_bounds(series: pd.Series) -> tuple[float, float] | None:
+    """(min, max) einer numerischen Spalte, oder None, wenn kein sinnvoller
+    Slider möglich ist.
+
+    All-NaN-Spalten liefern min=max=nan — und nan != nan ist True, weshalb
+    die einfache Prüfung einen Slider mit NaN-Grenzen durchließe. Konstante
+    Spalten (min == max) brauchen ebenfalls keinen Slider.
+    """
+    _min, _max = float(series.min()), float(series.max())
+    if _min != _min or _max != _max:  # NaN-Check ohne math.isnan
+        return None
+    if _min == _max:
+        return None
+    return _min, _max
+
+
 def _render_sidebar_filters(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     st.sidebar.markdown("---")
     st.sidebar.subheader("🔍 Daten filtern")
@@ -22,18 +52,15 @@ def _render_sidebar_filters(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFram
 
     search_term = st.sidebar.text_input("Globale Textsuche...")
     if search_term:
-        filtered_df = filtered_df[
-            filtered_df.astype(str)
-            .apply(lambda x: x.str.contains(search_term, case=False))
-            .any(axis=1)
-        ]
+        filtered_df = filtered_df[_text_search_mask(filtered_df, search_term)]
 
     filter_columns = st.sidebar.multiselect("Spalten für Filter auswählen:", df.columns)
 
     for col in filter_columns:
         if pd.api.types.is_numeric_dtype(filtered_df[col]):
-            _min, _max = float(df[col].min()), float(df[col].max())
-            if _min != _max:
+            bounds = _slider_bounds(df[col])
+            if bounds is not None:
+                _min, _max = bounds
                 step = (_max - _min) / 100
                 user_num_input = st.sidebar.slider(
                     f"Wertebereich {col}",
