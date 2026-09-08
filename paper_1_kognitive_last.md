@@ -237,7 +237,7 @@ Für die Forschung folgt ein doppelter Bedarf: eine Replikation mit größerer, 
 
 ## Daten- und Analyse-Verfügbarkeit
 
-Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. Alle berichteten Kennzahlen sind über die im Projekt versionskontrollierten Skripte reproduzierbar: `check_correlations.py` (Korrelationen, Abbildung 2), `check_mixed_model.py` (Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabelle 5). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung; zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert.
+Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. Die Kennzahlen sind über die im Projekt versionskontrollierten Skripte reproduzierbar: `check_correlations.py` (Korrelationen, Abbildung 2, Tabelle 2b, Start-/End-Zählungen), `check_mixed_model.py` (Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabellen 4 und 5, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung; zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert. **Ausnahme:** Tabelle 2 (aufgabenebene, 269 Messwerte) stammt aus der tabellarischen Auswertung der Analyseumgebung und wurde nur mit der in 3.3 dokumentierten Restdifferenz von ca. 2 % beim Stadt-Mittelwert rekonstruiert, nicht exakt reproduziert. Abbildung 1 (Boxplot) wurde einmalig erstellt und hat kein erzeugendes Skript.
 
 ---
 

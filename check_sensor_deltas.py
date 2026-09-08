@@ -126,6 +126,20 @@ def effective_rates_and_validity(data_dir: Path | str = DATA_DIR) -> None:
     print(f"Pupillen-Validity == 1: {100.0 * ok / tot:.1f} % von {tot:,} Samples")
 
 
+def negative_gsr_samples(data_dir: Path | str = DATA_DIR) -> tuple[int, dict[str, int]]:
+    """Anzahl physiologisch unmöglicher negativer Hautleitwert-Samples,
+    je Trial (Paper 1, Abschnitt 3.3: 120 in T-3/T-7/T-8/T-12/T-14)."""
+    per_trial: dict[str, int] = {}
+    for trial in load_trials_from_dir(str(data_dir)):
+        if not trial.streams:
+            continue
+        vals = trial.streams[0].channels.get("shimmer.GsrConductanceUS", [])
+        n = sum(1 for v in vals if v is not None and v < 0)
+        if n:
+            per_trial[trial.trial_id] = n
+    return sum(per_trial.values()), per_trial
+
+
 def _require_data() -> bool:
     if not DATA_DIR.exists():
         print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
@@ -154,6 +168,9 @@ def main() -> None:
 
     print("\nEffektive Messraten und Pupillen-Validität:")
     effective_rates_and_validity(DATA_DIR)
+
+    n_neg, per_trial = negative_gsr_samples(DATA_DIR)
+    print(f"\nNegative Hautleitwert-Samples: {n_neg} in {sorted(per_trial)} (je Trial: {per_trial})")
 
 
 if __name__ == "__main__":

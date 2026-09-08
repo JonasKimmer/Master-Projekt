@@ -160,6 +160,19 @@ def position_durations(data_dir: Path | str = DATA_DIR) -> dict[str, list[float]
     return durs
 
 
+def task_event_counts(data_dir: Path | str = DATA_DIR) -> tuple[int, int]:
+    """Anzahl task:start/task:end-Events gesamt (Paper 1, 3.3: 271/270 —
+    die Differenz ist der verwaiste Start in T-3/Stadt)."""
+    starts = ends = 0
+    for trial in load_trials_from_dir(str(data_dir)):
+        for e in trial.events:
+            if e.label == "task:start":
+                starts += 1
+            elif e.label == "task:end":
+                ends += 1
+    return starts, ends
+
+
 def _require_data() -> bool:
     if not DATA_DIR.exists():
         print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
@@ -173,6 +186,8 @@ def main() -> None:
         return
     # Bearbeitungszeit je Aufgabenposition (= Visualisierungstyp, Tabelle 2b)
     import numpy as np
+    s, e = task_event_counts()
+    print(f"task:start/-end gesamt: {s}/{e}")
     durs = position_durations()
     print("Bearbeitungszeit je Aufgabenposition (Restart-Paarung):")
     for i, viz in enumerate(VIZ_ORDER):
