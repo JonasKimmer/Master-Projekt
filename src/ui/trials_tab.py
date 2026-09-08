@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from src.analysis.statistics import baseline_vs_task, event_density
 from src.preprocessing.quality_checks import check_trial
 from src.preprocessing.segmentation import build_timeline_from_trial
 from src.analysis.reporting import timeline_to_dataframe, quality_reports_to_dataframe
@@ -21,7 +22,9 @@ def render_trials_tab() -> None:
     selected_id = st.selectbox("Trial auswählen", trial_ids)
     trial = next(t for t in trials if t.trial_id == selected_id)
 
-    inner_tab1, inner_tab2, inner_tab3 = st.tabs(["Timeline", "Events", "Qualität"])
+    inner_tab1, inner_tab2, inner_tab3, inner_tab4 = st.tabs(
+        ["Timeline", "Events", "Qualität", "Analysen"]
+    )
 
     # ── Timeline ──────────────────────────────────────────────────────────────
     with inner_tab1:
@@ -91,3 +94,44 @@ def render_trials_tab() -> None:
                 mime="text/csv",
                 key=f"trials_quality_csv_{trial.trial_id}",
             )
+
+    # ── Analysen: Eventdichte + Baseline-vs-Task ──────────────────────────────
+    with inner_tab4:
+        st.subheader(f"Analysen: {trial.trial_id}")
+        timeline = build_timeline_from_trial(trial)
+
+        st.markdown("**Eventdichte** (Events pro Sekunde je Segment)")
+        df_density = event_density(timeline, trial)
+        if df_density.empty:
+            st.info("Keine Events vorhanden.")
+        else:
+            st.dataframe(df_density, use_container_width=True)
+            st.download_button(
+                "Eventdichte CSV",
+                data=df_density.to_csv(index=False).encode(),
+                file_name=f"{trial.trial_id}_event_density.csv",
+                mime="text/csv",
+                key=f"trials_density_csv_{trial.trial_id}",
+            )
+
+        st.markdown("---")
+        st.markdown("**Baseline-vs-Task-Vergleich** (Kanal-Mittelwerte je Segmenttyp)")
+        if not trial.streams:
+            st.info("Keine Sensor-Streams vorhanden.")
+        else:
+            feature = st.selectbox(
+                "Merkmal", ["mean", "median", "std", "max", "min"],
+                key="trials_bvt_feature",
+            )
+            df_bvt = baseline_vs_task(trial, timeline, trial.streams[0], feature=feature)
+            if df_bvt.empty:
+                st.info("Keine vollständigen Baseline-/Task-Segmente gefunden.")
+            else:
+                st.dataframe(df_bvt, use_container_width=True)
+                st.download_button(
+                    "Baseline-vs-Task CSV",
+                    data=df_bvt.to_csv(index=False).encode(),
+                    file_name=f"{trial.trial_id}_baseline_vs_task.csv",
+                    mime="text/csv",
+                    key=f"trials_bvt_csv_{trial.trial_id}",
+                )

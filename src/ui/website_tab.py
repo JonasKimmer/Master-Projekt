@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 
 from src.feature_engineering.web_features import pages_to_dataframe, website_features
@@ -29,6 +30,23 @@ def render_website_tab() -> None:
         if website.portal_meta:
             with st.expander("Portal-Metadaten"):
                 st.json(website.portal_meta)
+
+        if website.asset_index:
+            n_assets = website.asset_index.get("n_assets", 0)
+            n_shared = website.asset_index.get("n_shared", 0)
+            with st.expander(f"Asset-Index ({n_assets} Assets, {n_shared} shared)"):
+                assets = website.asset_index.get("assets", {})
+                shared_rows = [
+                    {"url": url, "typ": a.get("type"), "seiten": a.get("pages"),
+                     "lokal": a.get("local_path", "")}
+                    for url, a in assets.items() if a.get("shared")
+                ]
+                if shared_rows:
+                    st.dataframe(pd.DataFrame(shared_rows), use_container_width=True)
+                else:
+                    st.info("Keine von mehreren Seiten geteilten Assets vorhanden.")
+                if website.shared_assets_dir:
+                    st.caption(f"Shared-Assets-Ordner: {website.shared_assets_dir}")
 
         df = pages_to_dataframe(website)
         if not df.empty:

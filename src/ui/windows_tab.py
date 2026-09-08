@@ -1,15 +1,35 @@
-"""AP11 – Windows tab: configure time windows and compute sensor features."""
+"""AP11 – Windows tab: configure time windows and compute sensor features.
+
+AP6: Fensterdefinitionen sind versionierbar speicher- und ladbbar
+     (WindowDefinitionStore, Persistenz in window_definitions.json).
+AP7: Der Stream kann vor der Fensterung auf ein einheitliches Zeitraster
+     synchronisiert (resampled) werden.
+"""
 
 from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
 
+from src.analysis.statistics import notable_windows
 from src.models.experiment_records import WindowDefinition
 from src.preprocessing.segmentation import build_timeline_from_trial
+from src.preprocessing.synchronization import split_fusion_stream, resample_stream
+from src.preprocessing.window_store import WindowDefinitionStore
 from src.preprocessing.windowing import generate_windows, slice_stream
 from src.feature_engineering.sensor_features import compute_window_features
 from src.session import get_trials
+
+
+def _select_stream(trial):
+    """Stream-Auswahl inkl. optionaler modality-Splits (ohne Prefix-Dopplung)."""
+    options: list[tuple[str, object]] = []
+    for s in trial.streams:
+        options.append((f"{s.source} (fusion, komplett)", s))
+        for part in split_fusion_stream(s):
+            if part.timestamps:
+                options.append((f"{s.source} → {part.modality}", part))
+    return options
 
 
 def render_windows_tab() -> None:
@@ -27,37 +47,94 @@ def render_windows_tab() -> None:
         trial_id = st.selectbox("Trial", [t.trial_id for t in trials], key="win_trial")
         trial = next(t for t in trials if t.trial_id == trial_id)
 
-        stream_options = [s.source for s in trial.streams]
+        stream_options = _select_stream(trial)
         if not stream_options:
             st.warning("Kein Stream vorhanden.")
             return
-        stream_src = st.selectbox("Stream", stream_options, key="win_stream")
-        stream = next(s for s in trial.streams if s.source == stream_src)
+        labels = [lbl for lbl, _ in stream_options]
+        stream_src = st.selectbox("Stream", labels, key="win_stream")
+        stream = next(s for lbl, s in stream_options if lbl == stream_src)
+
+        # AP7 – Synchronisation auf einheitliches Raster
+        st.markdown("**Synchronisation (AP7)**")
+        do_sync = st.checkbox(
+            "Auf einheitliches Zeitraster resampeln",
+            value=False,
+            help="Linear-Interpolation auf ein gemeinsames Abtastraster (AP7: Zeitstempel synchronisieren).",
+            key="win_sync",
+        )
+        if do_sync:
+            sync_hz = st.number_input(
+                "Ziel-Abtastrate (Hz)", min_value=1, value=10, step=1, key="win_sync_hz"
+            )
+            stream = resample_stream(stream, float(sync_hz))
 
         mode = st.radio("Modus", ["sliding", "fixed", "task"], key="win_mode")
-        duration = st.number_input("Fensterlänge (ms)", min_value=100, value=2000, step=100)
+        duration = st.number_input("Fensterlänge (ms)", min_value=100, value=2000, step=100, key="win_duration")
 
         step = None
         task_label = None
         task_timeline = None
         if mode == "sliding":
-            step = st.number_input("Schrittweite (ms)", min_value=100, value=1000, step=100)
+            step = st.number_input("Schrittweite (ms)", min_value=100, value=1000, step=100, key="win_step")
         elif mode == "task":
             task_timeline = build_timeline_from_trial(trial)
-            labels = list({s.label for s in task_timeline.segments})
-            if labels:
-                task_label = st.selectbox("Task-Label", labels)
+            labels_seg = list({s.label for s in task_timeline.segments})
+            if labels_seg:
+                task_label = st.selectbox("Task-Label", labels_seg, key="win_task_label")
             else:
                 st.warning("Trial hat keine Segmente (keine Events oder keine erkennbaren Start/End-Paare) — Task-Modus benötigt Event-Daten.")
 
-        offset_start = st.number_input("Offset Start (ms)", value=0, step=100)
-        offset_end   = st.number_input("Offset Ende (ms)", value=0, step=100)
+        offset_start = st.number_input("Offset Start (ms)", value=0, step=100, key="win_offset_start")
+        offset_end   = st.number_input("Offset Ende (ms)", value=0, step=100, key="win_offset_end")
+
+        # ── AP6: versionierbares Speichern / Laden ─────────────────────────────
+        st.markdown("**Definition versionierbar speichern (AP6)**")
+        store = WindowDefinitionStore()
+        def_name = st.text_input(
+            "Name der Definition", placeholder="z. B. baseline_2s", key="win_def_name"
+        )
+        if st.button("Aktuelle Konfiguration speichern", key="win_def_save"):
+            try:
+                definition = WindowDefinition(
+                    window_id=def_name or "manual",
+                    mode=mode,
+                    duration_ms=float(duration),
+                    step_ms=float(step) if step else None,
+                    task_label=task_label,
+                    offset_start_ms=float(offset_start),
+                    offset_end_ms=float(offset_end),
+                )
+                entry = store.save(def_name, definition)
+                st.success(f"Gespeichert: '{entry['name']}' v{entry['version']} (id {entry['id']}).")
+            except ValueError as e:
+                st.error(str(e))
+
+        entries = store.list_entries()
+        if entries:
+            entry_labels = {
+                f"#{e['id']} {e['name']} v{e['version']} ({e['created_at']})": e["id"]
+                for e in entries
+            }
+            sel_entry = st.selectbox("Gespeicherte Definitionen", list(entry_labels), key="win_def_sel")
+            if st.button("Definition laden", key="win_def_load"):
+                loaded = store.load(entry_labels[sel_entry])
+                if loaded is not None:
+                    st.session_state.win_mode = loaded.mode
+                    st.session_state.win_duration = int(loaded.duration_ms)
+                    st.session_state.win_step = int(loaded.step_ms) if loaded.step_ms else 1000
+                    st.session_state.win_offset_start = int(loaded.offset_start_ms)
+                    st.session_state.win_offset_end = int(loaded.offset_end_ms)
+                    if loaded.task_label:
+                        st.session_state.win_task_label = loaded.task_label
+                    st.rerun()
 
     with col2:
         st.markdown("#### Ergebnisse")
-        if st.button("Fenster berechnen", key="win_compute"):
+        compute = st.button("Fenster berechnen", key="win_compute")
+        if compute:
             definition = WindowDefinition(
-                window_id="manual",
+                window_id=def_name or "manual",
                 mode=mode,
                 duration_ms=float(duration),
                 step_ms=float(step) if step else None,
@@ -65,7 +142,11 @@ def render_windows_tab() -> None:
                 offset_start_ms=float(offset_start),
                 offset_end_ms=float(offset_end),
             )
-            windows = generate_windows(stream, definition, task_timeline)
+            try:
+                windows = generate_windows(stream, definition, task_timeline)
+            except ValueError as e:
+                st.error(f"Ungültige Fensterdefinition: {e}")
+                windows = []
 
             if not windows:
                 st.warning("Keine Fenster generiert.")
@@ -83,6 +164,18 @@ def render_windows_tab() -> None:
                 if all_rows:
                     df = pd.DataFrame(all_rows)
                     st.dataframe(df, use_container_width=True)
+
+                    # Auffällige Fenster direkt im Tool (kein ML-Umweg nötig)
+                    flagged = notable_windows(df)
+                    if not flagged.empty:
+                        st.warning(f"{len(flagged)} auffällige Fenster-Merkmale erkannt:")
+                        st.dataframe(flagged, use_container_width=True)
+                        df = df.merge(
+                            flagged[["window", "channel", "reason"]],
+                            on=["window", "channel"], how="left",
+                        )
+                        df["reason"] = df["reason"].fillna("")
+
                     st.download_button(
                         "Features CSV",
                         data=df.to_csv(index=False).encode(),
