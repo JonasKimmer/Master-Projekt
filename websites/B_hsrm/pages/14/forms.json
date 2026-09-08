@@ -1,0 +1,12 @@
+[
+  {
+    "action": "/studium/vor-dem-studium/studienangebot?tx_in2studyfinder_pi1%5Baction%5D=filter&tx_in2studyfinder_pi1%5Bcontroller%5D=StudyCourse&cHash=019b2084cee6230dc1602d0e91104892",
+    "method": "post",
+    "fields": 29
+  },
+  {
+    "action": "",
+    "method": "get",
+    "fields": 1
+  }
+]

@@ -1,0 +1,534 @@
+[
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien#content",
+    "text": "Skip to Content"
+  },
+  {
+    "href": "https://www.hs-rm.de/",
+    "text": "ZurHauptseite"
+  },
+  {
+    "href": "https://www.hs-rm.de/login",
+    "text": "Anmeldung Beschäftigte"
+  },
+  {
+    "href": "https://www.hs-rm.de/login",
+    "text": "Anmeldung Studierende"
+  },
+  {
+    "href": "https://www.hs-rm.de/suche",
+    "text": "Suche"
+  },
+  {
+    "href": "https://www.hs-rm.de/en/design-computer-science-media",
+    "text": "en"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge",
+    "text": "Studiengänge\n\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor",
+    "text": "Bachelor"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/angewandte-informatik",
+    "text": "Angewandte Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/innenarchitektur",
+    "text": "Innenarchitektur - Raum Inszenierung Design"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/kommunikationsdesign",
+    "text": "Kommunikationsdesign"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/media-conception-production",
+    "text": "Media: Conception & Production"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/media-management",
+    "text": "Media Management"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/medieninformatik",
+    "text": "Medieninformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/technische-informatik",
+    "text": "Technische Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/wirtschaftsinformatik",
+    "text": "Wirtschaftsinformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/dual",
+    "text": "Dual"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/angewandte-informatik",
+    "text": "Angewandte Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/medieninformatik",
+    "text": "Medieninformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/technische-informatik",
+    "text": "Technische Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/wirtschaftsinformatik",
+    "text": "Wirtschaftsinformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master",
+    "text": "Master"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/informatik-software-und-system-engineering",
+    "text": "Informatik - Software und System Engineering"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/innenarchitektur-conceptual-design",
+    "text": "Innenarchitektur – Conceptual Design"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/kommunikationsdesign-crossmedia-spaces",
+    "text": "Kommunikationsdesign - Crossmedia Spaces"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/media-design-management",
+    "text": "Media & Design Management"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/medieninformatik-intelligente-und-interaktive-systeme",
+    "text": "Medieninformatik - Intelligente und interaktive Systeme"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/screen-arts",
+    "text": "Screen Arts"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/wirtschaftsinformatik-information-systems-digital-transformation",
+    "text": "Wirtschaftsinformatik – Information Systems & Digital Transformation"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung",
+    "text": "Forschung\n\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/forschungszentrum-ssmt",
+    "text": "Forschungszentrum SSMT"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/doktorandenkolleg-sensyble",
+    "text": "Doktorandenkolleg SENSYBLE"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/forschergruppe-adrima",
+    "text": "Forschungsgruppe ADRIMA"
+  },
+  {
+    "href": "https://www.hs-rm.de/cci",
+    "text": "Institut CCI"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/forschungsprojekte",
+    "text": "Forschungsprojekte"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/promotionszentrum-angewandte-informatik",
+    "text": "Promotionszentrum­ Angewandte­ Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/caebus",
+    "text": "Center for Advanced ­­E-Business­­ Studies (CAEBUS)"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/promotion",
+    "text": "Promotion"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international",
+    "text": "International\n\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international/incoming",
+    "text": "Incoming"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international/outgoing",
+    "text": "Outgoing"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international/internationale-partnerschaften",
+    "text": "Internationale ­Partnerschaften"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/design-informatik-medien-in-wiesbaden",
+    "text": "Design Informatik Medien in Wiesbaden"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns",
+    "text": "Über uns\n\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/studieren-bei-uns",
+    "text": "Studieren bei uns"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/studieren-bei-uns/infos-fuer-erstsemester",
+    "text": "Infos für Erstsemester"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/studieren-bei-uns/infos-fuer-studieninteressierte",
+    "text": "Infos für Studieninteressierte"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/leitung-und-organisation",
+    "text": "Leitung und Organisation"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/organisation-gremien-ansprechpersonen",
+    "text": "Ansprechpersonen und Gremien"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/personen-am-fachbereich",
+    "text": "Personen am Fachbereich"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/kontakt",
+    "text": "Kontakt"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/alumni-ehemalige",
+    "text": "Alumni & Ehemalige"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/aktuelles",
+    "text": "Aktuelles"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge",
+    "text": "Studiengänge\n\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor",
+    "text": "Bachelor\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/angewandte-informatik",
+    "text": "Angewandte Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/innenarchitektur",
+    "text": "Innenarchitektur - Raum Inszenierung Design"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/kommunikationsdesign",
+    "text": "Kommunikationsdesign"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/media-conception-production",
+    "text": "Media: Conception & Production"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/media-management",
+    "text": "Media Management"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/medieninformatik",
+    "text": "Medieninformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/technische-informatik",
+    "text": "Technische Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/wirtschaftsinformatik",
+    "text": "Wirtschaftsinformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/dual",
+    "text": "Dual\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/angewandte-informatik",
+    "text": "Angewandte Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/medieninformatik",
+    "text": "Medieninformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/technische-informatik",
+    "text": "Technische Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor/wirtschaftsinformatik",
+    "text": "Wirtschaftsinformatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master",
+    "text": "Master\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/informatik-software-und-system-engineering",
+    "text": "Informatik - Software und System Engineering"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/innenarchitektur-conceptual-design",
+    "text": "Innenarchitektur – Conceptual Design"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/kommunikationsdesign-crossmedia-spaces",
+    "text": "Kommunikationsdesign - Crossmedia Spaces"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/media-design-management",
+    "text": "Media & Design Management"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/medieninformatik-intelligente-und-interaktive-systeme",
+    "text": "Medieninformatik - Intelligente und interaktive Systeme"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/screen-arts",
+    "text": "Screen Arts"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master/wirtschaftsinformatik-information-systems-digital-transformation",
+    "text": "Wirtschaftsinformatik – Information Systems & Digital Transformation"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung",
+    "text": "Forschung\n\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/forschungszentrum-ssmt",
+    "text": "Forschungszentrum SSMT"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/doktorandenkolleg-sensyble",
+    "text": "Doktorandenkolleg SENSYBLE"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/forschergruppe-adrima",
+    "text": "Forschungsgruppe ADRIMA"
+  },
+  {
+    "href": "https://www.hs-rm.de/cci",
+    "text": "Institut CCI"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/forschungsprojekte",
+    "text": "Forschungsprojekte"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/promotionszentrum-angewandte-informatik",
+    "text": "Promotionszentrum­ Angewandte­ Informatik"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/caebus",
+    "text": "Center for Advanced ­­E-Business­­ Studies (CAEBUS)"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/forschung/promotion",
+    "text": "Promotion"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international",
+    "text": "International\n\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international/incoming",
+    "text": "Incoming"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international/outgoing",
+    "text": "Outgoing"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/international/internationale-partnerschaften",
+    "text": "Internationale ­Partnerschaften"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/design-informatik-medien-in-wiesbaden",
+    "text": "Design Informatik Medien in Wiesbaden"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns",
+    "text": "Über uns\n\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/studieren-bei-uns",
+    "text": "Studieren bei uns\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tÜbersicht"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/studieren-bei-uns/infos-fuer-erstsemester",
+    "text": "Infos für Erstsemester"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/studieren-bei-uns/infos-fuer-studieninteressierte",
+    "text": "Infos für Studieninteressierte"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/leitung-und-organisation",
+    "text": "Leitung und Organisation"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/organisation-gremien-ansprechpersonen",
+    "text": "Ansprechpersonen und Gremien"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/personen-am-fachbereich",
+    "text": "Personen am Fachbereich"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/kontakt",
+    "text": "Kontakt"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/alumni-ehemalige",
+    "text": "Alumni & Ehemalige"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/ueber-uns/aktuelles",
+    "text": "Aktuelles"
+  },
+  {
+    "href": "https://www.hs-rm.de/login",
+    "text": "Anmeldung Beschäftigte"
+  },
+  {
+    "href": "https://www.hs-rm.de/login",
+    "text": "Anmeldung Studierende"
+  },
+  {
+    "href": "https://www.hs-rm.de/suche",
+    "text": "Suche"
+  },
+  {
+    "href": "https://www.hs-rm.de/en/design-computer-science-media",
+    "text": "en"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/fileadmin/_processed_/b/f/csm__MG_6474_17fd2c3d76.jpg",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/bachelor",
+    "text": "Bachelor"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/studiengaenge/master",
+    "text": "Master"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/meldung/werkschau-am-campus-unter-den-eichen",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/meldung/world-design-capital-2026-vintage-shopping-tour",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/meldung/kommunikationsstudierende-der-hsrm-beim-adc-creative-club-in-frankfurt",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/meldungen",
+    "text": "Alle Meldungen"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/termin/wdc-campus-ausstellung",
+    "text": "WDC-Campus Ausstellung \"dreams, ideas & prototypes\"Innovative, forschungsbasierte Projekte aus Design, Architektur und Wissenschaft von Student:innen, Absolvent:innen und Start-upsFr. 03.07.20262026-0"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/termin/mobile-media-forum",
+    "text": "Mobile Media Forum19. Mobile Media Forum:\r\n29. September 2026\r\nDas neue AI First Paradigma - Mit Agentic AI und Human-AI-Collaboration die Zukunft der Digitalisierung gestaltenDi. 29.09.20262026-09-29"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/termin/158-fbr-sitzung",
+    "text": "158. FBR-Sitzung158. FachbereichsratsitzungDi. 20.10.20262026-10-20T00:00:00+02:00UdE- Gebäude B1, Raum B002"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien/termine",
+    "text": "Alle Termine"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien#",
+    "text": "Feedback zur Seite"
+  },
+  {
+    "href": "https://www.hs-rm.de/design-informatik-medien#top",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/kontakt-und-service",
+    "text": "Kontakt und Service"
+  },
+  {
+    "href": "https://www.hs-rm.de/hilfe-im-notfall",
+    "text": "Hilfe im Notfall"
+  },
+  {
+    "href": "https://www.hs-rm.de/impressum",
+    "text": "Impressum"
+  },
+  {
+    "href": "https://www.hs-rm.de/datenschutz",
+    "text": "Datenschutz"
+  },
+  {
+    "href": "https://www.hs-rm.de/barrierefreiheit",
+    "text": "Barrierefreiheit"
+  },
+  {
+    "href": "https://www.hs-rm.de/leichte-sprache",
+    "text": "Leichte Sprache"
+  },
+  {
+    "href": "https://www.youtube.com/channel/UCDw5QulDbevSc436g1YgG5g",
+    "text": "Youtube"
+  },
+  {
+    "href": "https://www.facebook.com/HSRheinMain",
+    "text": "Facebook"
+  },
+  {
+    "href": "https://www.instagram.com/hs_rheinmain/",
+    "text": "Instagram"
+  },
+  {
+    "href": "https://de.linkedin.com/school/hochschulerheinmain/",
+    "text": "LinkedIn"
+  },
+  {
+    "href": "https://www.hs-rm.de/ueber-uns/organisation/hochschulverwaltung/paq/systemakkreditierte-hochschule",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/chancengerechtigkeit/gleichstellung/grundlagen",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/chancengerechtigkeit/diversity/teilnahme-am-diversity-audit",
+    "text": ""
+  },
+  {
+    "href": "https://www.hs-rm.de/kooperationen/foerderkultur/deutschlandstipendium",
+    "text": ""
+  }
+]

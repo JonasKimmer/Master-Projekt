@@ -1,0 +1,164 @@
+\documentclass[final]{beamer}
+
+\usepackage[orientation=portrait,size=a0,scale=1.6]{beamerposter}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{pifont}
+
+\definecolor{primary}{HTML}{0D9488}
+\definecolor{dark}{HTML}{134E4A}
+\definecolor{muted}{HTML}{6B7280}
+\definecolor{soft}{HTML}{F0FDFA}
+\definecolor{warn}{HTML}{D97706}
+
+\usetheme{default}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{block title}{fg=white,bg=primary}
+\setbeamercolor{block body}{fg=dark,bg=soft}
+\setbeamercolor{block title alerted}{fg=white,bg=dark}
+\setbeamercolor{block body alerted}{fg=dark,bg=soft}
+\setbeamerfont{block title}{size=\LARGE,series=\bfseries}
+\setbeamerfont{block body}{size=\large}
+\setbeamertemplate{navigation symbols}{}
+
+\newlength{\sepwidth}\setlength{\sepwidth}{0.025\textwidth}
+\newlength{\boxwidth}\setlength{\boxwidth}{0.305\textwidth}
+
+\begin{document}
+\begin{frame}[t]{}
+
+% ── HEADER ───────────────────────────────────────────────────────────────────
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[primary] (current page.north west)
+    rectangle ([yshift=-24cm]current page.north east);
+\end{tikzpicture}
+
+\vspace{1.0cm}
+{\color{white}\fontsize{52}{62}\selectfont\bfseries
+  Wie komplex ist eine Website wirklich?}\\[0.6cm]
+{\color{white}\fontsize{24}{30}\selectfont
+  Jonas Kimmer · Wirtschaftsinformatik M.Sc. · Hochschule RheinMain · 2026}\\[0.3cm]
+{\color{soft}\fontsize{20}{26}\selectfont
+  Betreuung: M.Sc. Yasmina Tajja \quad|\quad j.kimmer@student.hs-rm.de}
+\vspace{2.0cm}
+
+% ── ZEILE 1: Forschungsfrage + Beitrag ───────────────────────────────────────
+\begin{columns}[T]
+\begin{column}{0.47\textwidth}
+  \begin{alertblock}{Forschungsfrage}
+    \vspace{0.3em}
+    \large
+    Website-Komplexität lässt sich heute nicht\\
+    objektiv messen oder vergleichen.\\[0.5em]
+    \LARGE\bfseries
+    Lässt sich Website-Komplexität automatisch\\
+    messen und klassifizieren, ohne\\
+    manuelle Inspektion?
+    \vspace{0.3em}
+  \end{alertblock}
+\end{column}
+\hspace{\sepwidth}
+\begin{column}{0.47\textwidth}
+  \begin{block}{Beitrag dieser Arbeit}
+    \vspace{0.4em}
+    {\large
+    \textcolor{primary}{\bfseries Tool\enskip}--\enskip
+      Python · Streamlit · Einlesen · 6 Merkmale · Export\\[0.5em]
+    \textcolor{primary}{\bfseries Daten\enskip}--\enskip
+      DOM-Tiefe · Knoten · Links · Text · Medien · Formulare\\[0.5em]
+    \textcolor{primary}{\bfseries Ergebnis\enskip}--\enskip
+      Clustering ohne manuelle Labels
+    }
+    \vspace{0.3em}
+  \end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.8em}
+
+% ── ZEILE 2: Cluster-Bild (grüner Balken, Titel zentriert) ───────────────────
+{\setbeamertemplate{block title}{\vskip0.4em\centering\LARGE\bfseries\insertblocktitle\vskip0.4em}
+\begin{block}{Seitentypen automatisch erkannt}
+  \vspace{0.4em}
+  \begin{center}
+    \includegraphics[width=0.62\linewidth]{paper2_abb2_cluster_scatter.png}\\[0.4em]
+    {\large\color{muted}
+    Proof of Concept · 3 Test-Websites · 47 Seiten · drei Typen vollautomatisch gefunden}
+  \end{center}
+  \vspace{0.2em}
+\end{block}}
+
+\vspace{0.8em}
+
+% ── ZEILE 3: 3 Befunde nebeneinander ─────────────────────────────────────────
+\begin{columns}[T]
+
+\begin{column}{\boxwidth}
+  \begin{tikzpicture}
+    \node[fill=primary,rounded corners=8pt,inner sep=14pt,
+          text width=0.95\linewidth]{
+      \color{white!70!primary}\large\bfseries
+      \ding{172} Zwei Merkmale reichen\\[0.5em]
+      \color{white}\large\mdseries
+      Linkanzahl und DOM-Tiefe allein\\
+      genügen zur Klassifikation.\\
+      Alle anderen Merkmale sind zweitrangig.
+    };
+  \end{tikzpicture}
+\end{column}
+
+\hspace{\sepwidth}
+
+\begin{column}{\boxwidth}
+  \begin{tikzpicture}
+    \node[fill=dark,rounded corners=8pt,inner sep=14pt,
+          text width=0.95\linewidth]{
+      \color{white!60!dark}\large\bfseries
+      \ding{173} Kein einziges Label von Hand\\[0.5em]
+      \color{white}\large\mdseries
+      Normales ML braucht manuell\\
+      markierte Beispiele. Hier klassifiziert\\
+      der Algorithmus vollständig selbst.
+    };
+  \end{tikzpicture}
+\end{column}
+
+\hspace{\sepwidth}
+
+\begin{column}{\boxwidth}
+  \begin{tikzpicture}
+    \node[fill=warn,rounded corners=8pt,inner sep=14pt,
+          text width=0.95\linewidth]{
+      \color{white!70!warn}\large\bfseries
+      \ding{174} Formulare? Fast egal.\\[0.5em]
+      \color{white}\large\mdseries
+      Obwohl Formulare die stärkste\\
+      Interaktion bieten, erklären sie\\
+      Komplexität am wenigsten.
+    };
+  \end{tikzpicture}
+\end{column}
+
+\end{columns}
+
+\vspace{0.8em}
+
+% ── ZEILE 4: Ausblick (volle Breite) ─────────────────────────────────────────
+\begin{alertblock}{Anwendung \& Ausblick}
+  \vspace{0.3em}
+  \LARGE\bfseries
+  Komplexität ist messbar. Jetzt muss der Mensch bestätigen.\\[0.5em]
+  \large\mdseries
+  · Einsetzbar für Redesign-Vergleiche, Website-Audits und automatische Kategorisierung\\[0.3em]
+  · Offene Frage: Stimmen Algorithmus und Mensch überein?\\[0.3em]
+  {\color{muted!60!white}\normalsize Manuelle Validierung auf einem größeren Datensatz steht aus.}
+  \vspace{0.3em}
+\end{alertblock}
+
+\end{frame}
+\end{document}

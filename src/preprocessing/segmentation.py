@@ -1,0 +1,125 @@
+"""Task and segment logic for experiment trials.
+
+Takes a list of EventRecord objects and produces a TrialTimeline with
+paired Segment objects. Handles missing end events gracefully.
+"""
+
+from __future__ import annotations
+
+import re
+from collections import defaultdict
+
+from src.models.experiment_records import (
+    EventRecord,
+    EventType,
+    Segment,
+    TrialRecord,
+    TrialTimeline,
+)
+
+# ── Label helpers ─────────────────────────────────────────────────────────────
+
+_START_TYPES = {EventType.TASK_START, EventType.BASELINE_START, EventType.QUESTIONNAIRE_START}
+_END_TYPES   = {EventType.TASK_END,   EventType.BASELINE_END,   EventType.QUESTIONNAIRE_END}
+
+_START_SUFFIXES = ("_start", "_begin", " start", " begin")
+_END_SUFFIXES   = ("_end",   "_stop",  " end",   " stop")
+
+_TYPE_MAP: dict[EventType, str] = {
+    EventType.TASK_START:          "task",
+    EventType.TASK_END:            "task",
+    EventType.BASELINE_START:      "baseline",
+    EventType.BASELINE_END:        "baseline",
+    EventType.QUESTIONNAIRE_START: "questionnaire",
+    EventType.QUESTIONNAIRE_END:   "questionnaire",
+}
+
+
+def _base_label(label: str) -> str:
+    """Strip start/end suffix to get a matchable base label."""
+    lower = label.lower()
+    for suffix in _START_SUFFIXES + _END_SUFFIXES:
+        if lower.endswith(suffix):
+            return label[: len(label) - len(suffix)].strip("_-: ").strip()
+    # Fallback: also handles colon-separated "task:start" → "task"
+    return re.sub(r"[\s_:-]*(start|end|begin|stop)[\s_:-]*$", "", lower, flags=re.I).strip()
+
+
+def _segment_type(event_type: EventType) -> str:
+    return _TYPE_MAP.get(event_type, "unknown")
+
+
+# ── Core segmentation ─────────────────────────────────────────────────────────
+
+def build_timeline(trial_id: str, events: list[EventRecord]) -> TrialTimeline:
+    """
+    Pair start/end events into Segment objects.
+
+    Strategy:
+    - Group events by base_label.
+    - Within each group, match the first unmatched START to the next END.
+    - Unmatched STARTs produce incomplete segments (end_ms=None).
+    - Orphaned END events (no preceding START) are recorded as quality issues.
+    """
+    timeline = TrialTimeline(trial_id=trial_id)
+    sorted_events = sorted(events, key=lambda e: e.timestamp)
+
+    # pending_starts[base_label] = stack of unmatched start EventRecords
+    pending_starts: dict[str, list[EventRecord]] = defaultdict(list)
+
+    for event in sorted_events:
+        base = _base_label(event.label)
+        seg_type = _segment_type(event.event_type)
+
+        if event.event_type in _START_TYPES:
+            pending_starts[base].append(event)
+
+        elif event.event_type in _END_TYPES:
+            if pending_starts[base]:
+                start_event = pending_starts[base].pop(0)  # FIFO
+                timeline.segments.append(Segment(
+                    label=base,
+                    segment_type=seg_type,
+                    start_ms=start_event.timestamp,
+                    end_ms=event.timestamp,
+                    start_event=start_event,
+                    end_event=event,
+                ))
+            else:
+                timeline.quality_issues.append(
+                    f"Orphaned END event at t={event.timestamp:.0f} ms (label='{event.label}') — no matching START"
+                )
+
+    # Flush unmatched STARTs as incomplete segments
+    for base, stack in pending_starts.items():
+        for start_event in stack:
+            seg_type = _segment_type(start_event.event_type)
+            timeline.segments.append(Segment(
+                label=base,
+                segment_type=seg_type,
+                start_ms=start_event.timestamp,
+                end_ms=None,
+                start_event=start_event,
+                end_event=None,
+            ))
+            timeline.quality_issues.append(
+                f"Missing END for segment '{base}' started at t={start_event.timestamp:.0f} ms"
+            )
+
+    # Sort final segments by start time
+    timeline.segments.sort(key=lambda s: s.start_ms)
+
+    # Check for overlapping segments
+    for i in range(len(timeline.segments) - 1):
+        a, b = timeline.segments[i], timeline.segments[i + 1]
+        if a.end_ms is not None and b.start_ms < a.end_ms:
+            timeline.quality_issues.append(
+                f"Overlap: '{a.label}' (ends {a.end_ms:.0f} ms) overlaps '{b.label}' (starts {b.start_ms:.0f} ms)"
+            )
+
+    return timeline
+
+
+def build_timeline_from_trial(trial: TrialRecord) -> TrialTimeline:
+    """Convenience wrapper: build a TrialTimeline directly from a TrialRecord."""
+    return build_timeline(trial.trial_id, trial.events)
