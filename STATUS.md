@@ -125,10 +125,11 @@ mehrfach reviewt (Code, Paper-Inhalt, Reproduzierbarkeit):
 
 ## Tests und Qualitätssicherung
 
-- `tests/` — 110 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
+- `tests/` — 132 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
   ohne `data/` selbst). Abgedeckt: Synchronisation, Segmentierung,
   Trial-/Alias-Verträge, Quality-Checks, ML-Vertragskern, UI-Pfade
-  (Tabular-Filter, Missing-Report, Windows-Tab/Definitionsladen) sowie
+  (Tabular-Filter, Missing-Report, Windows-Tab/Definitionsladen),
+  App-Module (windowing, sensor_features, web_features, Loader) sowie
   alle vier Analyse-Skripte (inkl. Determinismus).
 - Neun Review-Runden über Code und Papers; alle gefundenen Crash-Bugs
   behoben, letzte offene Punkte siehe unten.
@@ -137,15 +138,8 @@ mehrfach reviewt (Code, Paper-Inhalt, Reproduzierbarkeit):
 
 ## Verbleibende Punkte (nice-to-have, nicht abgabe-blockierend)
 
-- Testabdeckung für `windowing`, `sensor_features`, `web_features`,
-  `reporting` und die ungetesteten Loader (`website_loader`,
-  `tabular_loader`) — betrifft App-Pfade, nicht die Paper-Ergebnisse
-- pandas-4-Migration: `pd.api.types.is_categorical_dtype` in
-  `tabular_tab.py` ist deprecated (löst Warnung aus, Aufruf funktioniert noch)
-- Paper 2, optional: StratifiedKFold-/Log-Transform-Robustheitsvarianten
-  und balancierte Klassifikationsmetriken nachreichen
-- Paper 1: kein erzeugendes Skript für Abbildung 1 (`figures/
-  paper1_abb1_tlx_boxplot.png`) — im Paper nicht als reproduzierbar
-  deklariert
-- Repo-Hygiene: verwaiste `worktree-agent-*`-Branches, `figures/old/`,
-  `app.md` (veraltete Plan-Kopie)
+- Testabdeckung für `reporting` und `styles` — reine Darstellungs-/Export-
+  Pfade ohne Paper-Bezug
+- Klärung mit der Ursprungserhebung (nur vom Datenbesitzer möglich):
+  TLX-Scoring-Richtung der Dimension 'Leistung', Aufgaben-Texte/-Antwort-
+  format, Item-Anker, Geräte-Modelle (Tobii/Shimmer-Konfiguration)
