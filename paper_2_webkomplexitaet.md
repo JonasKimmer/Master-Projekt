@@ -280,7 +280,7 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 Die zentrale Forschungsfrage ist damit differenziert zu beantworten: Automatisierte Merkmalsextraktion und Clustering von Webseiten sind technisch machbar, ein belastbarer Mehrwert des mehrdimensionalen Modells gegenüber einer Einzelmetrik lässt sich mit dieser Stichprobe dagegen nicht zeigen — auch die Dekorrelations-Analyse (4.5) verbessert das Mehrdimensionale nur auf die „gut"-Schwelle, ohne die Einzelmetrik-Baseline zu erreichen. Jede der in dieser Arbeit durchgeführten Robustheitsprüfungen deckt einen anderen Punkt auf, an dem eine oberflächliche Analyse zu falschen Schlüssen geführt hätte: die suboptimale Cluster-Anzahl, eine durch MDI verzerrte Merkmalsrangfolge, eine durch Einzel-Split überschätzte Modellgüte (stratifiziert 0,94 statt 1,00) und eine Einzelmetrik, die im internen Gütekriterium sogar besser abschneidet als das volle Sechs-Merkmale-Modell. Am schwersten wiegt der Befund aus 4.6, denn erst der Test gegen ein unabhängiges Kriterium zeigt, dass die gefundene Clusterstruktur im geprüften Außenkriterium ohne nachweisbaren Effekt bleibt.
 
-Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websites strukturell beschreiben kann, aber ohne begleitende externe Validierung keine belastbare Aussage über praktische Relevanz trifft. Für die Methodik folgt daraus eine allgemeinere Lehre für vergleichbare Arbeiten: Cluster-Anzahl, Feature-Importance-Verfahren und Modellbewertung sollten grundsätzlich gegeneinander geprüft werden, bevor aus einem einzelnen Durchlauf Schlüsse gezogen werden.
+Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websites strukturell beschreiben kann, aber ohne begleitende externe Validierung keine belastbare Aussage über praktische Relevanz trifft. Für die Methodik folgt daraus eine allgemeinere Lehre für vergleichbare Arbeiten: Cluster-Anzahl, Feature-Importance-Verfahren und Modellbewertung sollten grundsätzlich gegeneinander geprüft werden, bevor aus einem einzelnen Durchlauf Schlüsse gezogen werden. Der dabei durchlaufene Prüfkanon — k-Scan, Einzelmetrik-Baseline, Dekorrelation, Permutations- statt MDI-Importance, stratifizierte Cross-Validation, externes Kriterium — ist als wiederverwendbare Checkliste für Clustering-Studien auf tabellarischen Merkmalen formulierbar; ebenso ist die Pipeline aus robots.txt-konformem Crawler, typisierten Loader-Datenklassen und entkoppelter Merkmalsberechnung unabhängig von dieser Datenlage einsetzbar und um weitere Merkmalsfamilien erweiterbar.
 
 ---
 
@@ -296,7 +296,7 @@ Breiman, L. (2001). Random forests. *Machine Learning, 45*(1), 5–32.
 
 Butkiewicz, M., Madhyastha, H. V., & Sekar, V. (2011). Understanding website complexity: Measurements, metrics, and implications. *Proceedings of the 11th ACM SIGCOMM Conference on Internet Measurement (IMC '11)*.
 
-Chen, M. (2018). Improving website structure through reducing information overload. *Decision Support Systems*.
+Chen, M. (2018). Improving website structure through reducing information overload. *Decision Support Systems, 110*, 84–94.
 
 Hubert, L., & Arabie, P. (1985). Comparing partitions. *Journal of Classification, 2*(1), 193–218.
 
