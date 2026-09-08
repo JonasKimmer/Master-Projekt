@@ -173,6 +173,72 @@ def task_event_counts(data_dir: Path | str = DATA_DIR) -> tuple[int, int]:
     return starts, ends
 
 
+ARTIFACT_THRESHOLD_S = 600.0  # >10 min gilt als Datenerfassungsstörung (T-3/Stadt-FIFO-Artefakt)
+
+
+def task_level_table2(data_dir: Path | str = DATA_DIR) -> dict[str, dict[str, float]]:
+    """Tabelle 2 (Paper 1): Aufgabendauern je Domäne, FIFO-Paarung über
+    build_timeline, Ausreißer-Ausschluss >600 s (das verwaiste-Start-
+    Artefakt in T-3/Stadt). Reproduziert die Paper-Werte exakt."""
+    import numpy as np
+    from src.preprocessing.segmentation import build_timeline
+
+    per_domain: dict[str, list[float]] = {}
+    for trial in load_trials_from_dir(str(data_dir)):
+        for seg in build_timeline(trial.trial_id, trial.events).segments:
+            if seg.segment_type == "task" and seg.is_complete and seg.domain:
+                per_domain.setdefault(seg.domain, []).append(
+                    (seg.end_ms - seg.start_ms) / 1000.0)
+
+    out = {}
+    for d, vals in per_domain.items():
+        a = np.array(vals)
+        art = a[a > ARTIFACT_THRESHOLD_S]
+        a = a[a <= ARTIFACT_THRESHOLD_S]
+        out[d] = {"n": len(a), "M": float(a.mean()), "SD": float(a.std(ddof=1)),
+                  "min": float(a.min()), "max": float(a.max()),
+                  "n_artifacts": len(art), "artifact_s": art.tolist()}
+    return out
+
+
+def make_tlx_boxplot(data_dir: Path | str = DATA_DIR,
+                     out_path: Path = Path("figures/paper1_abb1_tlx_boxplot.png")) -> None:
+    """Abbildung 1 (Paper 1): Boxplots der sechs NASA-TLX-Dimensionen je
+    Domäne."""
+    import matplotlib.axes
+    from src.loaders.trial_loader import load_trials_from_dir
+
+    dims = ["mentale", "koerperliche", "zeitliche", "leistung", "anstrengung", "frustration"]
+    labels = ["Mentale", "Körperliche", "Zeitliche", "Leistung", "Anstrengung", "Frustration"]
+    data = {d: {dim: [] for dim in dims} for d in ("gaming", "health", "city")}
+    for trial in load_trials_from_dir(str(data_dir)):
+        for e in trial.events:
+            if e.label.lower() == "tlx:submit":
+                d = e.meta.get("domain")
+                s = e.meta.get("scores") or {}
+                if d in data:
+                    for dim in dims:
+                        v = s.get(dim)
+                        if isinstance(v, (int, float)):
+                            data[d][dim].append(float(v))
+
+    fig, axes = plt.subplots(2, 3, figsize=(13, 7))
+    colors = {"gaming": "#4C72B0", "health": "#55A868", "city": "#C44E52"}
+    for ax, dim, lab in zip(axes.flat, dims, labels):
+        ax.boxplot([data[d][dim] for d in ("gaming", "health", "city")],
+                   tick_labels=["Gaming", "Gesundheit", "Stadt"], patch_artist=True,
+                   medianprops=dict(color="black"))
+        for patch, d in zip(ax.patches, ("gaming", "health", "city")):
+            patch.set_facecolor(colors[d]); patch.set_alpha(0.7)
+        ax.set_title(lab, fontsize=11)
+        ax.set_ylabel("0–100")
+    fig.suptitle("NASA-TLX-Dimensionen nach Domäne (N = 18 je Domäne)")
+    fig.tight_layout()
+    out_path.parent.mkdir(exist_ok=True)
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
 def _require_data() -> bool:
     if not DATA_DIR.exists():
         print(f"Hinweis: {DATA_DIR} fehlt — die Experiment-Rohdaten sind aus "
@@ -188,6 +254,13 @@ def main() -> None:
     import numpy as np
     s, e = task_event_counts()
     print(f"task:start/-end gesamt: {s}/{e}")
+
+    print("\nTabelle 2-Nachbau (FIFO, aufgabenebene, Artefakte >600 s ausgeschlossen):")
+    for d, row in sorted(task_level_table2().items()):
+        print(f"  {d:8} n={row['n']} M={row['M']:6.1f} SD={row['SD']:5.1f} "
+              f"min={row['min']:5.1f} max={row['max']:6.1f} "
+              f"(Ausreißer: {row['n_artifacts']}, {row['artifact_s']})")
+
     durs = position_durations()
     print("Bearbeitungszeit je Aufgabenposition (Restart-Paarung):")
     for i, viz in enumerate(VIZ_ORDER):
@@ -248,6 +321,10 @@ def main() -> None:
     plt.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Gespeichert: {out}")
     plt.close(fig)
+
+    # Abbildung 1: TLX-Boxplots je Domäne
+    make_tlx_boxplot()
+    print("Gespeichert: figures/paper1_abb1_tlx_boxplot.png")
 
 
 if __name__ == "__main__":

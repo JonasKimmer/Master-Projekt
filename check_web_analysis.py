@@ -139,6 +139,36 @@ def stability(df: pd.DataFrame, seed: int = SEED_STABILITY,
     return float(np.mean(aris)), float(np.min(aris))
 
 
+def stratified_cv(df: pd.DataFrame, labels) -> dict:
+    """StratifiedKFold-Variante (5 Folds, Seed 42) plus balancierte
+    Accuracy der out-of-fold-Vorhersagen — Ergänzung zur unstratifizierten
+    Standard-CV, da die Cluster stark unbalanciert sind (30/6/11)."""
+    from sklearn.metrics import balanced_accuracy_score
+    from sklearn.model_selection import StratifiedKFold, cross_val_predict, cross_val_score
+
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    rf = RandomForestClassifier(n_estimators=100, random_state=SEED_RF)
+    acc = cross_val_score(rf, df[FEATS], labels, cv=skf)
+    pred = cross_val_predict(rf, df[FEATS], labels, cv=skf)
+    return {
+        "folds": [round(float(v), 3) for v in acc],
+        "mean": float(acc.mean()),
+        "balanced_accuracy": float(balanced_accuracy_score(labels, pred)),
+    }
+
+
+def log_transform_clustering(df: pd.DataFrame) -> dict:
+    """Robustheitsvariante gegen die Rechtsschiefe von link_count und
+    text_length: log1p vor der z-Standardisierung."""
+    Xlog = StandardScaler().fit_transform(np.log1p(df[FEATS]))
+    labels_log = _kmeans(Xlog)
+    ref = _kmeans(StandardScaler().fit_transform(df[FEATS]))
+    return {
+        "silhouette": float(silhouette_score(Xlog, labels_log)),
+        "ari_to_untransformed": float(adjusted_rand_score(ref, labels_log)),
+    }
+
+
 def make_figures(df: pd.DataFrame, labels, out_dir: Path = Path("figures")) -> None:
     out_dir.mkdir(exist_ok=True)
     # Abbildung 1: Merkmalsverteilung (M ± SD, skaliert wie im Paper)
@@ -216,6 +246,13 @@ def main() -> None:
     print(f"\nSilhouette-Bootstrap: M={m:.3f}, 95%-CI [{lo:.3f}, {hi:.3f}]")
     smean, smin = stability(df)
     print(f"Cluster-Stabilität (50 Seeds, rng(0)): M={smean:.3f}, min={smin:.3f}")
+
+    scv = stratified_cv(df, ca["labels"])
+    print(f"StratifiedKFold-CV: {scv['folds']} (M {scv['mean']:.3f}), "
+          f"balancierte Accuracy {scv['balanced_accuracy']:.3f}")
+    lt = log_transform_clustering(df)
+    print(f"Log-Transform: Silhouette {lt['silhouette']:.3f}, "
+          f"ARI zur untransformierten Lösung {lt['ari_to_untransformed']:.3f}")
 
     c = df[FEATS].corr().round(2)
     print(f"Korrelationen: r(link,text)={c.loc['link_count', 'text_length']}, "

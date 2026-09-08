@@ -73,7 +73,7 @@ def _render_sidebar_filters(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFram
 
         elif pd.api.types.is_object_dtype(
             filtered_df[col]
-        ) or pd.api.types.is_categorical_dtype(filtered_df[col]):
+        ) or isinstance(filtered_df[col].dtype, pd.CategoricalDtype):
             unique_values = df[col].dropna().unique()
             user_cat_input = st.sidebar.multiselect(
                 f"Kategorien {col}", unique_values, default=unique_values

@@ -76,7 +76,7 @@ Der NASA-TLX (Raw-Version) wurde nach jedem Domänenblock erhoben (54 Datensätz
 
 Aus den Eventlogs wurden Start-/Endzeitstempel je Aufgabe extrahiert (15 Aufgabensegmente plus Baseline-Segment(e): in der Regel eines, in drei Trials — darunter T-3 — zwei; vgl. 4.4 zur Konsequenz für die Zentrierung). Die in 4.3 verwendete kumulierte Bearbeitungszeit je Domäne ist die Summe der fünf Aufgabendauern eines Domänenblocks. Sampling-Lücken (>3.000 ms; Schwellenwert der Standardeinstellung der Analyseumgebung), doppelte Zeitstempel und Plausibilitätsverletzungen wurden automatisch geprüft. Dabei fanden sich 120 negative Hautleitwert-Samples (physiologisch unmögliche Leitfähigkeiten), verteilt auf fünf Trials (T-3, T-7, T-8, T-12, T-14); diese Werte verbleiben als Rohwerte in den deskriptiven Statistiken (Tabelle 4) und werden in 5.3 als Einschränkung benannt.
 
-Zwei Event-Paarungslogiken kommen zum Einsatz, die sich in einem konkreten Datenartefakt unterscheiden: In T-3/Stadt existiert ein verwaister `task:start` ohne zugehöriges `task:end` (271 Starts stehen 270 Ends gegenüber; die Lücke zum nächsten Start beträgt rund 825 s). Die tabellarische Aufgaben-Auswertung (Tabelle 2) paart nach dem First-In-First-Out-Vertrag der Analyseumgebung und weist diese Lücke daher als eigene, rund 14 Minuten lange Aufgabe aus — daraus resultiert der in 4.2 berichtete Ausreißer. Die Korrelationsauswertung (Tabelle 3) behandelt einen neuen Start derselben Domäne als Neustart und verwirft den verwaisten Start. Beide Berechnungswege wurden eigenständig aus den Rohdaten rekonstruiert; die verbleibende Restdifferenz beim Stadt-Mittelwert (ca. 2 %) ist auf genau dieses Artefakt zurückzuführen und damit geklärt (früher als ungeklärt vermerkt).
+Zwei Event-Paarungslogiken kommen zum Einsatz, die sich in einem konkreten Datenartefakt unterscheiden: In T-3/Stadt existiert ein verwaister `task:start` ohne zugehöriges `task:end` (271 Starts stehen 270 Ends gegenüber; die Lücke zum nächsten Start beträgt rund 825 s). Die tabellarische Aufgaben-Auswertung (Tabelle 2) paart nach dem First-In-First-Out-Vertrag der Analyseumgebung und weist diese Lücke daher als eigene, rund 14 Minuten lange Aufgabe aus — daraus resultiert der in 4.2 berichtete Ausreißer. Die Korrelationsauswertung (Tabelle 3) behandelt einen neuen Start derselben Domäne als Neustart und verwirft den verwaisten Start. Beide Berechnungswege wurden eigenständig aus den Rohdaten rekonstruiert; mit der FIFO-Paarung reproduziert sich Tabelle 2 exakt (Reproduktion: `check_correlations.py`) — die früher beobachtete Restdifferenz von ca. 2 % beim Stadt-Mittelwert entstand durch Vermischung der beiden Paarungslogiken und ist damit geklärt.
 
 Alle berichteten Analysen sind über die Skripte `check_correlations.py`, `check_mixed_model.py` und `check_sensor_deltas.py` aus den Rohdaten reproduzierbar (s. Verfügbarkeitsstatement).
 
@@ -105,17 +105,17 @@ Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchst
 
 ![Abbildung 1: NASA-TLX-Boxplot](figures/paper1_abb1_tlx_boxplot.png)
 
-*Boxplots aller sechs NASA-TLX-Dimensionen je Domäne (N = 18). Median, Interquartilsabstand und Ausreißer. Die Boxplot-Mediane zeichnen dasselbe Bild wie die Mittelwerte in Tabelle 1.*
+*Boxplots aller sechs NASA-TLX-Dimensionen je Domäne (N = 18). Median, Interquartilsabstand und Ausreißer. Die Boxplot-Mediane zeichnen dasselbe Bild wie die Mittelwerte in Tabelle 1. Die Abbildung wird von `check_correlations.py` erzeugt.*
 
 ### 4.2 Bearbeitungszeit nach Domäne
 
-**Tabelle 2: Bearbeitungszeit in Sekunden (269 Aufgaben; 1 Ausreißer ausgeschlossen)**
+**Tabelle 2: Bearbeitungszeit in Sekunden (269 Aufgaben; 1 Ausreißer ausgeschlossen; Stichproben-SD; Reproduktion: `check_correlations.py`)**
 
 | Domäne | N | M (s) | SD (s) | Min | Max |
 |---|---|---|---|---|---|
-| Gaming | 90 | 69,6 | 38,5 | 7 | 214 |
-| Gesundheit | 90 | 75,2 | 54,1 | 7 | 310 |
-| Stadt | 89¹ | 68,7 | 32,3 | 16 | 164 |
+| Gaming | 90 | 69,6 | 38,7 | 7 | 214 |
+| Gesundheit | 90 | 75,2 | 54,4 | 7 | 310 |
+| Stadt | 89¹ | 68,7 | 32,5 | 16 | 164 |
 
 ¹ Ein Aufgabenmesswert (T-3, Stadt, 849 s = 14,2 min) wurde als Datenerfassungsstörung eingestuft und ausgeschlossen (N = 89 statt 90). Nach der Ursachenanalyse in 3.3 handelt es sich dabei sehr wahrscheinlich um das FIFO-gepaarte Artefakt des verwaisten Task-Starts. Die übrigen Daten dieses Trials blieben in der Auswertung.
 
@@ -237,7 +237,7 @@ Für die Forschung folgt ein doppelter Bedarf: eine Replikation mit größerer, 
 
 ## Daten- und Analyse-Verfügbarkeit
 
-Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. Die Kennzahlen sind über die im Projekt versionskontrollierten Skripte reproduzierbar: `check_correlations.py` (Korrelationen, Abbildung 2, Tabelle 2b, Start-/End-Zählungen), `check_mixed_model.py` (Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabellen 4 und 5, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung; zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert. **Ausnahme:** Tabelle 2 (aufgabenebene, 269 Messwerte) stammt aus der tabellarischen Auswertung der Analyseumgebung und wurde nur mit der in 3.3 dokumentierten Restdifferenz von ca. 2 % beim Stadt-Mittelwert rekonstruiert, nicht exakt reproduziert. Abbildung 1 (Boxplot) wurde einmalig erstellt und hat kein erzeugendes Skript.
+Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. **Alle Kennzahlen und beide Abbildungen sind über die im Projekt versionskontrollierten Skripte reproduzierbar:** `check_correlations.py` (Korrelationen, Abbildungen 1 und 2, Tabellen 2 und 2b, Start-/End-Zählungen), `check_mixed_model.py` (Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabellen 4 und 5, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung; zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert.
 
 ---
 
