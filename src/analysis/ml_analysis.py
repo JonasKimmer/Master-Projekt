@@ -13,12 +13,18 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 # ── Preprocessing ─────────────────────────────────────────────────────────────
 
 def prepare_features(df: pd.DataFrame, drop_cols: list[str] | None = None) -> tuple[pd.DataFrame, list[str]]:
-    """Drop non-feature columns and return numeric-only feature matrix + column list."""
+    """Drop non-feature columns and return numeric-only feature matrix + column list.
+
+    feature_names wird NACH dropna(axis=1, how="all") gebildet — die
+    zurückgegebene Liste muss exakt den Spalten der Matrix entsprechen,
+    sonst verrutscht jede Index-Zuordnung (Feature-Importances etc.).
+    """
     exclude = set(drop_cols or [])
     numeric = df.select_dtypes(include="number").drop(
         columns=[c for c in (drop_cols or []) if c in df.columns], errors="ignore"
     )
-    return numeric.dropna(axis=1, how="all").fillna(0), list(numeric.columns)
+    features = numeric.dropna(axis=1, how="all").fillna(0)
+    return features, list(features.columns)
 
 
 # ── Clustering ────────────────────────────────────────────────────────────────
