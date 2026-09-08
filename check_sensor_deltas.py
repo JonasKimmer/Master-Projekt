@@ -102,6 +102,30 @@ def pooled_descriptives(data_dir: Path | str = DATA_DIR) -> dict[str, dict[str, 
     }
 
 
+def effective_rates_and_validity(data_dir: Path | str = DATA_DIR) -> None:
+    """Effektive Messraten (aus Timestamp-Medianabständen) und Anteil
+    gültiger Pupillen-Samples — direkt aus den Fusionsdaten gemessen."""
+    import numpy as np
+    shimmer_r, gaze_r = [], []
+    ok = tot = 0
+    for trial in load_trials_from_dir(str(data_dir)):
+        if not trial.streams:
+            continue
+        stream = trial.streams[0]
+        ts = np.array(stream.timestamps)
+        for ch, out in (("shimmer.GsrKOhm", shimmer_r), ("gaze.LeftX", gaze_r)):
+            tss = ts[[i for i, v in enumerate(stream.channels.get(ch, [])) if v is not None]]
+            if len(tss) > 10:
+                out.append(1000.0 / float(np.median(np.diff(np.sort(tss)))))
+        for ch in ("gaze.LeftValidity", "gaze.RightValidity"):
+            v = stream.channels.get(ch, [])
+            ok += sum(1 for x in v if x == 1.0)
+            tot += sum(1 for x in v if x is not None)
+    print(f"Shimmer effektiv: M={np.mean(shimmer_r):.2f} Hz (SD {np.std(shimmer_r):.2f}, n={len(shimmer_r)})")
+    print(f"Gaze effektiv:    M={np.mean(gaze_r):.2f} Hz (SD {np.std(gaze_r):.2f}, n={len(gaze_r)})")
+    print(f"Pupillen-Validity == 1: {100.0 * ok / tot:.1f} % von {tot:,} Samples")
+
+
 def main() -> None:
     deltas = sensor_deltas(DATA_DIR)
     print(f"{'Kanal':26} {'Gaming Δ (SD)':>18} {'Gesundheit Δ (SD)':>20} {'Stadt Δ (SD)':>16}")
@@ -117,6 +141,9 @@ def main() -> None:
     for label, s in pooled_descriptives(DATA_DIR).items():
         print(f"  {label:28} M={s['M']:8.2f} SD={s['SD']:6.2f} "
               f"min={s['min']:7.2f} max={s['max']:7.2f} n={s['n']}")
+
+    print("\nEffektive Messraten und Pupillen-Validität:")
+    effective_rates_and_validity(DATA_DIR)
 
 
 if __name__ == "__main__":

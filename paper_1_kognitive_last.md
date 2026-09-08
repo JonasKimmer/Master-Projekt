@@ -71,8 +71,8 @@ Der NASA-TLX (Raw-Version) wurde nach jedem Domänenblock erhoben (54 Datensätz
 
 ### 3.3 Messinstrumente und Datenvorverarbeitung
 
-- **Shimmer3** (Handgelenk, 10 Hz): Hautleitwert, Herzrate (PPG), Beschleunigung/Gyroskop/Magnetometer.
-- **Tobii Eye-Tracker** (remote, ~33 Hz): Blickpunkt, Pupillendurchmesser beidseitig.
+- **Shimmer3** (Handgelenk; nominal 10 Hz, aus den Timestamps effektiv M = 9,6 Hz über alle Trials): Hautleitwert, Herzrate (PPG), Beschleunigung/Gyroskop/Magnetometer.
+- **Tobii Eye-Tracker** (remote; native Angabe der Ursprungserhebung ~33 Hz, in den ausgelieferten Fusionsdaten effektiv M = 9,5 Hz, da die Fusion auf das 10-Hz-Zeitraster bündelt): Blickpunkt, Pupillendurchmesser beidseitig mit separaten Gültigkeitsflags (83,5 % der Pupillen-Samples als gültig markiert).
 
 Aus den Eventlogs wurden Start-/Endzeitstempel je Aufgabe extrahiert (15 Aufgabensegmente + ein Baseline-Segment pro Trial). Die in 4.3 verwendete kumulierte Bearbeitungszeit je Domäne ist die Summe der fünf Aufgabendauern eines Domänenblocks. Sampling-Lücken (>3.000 ms; Schwellenwert der Standardeinstellung der Analyseumgebung), doppelte Zeitstempel und Plausibilitätsverletzungen wurden automatisch geprüft. Dabei fanden sich 120 negative Hautleitwert-Samples (physiologisch unmögliche Leitfähigkeiten), verteilt auf fünf Trials (T-3, T-7, T-8, T-12, T-14); diese Werte verbleiben als Rohwerte in den deskriptiven Statistiken (Tabelle 4) und werden in 5.3 als Einschränkung benannt.
 
@@ -120,6 +120,20 @@ Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchst
 ¹ Ein Aufgabenmesswert (T-3, Stadt, 849 s = 14,2 min) wurde als Datenerfassungsstörung eingestuft und ausgeschlossen (N = 89 statt 90). Nach der Ursachenanalyse in 3.3 handelt es sich dabei sehr wahrscheinlich um das FIFO-gepaarte Artefakt des verwaisten Task-Starts. Die übrigen Daten dieses Trials blieben in der Auswertung.
 
 Gesundheits-Aufgaben dauerten im Schnitt am längsten und wiesen zugleich die höchste Variabilität auf.
+
+Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsreihenfolge bearbeitet wurden (3.2), lässt sich die Bearbeitungszeit zusätzlich nach Aufgabenposition aufschlüsseln — die Position entspricht dem Visualisierungstyp:
+
+**Tabelle 2b: Bearbeitungszeit in Sekunden nach Aufgabenposition (= Visualisierungstyp; Restart-Paarung, n = 270, 54 je Position über alle Domänen und Trials)**
+
+| Position / Typ | M (s) | SD (s) |
+|---|---|---|
+| 1 – Timeline | 56,4 | 27,0 |
+| 2 – Scatter | 73,4 | 35,2 |
+| 3 – Combo | 64,9 | 36,3 |
+| 4 – Heatmap | 68,3 | 46,2 |
+| 5 – Dashboard | 89,4 | 57,8 |
+
+Die mittlere Bearbeitungszeit nimmt über die Positionen zu (erste Position 56,4 s, letzte 89,4 s). Dieses Muster ist jedoch nicht interpretierbar als Wirkung der Visualisierungstypen: Wegen der festen Reihenfolge sind Typ und Position vollständig konfundiert, und Lern-, Ermüdungs- oder Motivationseffekte über die Sitzung hinweg können dasselbe Bild erzeugen (vgl. 5.3). Die Tabelle dokumentiert das Muster daher nur deskriptiv.
 
 ### 4.3 Korrelation zwischen Bearbeitungszeit und NASA-TLX
 
@@ -203,7 +217,7 @@ Studien, die Bearbeitungszeit als kognitive Last interpretieren — und das ist 
 
 **Ausreißermanagement:** Die berichteten Korrelationen hängen vom Ausschlussentscheid ab (Robustheitsvermerk in Tabelle 3): Der Frustrations-Zusammenhang schwankt zwischen r = 0,43 und r = 0,56, je nachdem, welcher Ausreißer entfernt wird. Das Kriterium (>3 SD auf den Dauern) wurde nachträglich auf die Daten angewandt, nicht vorab festgelegt.
 
-**Fehlende Sensor-TLX-Korrelation und Sensordatenqualität:** Die Sensordaten wurden nur baseline-korrigiert pro Domäne verglichen (4.4), nicht mit TLX-Scores korreliert; zudem gingen Gültigkeitsflags der Pupillenmessung und Bewegungsartefakte nicht in die Bereinigung ein, und die 120 in 3.3 dokumentierten negativen Hautleitwert-Samples verblieben unkorrigiert in den Daten.
+**Fehlende Sensor-TLX-Korrelation und Sensordatenqualität:** Die Sensordaten wurden nur baseline-korrigiert pro Domäne verglichen (4.4), nicht mit TLX-Scores korreliert; zudem gingen die Gültigkeitsflags der Pupillenmessung (16,5 % der Samples ungültig, s. 3.3) und Bewegungsartefakte nicht in die Bereinigung ein, und die 120 in 3.3 dokumentierten negativen Hautleitwert-Samples verblieben unkorrigiert in den Daten. Die effektive Blickpunkt-/Pupillenrate von 9,5 Hz (statt der nativen ~33 Hz) reduziert zusätzlich die zeitliche Auflösung der Augendaten.
 
 **Selbstauskunfts-Bias:** Die Domänenvertrautheit wurde nur über Selbsteinschätzung erfasst (Verzerrungsrisiko, z. B. Dunning-Kruger-Effekt).
 

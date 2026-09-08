@@ -131,7 +131,45 @@ def _scatter_panel(ax, records: list[dict], mask: np.ndarray, tlx_key: str,
     ax.set_title(f"Taskdauer x {label.split(' ')[0]}  (N = {int(mask.sum())})", fontsize=12)
 
 
+VIZ_ORDER = ("Timeline", "Scatter", "Combo", "Heatmap", "Dashboard")
+
+
+def position_durations(data_dir: Path | str = DATA_DIR) -> dict[str, list[float]]:
+    """Aufgabendauern je Position innerhalb des Domänenblocks (= Visualisierungs-
+    typ, da feste Reihenfolge). Nutzt dieselbe Restart-Paarung wie
+    collect_records; Rückgabe {Position: [Dauern in s]}."""
+    from collections import defaultdict
+
+    durs: dict[str, list[float]] = defaultdict(list)
+    for trial in load_trials_from_dir(str(data_dir)):
+        starts: dict[object, float] = {}
+        pairs: dict[object, list[tuple[float, float]]] = defaultdict(list)
+        for e in trial.events:
+            domain = e.meta.get("domain")
+            if not domain:
+                continue
+            label = e.label.lower()
+            if label == "task:start":
+                starts[domain] = e.timestamp
+            elif label == "task:end" and domain in starts:
+                pairs[domain].append((starts[domain], e.timestamp))
+                del starts[domain]
+        for plist in pairs.values():
+            for i, (a, b) in enumerate(sorted(plist)):
+                if i < len(VIZ_ORDER):
+                    durs[VIZ_ORDER[i]].append((b - a) / 1000.0)
+    return durs
+
+
 def main() -> None:
+    # Bearbeitungszeit je Aufgabenposition (= Visualisierungstyp, Tabelle 2b)
+    import numpy as np
+    durs = position_durations()
+    print("Bearbeitungszeit je Aufgabenposition (Restart-Paarung):")
+    for i, viz in enumerate(VIZ_ORDER):
+        a = np.array(durs[viz])
+        print(f"  {i+1} {viz:10} M={a.mean():6.1f} s  SD={a.std(ddof=1):6.1f}  n={len(a)}")
+
     records = complete_records(collect_records(DATA_DIR))
     print(f"Datenpunkte gesamt (mit vollständigen TLX-Werten): {len(records)}")
     if len(records) < 2:
