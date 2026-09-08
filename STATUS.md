@@ -125,7 +125,7 @@ mehrfach reviewt (Code, Paper-Inhalt, Reproduzierbarkeit):
 
 ## Tests und Qualitätssicherung
 
-- `tests/` — 105 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
+- `tests/` — 110 Tests, clean-clone-fähig (Real-Data-Test überspringt sich
   ohne `data/` selbst). Abgedeckt: Synchronisation, Segmentierung,
   Trial-/Alias-Verträge, Quality-Checks, ML-Vertragskern, UI-Pfade
   (Tabular-Filter, Missing-Report, Windows-Tab/Definitionsladen) sowie
