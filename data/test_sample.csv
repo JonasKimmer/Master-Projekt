@@ -1,0 +1,16 @@
+id,age,gender,heart_rate,gsr,task_score,errors,completed
+1,24,male,72,0.45,85,2,yes
+2,31,female,88,0.61,91,1,yes
+3,22,male,95,0.78,67,5,yes
+4,28,female,76,0.52,79,3,yes
+5,35,male,110,0.91,55,8,yes
+6,27,female,69,0.38,93,0,yes
+7,29,male,84,0.67,88,2,yes
+8,33,female,78,0.49,82,3,yes
+9,21,male,102,0.83,61,7,no
+10,26,female,71,0.41,90,1,yes
+11,30,male,89,0.72,74,4,yes
+12,24,female,66,0.35,96,0,yes
+13,38,male,115,0.95,48,11,no
+14,25,female,80,0.58,87,2,yes
+15,32,male,93,0.76,70,5,yes
