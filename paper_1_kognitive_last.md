@@ -109,8 +109,6 @@ Tabelle 1 zeigt Mittelwerte und Streuung der sechs NASA-TLX-Dimensionen je Domä
 
 Die **mentale Anforderung** liegt in allen Domänen auf nahezu identischem Niveau. Die Differenz zwischen höchstem und niedrigstem Domänenmittel (Δ = 1,7, 63,2 in Stadt vs. 61,5 in Gaming) ist angesichts der Streuung (SD ≈ 22–26) klein und ohne Signifikanztest nicht von Rauschen zu unterscheiden. **Frustration** weist die stärkste domänenabhängige Variation auf (Gaming vs. Stadt: Δ = 10,6). Die übrigen Dimensionen zeigen ähnliche Muster über alle Domänen und werden nicht weiter differenziert.
 
-Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchste Frustration** (M = 47,4), allerdings rein deskriptiv und ohne Inferenztest. Die zweite Nebenfrage, der Zusammenhang von Dauer und TLX-Dimensionen, beantwortet Abschnitt 4.3.
-
 **Abbildung 1: NASA-TLX-Dimensionen nach Domäne**
 
 ![Abbildung 1: NASA-TLX-Boxplot](figures/paper1_abb1_tlx_boxplot.png)
@@ -157,7 +155,7 @@ Die Zeile „Gesamt" poolt über alle Domänen und ist selbst pseudorepliziert. 
 
 *Kumulierte Bearbeitungszeit pro Domänendurchlauf gegen Frustration (links) und mentale Anforderung (rechts), farblich nach Domäne, mit Regressionsgeraden je Domäne und gesamt (N = 53, ein Ausreißer ausgeschlossen). Die Abbildung wird von `check_correlations.py` erzeugt.*
 
-Abbildung 2 liefert einen Hinweis, der über die reinen r-Werte hinausgeht. Im linken Teilbild steigen die drei domänenspezifischen Regressionsgeraden für Frustration übereinstimmend mit der Bearbeitungszeit an, wenn auch mit unterschiedlicher Steigung. Der positive Zusammenhang ist also nicht auf eine einzelne Domäne beschränkt. Im rechten Teilbild verlaufen die Regressionsgeraden zur mentalen Anforderung dagegen uneinheitlich in unterschiedliche Richtungen, was erklärt, warum sich über alle Domänen hinweg kein Gesamttrend ergibt.
+In Abbildung 2 steigen die drei domänenspezifischen Regressionsgeraden für Frustration übereinstimmend mit der Bearbeitungszeit an, wenn auch mit unterschiedlicher Steigung. Die Geraden zur mentalen Anforderung verlaufen dagegen uneinheitlich in unterschiedliche Richtungen.
 
 Zur Absicherung gegen Pseudoreplikation folgen in Tabelle 3b Personen-Zentrierung, ein personen-geclusterter Bootstrap (5.000 Resamples) und ein Mixed-Model mit Random Intercept je Person (Reproduktion: `check_mixed_model.py`):
 
@@ -169,7 +167,7 @@ Zur Absicherung gegen Pseudoreplikation folgen in Tabelle 3b Personen-Zentrierun
 | Mentale Anforderung | 0,03 | [−0,24, 0,30] | 0,15 | [−0,11, 0,42] | 0,013 [−0,032, 0,058] | 0,574 |
 | Anstrengung | 0,09 | [−0,18, 0,35] | −0,00 | [−0,38, 0,39] | 0,001 [−0,041, 0,044] | 0,945 |
 
-Beide Korrekturverfahren bestätigen übereinstimmend, dass Frustration nicht auf Personenunterschiede zurückzuführen ist: Der Effekt bleibt nach Zentrierung nahezu unverändert und ist im Mixed-Model hochsignifikant. Für mentale Anforderung und Anstrengung zeigt sich in keinem Verfahren ein belastbarer Effekt.
+Der Frustrations-Effekt bleibt nach Zentrierung nahezu unverändert und ist im Mixed-Model signifikant. Für mentale Anforderung und Anstrengung zeigt sich in keinem der drei Verfahren ein Effekt.
 
 ### 4.4 Sensordaten: Baseline-zentrierte Domänen-Deltas
 
@@ -181,7 +179,7 @@ Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Pooled �
 | Pupillendurchmesser (mm) | −0,07 (0,25) | −0,08 (0,31) | −0,02 (0,25) |
 | Hautleitwert (µS) | +1,64 (3,01) | +1,75 (3,17) | +1,31 (1,92) |
 
-Der Pupillendurchmesser unterscheidet sich über alle drei Domänen hinweg nicht nennenswert von der Baseline (Deltas ≤ 0,08 mm bei Trial-SDs von 0,25–0,31). Der Hautleitwert steigt unter Aufgabe generell an (+1,3 bis +1,8 µS), unterscheidet die Domänen aber ebenfalls nicht: Die Domänen-Deltas überlappen angesichts der großen Streuung vollständig. Ein domänenspezifisches physiologisches Muster existiert in diesen Daten somit nicht, anders als das Frustrationsmuster in Tabelle 1.
+Der Pupillendurchmesser unterscheidet sich über alle drei Domänen hinweg nicht nennenswert von der Baseline (Deltas ≤ 0,08 mm bei Trial-SDs von 0,25–0,31). Der Hautleitwert steigt unter Aufgabe generell an (+1,3 bis +1,8 µS), die Domänen-Deltas überlappen jedoch angesichts der großen Streuung vollständig. Ein domänenspezifisches Muster zeigen die Sensordaten damit nicht.
 
 ---
 
