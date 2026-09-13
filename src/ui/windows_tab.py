@@ -219,6 +219,7 @@ def render_windows_tab() -> None:
                 # Export über reporting.window_features_to_dataframe
                 records: list[WindowFeatureRecord] = []
                 all_rows = []
+                n_empty_windows = 0
                 for i, (start, end) in enumerate(windows):
                     sliced = slice_stream(stream, start, end)
                     feats = compute_window_features(sliced)
@@ -231,14 +232,38 @@ def render_windows_tab() -> None:
                             end_ms=end,
                             features=feats,
                         ))
+                    else:
+                        n_empty_windows += 1  # AP8: leere Fenster erkennen
                     for ch, ch_feats in feats.items():
                         row = {"window": i, "start_ms": round(start), "end_ms": round(end), "channel": ch}
                         row.update(ch_feats)
                         all_rows.append(row)
 
+                if n_empty_windows:
+                    st.warning(
+                        f"{n_empty_windows} von {len(windows)} Fenstern enthalten "
+                        "überhaupt keine gültigen Samples (leere Fenster, AP8)."
+                    )
+
                 if all_rows:
                     df = pd.DataFrame(all_rows)
-                    st.dataframe(df, use_container_width=True)
+
+                    # AP6: gewünschte Aggregationskennzahlen auswählbar —
+                    # Identitätsspalten bleiben immer dabei; notable_windows
+                    # und der breite Export rechnen weiterhin auf dem vollen
+                    # Satz, damit die Kennzahlen-Kombination keine
+                    # Qualitätsflags verschleiert.
+                    id_cols = ["window", "start_ms", "end_ms", "channel"]
+                    metric_cols = [c for c in df.columns if c not in id_cols]
+                    chosen = st.multiselect(
+                        "Aggregationskennzahlen",
+                        metric_cols,
+                        default=metric_cols,
+                        key="win_metrics",
+                        help="Welche Kennzahlen in Tabelle und langem CSV-Export enthalten sein sollen.",
+                    )
+                    view_cols = id_cols + [c for c in chosen if c in df.columns]
+                    st.dataframe(df[view_cols], use_container_width=True)
 
                     # Auffällige Fenster direkt im Tool (kein ML-Umweg nötig)
                     flagged = notable_windows(df)
@@ -254,11 +279,12 @@ def render_windows_tab() -> None:
                     # Breite Feature-Tabelle (eine Zeile pro Fenster) für
                     # nachgelagerte Statistik / ML exportieren
                     df_wide = window_features_to_dataframe(records)
+                    df_long = df[view_cols + (["reason"] if "reason" in df.columns else [])]
                     dl1, dl2 = st.columns(2)
                     with dl1:
                         st.download_button(
                             "Features CSV (lang, mit Flags)",
-                            data=df.to_csv(index=False).encode(),
+                            data=df_long.to_csv(index=False).encode(),
                             file_name=f"{trial_id}_windows.csv",
                             mime="text/csv",
                             key=f"win_features_csv_{trial_id}",

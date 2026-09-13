@@ -11,8 +11,14 @@ import numpy as np
 def compute_channel_features(values: list[Any]) -> dict[str, float]:
     """
     Compute standard features for a list of numeric (or None/unparseable) values.
-    Returns an empty dict if no value survives cleaning.
+
+    Enthält mit ``missing_rate`` die Fehlerrate (AP7): Anteil der Samples
+    im Slice, die None/unparseable sind und damit in keine Kennzahl
+    eingehen. Ist kein einziger Wert gültig, wird nur
+    ``{"missing_rate": 1.0, "n_samples": 0.0}`` geliefert — der Kanal
+    bleibt damit sichtbar, statt still zu verschwinden.
     """
+    total = len(values)
     clean: list[float] = []
     for v in values:
         if v is None:
@@ -26,6 +32,8 @@ def compute_channel_features(values: list[Any]) -> dict[str, float]:
         clean.append(fv)
 
     if not clean:
+        if total:
+            return {"missing_rate": 1.0, "n_samples": 0.0}
         return {}
 
     arr = np.asarray(clean, dtype=float)
@@ -42,16 +50,17 @@ def compute_channel_features(values: list[Any]) -> dict[str, float]:
     trend = float(np.polyfit(np.arange(n), arr, 1)[0]) if n > 1 else 0.0
 
     return {
-        "mean":       round(mean, 6),
-        "median":     round(float(np.median(arr)), 6),
-        "std":        round(std, 6),
-        "variance":   round(std ** 2, 6),
-        "min":        round(min_v, 6),
-        "max":        round(max_v, 6),
-        "range":      round(max_v - min_v, 6),
-        "peak_count": float(peaks),
-        "trend":      round(trend, 6),
-        "n_samples":  float(n),
+        "mean":         round(mean, 6),
+        "median":       round(float(np.median(arr)), 6),
+        "std":          round(std, 6),
+        "variance":     round(std ** 2, 6),
+        "min":          round(min_v, 6),
+        "max":          round(max_v, 6),
+        "range":        round(max_v - min_v, 6),
+        "peak_count":   float(peaks),
+        "trend":        round(trend, 6),
+        "n_samples":    float(n),
+        "missing_rate": round(1.0 - n / total, 6) if total else 0.0,
     }
 
 

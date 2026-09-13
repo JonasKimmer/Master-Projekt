@@ -122,8 +122,11 @@ class TestComputeChannelFeatures:
         f = compute_channel_features([1.0, None, "x", 3.0, float("nan")])
         assert f["n_samples"] == 2.0 and f["mean"] == 2.0
 
-    def test_all_invalid_returns_empty(self):
-        assert compute_channel_features([None, "abc"]) == {}
+    def test_all_invalid_returns_missing_rate_only(self):
+        # Vertrag seit AP7-Fehlerrate: Kanäle ohne gültige Werte bleiben
+        # sichtbar (missing_rate=1.0), statt als leeres Dict zu verschwinden
+        assert compute_channel_features([None, "abc"]) == \
+            {"missing_rate": 1.0, "n_samples": 0.0}
 
     def test_peak_count_and_trend(self):
         # Ein klarer Peak bei Index 1, steigender Trend 0,1,2,...,5
@@ -245,3 +248,22 @@ class TestTabularLoader:
         from src.loaders.tabular_loader import is_json_file
         assert is_json_file(tmp_path / "x.json")
         assert not is_json_file(tmp_path / "x.csv")
+
+
+class TestMissingRateFeature:
+    """AP7-Fehlerrate: missing_rate pro Kanal und Fenster (Review-Final #1)."""
+
+    def test_missing_rate_computed(self):
+        from src.feature_engineering.sensor_features import compute_channel_features
+        f = compute_channel_features([1.0, None, 2.0, None, None])
+        assert f["n_samples"] == 2.0
+        assert f["missing_rate"] == 0.6
+
+    def test_all_missing_channel_stays_visible(self):
+        from src.feature_engineering.sensor_features import compute_channel_features
+        f = compute_channel_features([None, None, None])
+        assert f == {"missing_rate": 1.0, "n_samples": 0.0}
+
+    def test_empty_slice_returns_empty(self):
+        from src.feature_engineering.sensor_features import compute_channel_features
+        assert compute_channel_features([]) == {}
