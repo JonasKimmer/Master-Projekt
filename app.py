@@ -7,6 +7,7 @@ from src.session import get_tabular, has_tabular, set_tabular
 from src.ui.import_tab import render_import_tab
 from src.ui.inventory_tab import render_inventory_tab
 from src.ui.ml_tab import render_ml_tab
+from src.ui.sensor_tab import render_sensor_tab
 from src.ui.reporting_tab import render_reporting_tab
 from src.ui.styles import inject_styles
 from src.ui.tabular_tab import render_tabular_section
@@ -69,13 +70,14 @@ if uploaded_file is not None:
 
 # ── Main tabs ─────────────────────────────────────────────────────────────────
 (tab_tabular, tab_import, tab_inventory,
- tab_trials, tab_windows, tab_websites,
+ tab_trials, tab_windows, tab_sensor, tab_websites,
  tab_reporting, tab_ml) = st.tabs([
     "Tabellarische Daten",
     "Import",
     "Dateninventar",
     "Trials",
     "Zeitfenster",
+    "Sensoranalyse",
     "Websites",
     "Reporting",
     "ML",
@@ -99,6 +101,9 @@ with tab_trials:
 
 with tab_windows:
     render_windows_tab()
+
+with tab_sensor:
+    render_sensor_tab()
 
 with tab_websites:
     render_website_tab()

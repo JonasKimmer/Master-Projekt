@@ -304,3 +304,37 @@ class TestImuEegPlausibility:
         assert imu, "IMU-Kanäle nicht gefunden"
         assert all(c.n_out_of_range == 0 for c in imu), \
             [(c.channel, c.n_out_of_range) for c in imu if c.n_out_of_range]
+
+
+class TestSensorTab:
+    """AP11: eigenständiger Sensoranalyse-Tab."""
+
+    _APP = str(Path(__file__).resolve().parent.parent / "app.py")
+
+    def test_app_has_nine_tabs_with_sensor(self, tmp_path, monkeypatch, synthetic_trial):
+        from streamlit.testing.v1 import AppTest
+        monkeypatch.chdir(tmp_path)
+        at = AppTest.from_file(self._APP, default_timeout=120)
+        at.session_state["trials"] = [synthetic_trial]
+        at.run()
+        assert not at.exception, f"{at.exception}"
+        # AppTest flacht auch verschachtelte Innertabs des Trials-Tabs ab;
+        # die oberste Ebene ergibt sich nach Entfernen der Innertab-Labels
+        inner = {"Timeline", "Events", "Qualität", "Analysen"}
+        labels = [t.label for t in at.tabs if t.label not in inner]
+        assert labels == ["Tabellarische Daten", "Import", "Dateninventar",
+                          "Trials", "Zeitfenster", "Sensoranalyse",
+                          "Websites", "Reporting", "ML"]
+
+    def test_sensor_tab_modality_quality(self, tmp_path, monkeypatch, synthetic_trial):
+        from streamlit.testing.v1 import AppTest
+        monkeypatch.chdir(tmp_path)
+        at = AppTest.from_file(self._APP, default_timeout=120)
+        at.session_state["trials"] = [synthetic_trial]
+        at.run()
+        # Beide Modalitäten anbieten, shimmer auswählen darf nicht crashen
+        assert sorted(at.selectbox(key="sensor_modality").options) == \
+            ["eye_tracking", "shimmer_physio"]
+        at.selectbox(key="sensor_modality").set_value("shimmer_physio")
+        at.run()
+        assert not at.exception, f"{at.exception}"
