@@ -57,17 +57,37 @@ def _find_raw_html(page_dir: Path) -> str | None:
     return None
 
 
+def _find_json(page_dir: Path, name: str, errors: dict[str, str] | None = None) -> Any | None:
+    """
+    JSON-Artefakt laden, ohne harte Bindung an exakte Dateinamen (AP3):
+    bevorzugt ``<name>.json``; danach jedes ``<name>.*`` mit .json-Endung
+    (case-insensitive, z. B. Links.JSON oder links_v2.json). Korrupte
+    Dateien werden wie in _load_json_safe im errors-Dict vermerkt.
+    """
+    canonical = _load_json_safe(page_dir / f"{name}.json", errors)
+    if canonical is not None:
+        return canonical
+    if page_dir.is_dir():
+        for f in sorted(page_dir.iterdir(), key=lambda e: e.name):
+            if f.is_file() and f.suffix.lower() == ".json" \
+                    and f.stem.lower().startswith(name.lower()):
+                loaded = _load_json_safe(f, errors)
+                if loaded is not None:
+                    return loaded
+    return None
+
+
 # ── Page loader ───────────────────────────────────────────────────────────────
 
 def _load_page(page_dir: Path) -> PageRecord:
     page_id = page_dir.name
 
     load_errors: dict[str, str] = {}
-    visible_text = _load_json_safe(page_dir / "visible_text.json", load_errors)
-    links_raw    = _load_json_safe(page_dir / "links.json", load_errors)
-    forms_raw    = _load_json_safe(page_dir / "forms.json", load_errors)
-    media_raw    = _load_json_safe(page_dir / "media.json", load_errors)
-    dom          = _load_json_safe(page_dir / "dom.json", load_errors)
+    visible_text = _find_json(page_dir, "visible_text", load_errors)
+    links_raw    = _find_json(page_dir, "links", load_errors)
+    forms_raw    = _find_json(page_dir, "forms", load_errors)
+    media_raw    = _find_json(page_dir, "media", load_errors)
+    dom          = _find_json(page_dir, "dom", load_errors)
 
     # Normalise: ensure lists even if the file holds a dict wrapper
     def _to_list(val: Any) -> list[dict[str, Any]]:

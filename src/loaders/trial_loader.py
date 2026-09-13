@@ -1,17 +1,29 @@
 """Loader for experiment trial folders.
 
-Expected folder layout:
+Expected folder layout (kanonische Namen, aber keine harte Bindung —
+siehe find_event_file/find_sensor_files):
   <trial_dir>/
-    events.ndjson
-    fusion_merged.ndjson   (NDJSON or JSON array)
+    events.ndjson            (oder events.json / events*.ndjson)
+    fusion_merged.ndjson     (oder .json; weitere fusion*/openbci*/sensor*-
+                             Quellen werden zusätzlich als eigene Streams
+                             geladen, siehe sensor_loader)
 """
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
+from src.loaders.sensor_loader import (  # noqa: F401  (re-export für Kompatibilität)
+    _extract_timestamp,
+    _is_timestamp_alias,
+    _is_skippable,
+    _read_ndjson,
+    _timestamp_key_and_value,
+    find_sensor_files,
+    load_sensor_streams,
+    parse_sensor_stream,
+)
 from src.loaders.sort_utils import natural_sort_key
 from src.models.experiment_records import (
     EventRecord,
@@ -19,6 +31,10 @@ from src.models.experiment_records import (
     SensorStreamRecord,
     TrialRecord,
 )
+
+# Kompatibilitäts-Alias: bisherige Aufrufer (inkl. Tests) importieren
+# _parse_sensor_stream aus dem trial_loader.
+_parse_sensor_stream = parse_sensor_stream
 
 # ── Event-type classification ─────────────────────────────────────────────────
 
@@ -41,64 +57,30 @@ def _classify(label: str) -> EventType:
     return EventType.UNKNOWN
 
 
-# ── NDJSON helpers ────────────────────────────────────────────────────────────
+# ── Event-file discovery (keine harte Dateinamen-Bindung, AP3) ───────────────
 
-def _read_ndjson(path: str) -> list[dict[str, Any]]:
-    """Parse NDJSON (one JSON object per line) or a plain JSON array."""
-    records: list[dict[str, Any]] = []
-    with open(path, encoding="utf-8") as fh:
-        content = fh.read().strip()
-
-    if content.startswith("["):
-        # Plain JSON array
-        return json.loads(content)
-
-    for line in content.splitlines():
-        line = line.strip()
-        if line:
-            records.append(json.loads(line))
-    return records
+_EVENT_SUFFIXES = {".ndjson", ".json"}
 
 
-_TS_KEYS: tuple[str, ...] = ("timestamp", "ts", "time", "t", "Timestamp", "Time")
-
-# Normalisierte Formen (klein, ohne Separatoren) der erlaubten Timestamp-Keys:
-# erfasst auch timestamp_ms / timestampMs / ts_ms / TimeMs etc.
-_TS_KEYS_NORMALIZED: set[str] = {"ts", "t", "time", "timestamp", "timestampms", "tsms", "timems"}
-
-
-def _normalize_key(key: str) -> str:
-    return key.lower().replace("_", "").replace("-", "")
-
-
-def _timestamp_key_and_value(obj: dict[str, Any]) -> tuple[str | None, float | None]:
+def find_event_file(trial_dir: str | Path) -> Path | None:
     """
-    Liefert (Schlüssel, Wert) des Record-Timestamps einer Zeile.
-    Exakte Treffer zuerst (bestehende Priorität), danach normalisierte
-    Varianten wie timestamp_ms / timestampMs. Der Schlüssel wird mit
-    zurückgegeben, damit er konsistent aus meta entfernt werden kann.
+    Event-Log eines Trial-Ordners finden.
+
+    Bevorzugt: events.ndjson, events.json; danach beliebige events*-
+    Dateien mit den Endungen .ndjson/.json (z. B. events_t1.ndjson).
     """
-    candidates = [k for k in _TS_KEYS if k in obj]
-    candidates += [
-        k for k in obj
-        if k not in _TS_KEYS and _normalize_key(k) in _TS_KEYS_NORMALIZED
-    ]
-    for key in candidates:
-        try:
-            return key, float(obj[key])
-        except (TypeError, ValueError):
-            pass
-    return None, None
-
-
-def _is_timestamp_alias(key: str) -> bool:
-    """True, wenn der Schlüssel ein Timestamp-Alias ist (exakt oder in
-    normalisierter Form wie timestamp_ms / ts_ms / TimeMs)."""
-    return key in _TS_KEYS or _normalize_key(key) in _TS_KEYS_NORMALIZED
-
-
-def _extract_timestamp(obj: dict[str, Any]) -> float | None:
-    return _timestamp_key_and_value(obj)[1]
+    p = Path(trial_dir)
+    for canonical in ("events.ndjson", "events.json"):
+        candidate = p / canonical
+        if candidate.is_file():
+            return candidate
+    if not p.is_dir():
+        return None
+    for f in sorted(p.iterdir(), key=lambda e: e.name):
+        if f.is_file() and f.stem.lower().startswith("events") \
+                and f.suffix.lower() in _EVENT_SUFFIXES:
+            return f
+    return None
 
 
 def _extract_label(obj: dict[str, Any]) -> str:
@@ -133,107 +115,6 @@ def _parse_events(path: str) -> list[EventRecord]:
     return events
 
 
-def _flatten(obj: dict[str, Any], prefix: str = "") -> dict[str, Any]:
-    """Recursively flatten nested dicts with dot-notation keys."""
-    result: dict[str, Any] = {}
-    for key, val in obj.items():
-        full_key = f"{prefix}{key}" if not prefix else f"{prefix}.{key}"
-        if isinstance(val, dict):
-            result.update(_flatten(val, full_key))
-        else:
-            result[full_key] = val
-    return result
-
-
-_SKIP_KEYS = {"rate_hz", "fresh_shimmer", "fresh_gaze", "ts_iso", "trialid", "fusionconf"}
-
-# Blattnamen, die genau einem Timestamp-Alias entsprechen (normalisiert):
-# ts, t, time, timestamp, timestamp_ms, ts_ms, timeMs, …
-_TS_LEAF_EXACT: set[str] = set(_TS_KEYS_NORMALIZED)
-
-# Zusammengesetzte Uhrfelder bekannter Quellen: <prefix>timestamp(ms).
-# Nur diese Präfixe gelten als Clock-Feld — Kanäle wie 'heart_timestamp'
-# sind Signale und bleiben erhalten.
-_TS_CLOCK_PREFIXES: tuple[str, ...] = (
-    "app", "system", "sample", "sensor", "frame", "record", "event",
-    "device", "capture", "unix", "epoch", "server", "client", "log",
-    "source", "sent", "receive",
-)
-
-
-def _is_clock_field(compact_leaf: str) -> bool:
-    if compact_leaf in _TS_LEAF_EXACT:
-        return True
-    return any(
-        compact_leaf == f"{prefix}{suffix}"
-        for prefix in _TS_CLOCK_PREFIXES
-        for suffix in ("timestampms", "timestamp")
-    )
-
-
-def _is_skippable(key: str) -> bool:
-    base = key.split(".")[-1].lower()  # last segment for skip-check
-    compact = base.replace("_", "").replace("-", "")
-    return (
-        key in _TS_KEYS
-        or base in _TS_KEYS
-        or base in _SKIP_KEYS
-        or _is_clock_field(compact)
-    )
-
-
-def _parse_sensor_stream(path: str) -> SensorStreamRecord:
-    """
-    Parse fusion_merged.ndjson into a SensorStreamRecord.
-
-    Nested objects (shimmer, gaze, …) are flattened with dot-notation keys.
-    Only numeric leaf values become channels. Records may carry different
-    subsets of keys (e.g. modality-specific fusion rows); every channel is
-    padded with None so it stays parallel with `timestamps` (see
-    SensorStreamRecord's documented invariant).
-    """
-    parsed: list[tuple[float, dict[str, Any]]] = []
-    for obj in _read_ndjson(path):
-        ts = _extract_timestamp(obj)
-        if ts is None:
-            continue
-        parsed.append((ts, _flatten(obj)))
-
-    # First pass: which keys ever hold a numeric value → become channels.
-    channel_keys: set[str] = set()
-    skipped_keys: set[str] = set()
-    for _, flat in parsed:
-        for key, val in flat.items():
-            if _is_skippable(key) or key in channel_keys:
-                continue
-            try:
-                float(val)
-                channel_keys.add(key)
-            except (TypeError, ValueError):
-                skipped_keys.add(key)
-    skipped_keys -= channel_keys
-
-    # Second pass: build parallel arrays (None where a record lacks the key).
-    timestamps: list[float] = []
-    channels: dict[str, list[Any]] = {key: [] for key in channel_keys}
-    for ts, flat in parsed:
-        timestamps.append(ts)
-        for key in channel_keys:
-            val = flat.get(key)
-            try:
-                channels[key].append(float(val))
-            except (TypeError, ValueError):
-                channels[key].append(None)
-
-    return SensorStreamRecord(
-        source=Path(path).stem,
-        modality="fusion",
-        timestamps=timestamps,
-        channels=channels,
-        meta={"skipped_non_numeric_keys": sorted(skipped_keys)} if skipped_keys else {},
-    )
-
-
 # ── Public API ────────────────────────────────────────────────────────────────
 
 def load_trial(trial_dir: str) -> TrialRecord:
@@ -242,15 +123,10 @@ def load_trial(trial_dir: str) -> TrialRecord:
     trial_id = p.name
 
     events: list[EventRecord] = []
-    streams: list[SensorStreamRecord] = []
-
-    events_path = p / "events.ndjson"
-    if events_path.exists():
+    if (events_path := find_event_file(p)) is not None:
         events = _parse_events(str(events_path))
 
-    fusion_path = p / "fusion_merged.ndjson"
-    if fusion_path.exists():
-        streams.append(_parse_sensor_stream(str(fusion_path)))
+    streams: list[SensorStreamRecord] = load_sensor_streams(p)
 
     return TrialRecord(
         trial_id=trial_id,
@@ -263,7 +139,8 @@ def load_trial(trial_dir: str) -> TrialRecord:
 def load_trials_from_dir(parent_dir: str) -> list[TrialRecord]:
     """
     Scan parent_dir for sub-folders and load each as a TrialRecord.
-    Sub-folders are included if they contain at least one of the expected files.
+    Sub-folders are included if they contain at least one recognizable
+    event or sensor file (kanonische Namen oder Muster).
     """
     p = Path(parent_dir)
     trials: list[TrialRecord] = []
@@ -271,9 +148,7 @@ def load_trials_from_dir(parent_dir: str) -> list[TrialRecord]:
     for entry in sorted(p.iterdir(), key=lambda e: natural_sort_key(e.name)):
         if not entry.is_dir():
             continue
-        has_events = (entry / "events.ndjson").exists()
-        has_fusion = (entry / "fusion_merged.ndjson").exists()
-        if has_events or has_fusion:
+        if find_event_file(entry) is not None or find_sensor_files(entry):
             trials.append(load_trial(str(entry)))
 
     return trials
