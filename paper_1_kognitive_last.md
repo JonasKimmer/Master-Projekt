@@ -100,6 +100,8 @@ Alle berichteten Analysen sind über die Skripte `check_correlations.py`, `check
 
 ### 4.1 NASA-TLX nach Domäne
 
+Tabelle 1 zeigt Mittelwerte und Streuung der sechs NASA-TLX-Dimensionen je Domäne.
+
 **Tabelle 1: NASA-TLX-Scores nach Domäne (N = 18, Skala 0–100, Stichproben-SD)**
 
 | Dimension | Gaming M (SD) | Gesundheit M (SD) | Stadt M (SD) |
@@ -123,6 +125,8 @@ Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchst
 
 ### 4.2 Bearbeitungszeit nach Domäne
 
+Tabelle 2 zeigt die Bearbeitungszeiten je Domäne.
+
 **Tabelle 2: Bearbeitungszeit in Sekunden (269 Aufgaben, 1 Ausreißer ausgeschlossen, Stichproben-SD, Reproduktion: `check_correlations.py`)**
 
 | Domäne | N | M (s) | SD (s) | Min | Max |
@@ -131,7 +135,7 @@ Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchst
 | Gesundheit | 90 | 75,2 | 54,4 | 7 | 310 |
 | Stadt | 89¹ | 68,7 | 32,5 | 16 | 164 |
 
-¹ Ein Aufgabenmesswert (T-3, Stadt, 849 s = 14,2 min) wurde als Datenerfassungsstörung eingestuft und ausgeschlossen (N = 89 statt 90). Nach der Ursachenanalyse in 3.3 handelt es sich dabei sehr wahrscheinlich um das FIFO-gepaarte Artefakt des verwaisten Task-Starts. Die übrigen Daten dieses Trials blieben in der Auswertung.
+¹ Ein Aufgabenmesswert (T-3, Stadt, 849 s) wurde als Datenerfassungsstörung ausgeschlossen (Ursache in 3.3).
 
 Gesundheits-Aufgaben dauerten im Schnitt am längsten und wiesen zugleich die höchste Variabilität auf.
 
@@ -142,7 +146,7 @@ Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsrei
 Tabelle 3 stellt die Pearson-Korrelationen zwischen kumulierter Bearbeitungszeit pro Domäne und den NASA-TLX-Dimensionen dar. Die Analyse ist explorativ. Die einfachen Domänen-Korrelationen werden ohne p-Wert berichtet, da die 53 Domänendurchläufe aus nur 18 Personen stammen (Pseudoreplikation). Erst die nachfolgenden Korrekturverfahren liefern interpretierbare Inferenz. Nach Cohen (1988) entspricht r ≈ 0,5 einem großen Effekt.
 
 **Tabelle 3: Pearson-Korrelationen Bearbeitungszeit × NASA-TLX**
-*(N = 53 statt 54 Domänendurchläufe: Ausgeschlossen wurde T-4/Gesundheit mit 891 s kumulierter Dauer nach der globalen >3-SD-Regel auf den Dauern. Hinweis auf Robustheit: Schließt man stattdessen den in 4.2 diskutierten Durchlauf T-3/Stadt aus, ergibt sich für Frustration r = 0,43 statt 0,56. Der Zusammenhang bleibt also im Vorzeichen und der Größenordnung nach stabil, ist in seiner Stärke vom Ausreißermanagement abhängig.)*
+*(N = 53 statt 54: Ausgeschlossen wurde T-4/Gesundheit mit 891 s kumulierter Dauer nach der >3-SD-Regel.)*
 
 | Domäne | r (Frustration) | r (Mentale Anf.) | r (Anstrengung) |
 |---|---|---|---|
@@ -161,7 +165,7 @@ Die Zeile „Gesamt" poolt über alle Domänen und ist selbst pseudorepliziert. 
 
 Abbildung 2 liefert einen Hinweis, der über die reinen r-Werte hinausgeht. Im linken Teilbild steigen die drei domänenspezifischen Regressionsgeraden für Frustration übereinstimmend mit der Bearbeitungszeit an, wenn auch mit unterschiedlicher Steigung. Der positive Zusammenhang ist also nicht auf eine einzelne Domäne beschränkt. Im rechten Teilbild verlaufen die Regressionsgeraden zur mentalen Anforderung dagegen uneinheitlich in unterschiedliche Richtungen, was erklärt, warum sich über alle Domänen hinweg kein Gesamttrend ergibt.
 
-Um den Frustrations-Effekt gegen Pseudoreplikation abzusichern, wurde er zusätzlich innerhalb der Personen zentriert (Abzug des jeweiligen Personen-Mittelwerts von Dauer und Dimension) und per personen-geclustertem Bootstrap (5.000 Resamples, fester Seed, gezogen werden dabei Personen mitsamt aller ihrer Domänendurchläufe, mit Zurücklegen) sowie einem Mixed-Model (Random Intercept pro Person, statsmodels `MixedLM`) geprüft (Reproduktion: `check_mixed_model.py`):
+Zur Absicherung gegen Pseudoreplikation folgen in Tabelle 3b Personen-Zentrierung, ein personen-geclusterter Bootstrap (5.000 Resamples) und ein Mixed-Model mit Random Intercept je Person (Reproduktion: `check_mixed_model.py`):
 
 **Tabelle 3b: Absicherung gegen Pseudoreplikation (Zentrierung, Bootstrap, Mixed-Model)**
 

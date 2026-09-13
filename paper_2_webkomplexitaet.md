@@ -117,7 +117,6 @@ Zwei Merkmale sind durch die Erfassungsartefakte aus 3.1 systematisch nach unten
 Die Clusteranalyse teilt die 47 Seiten in drei Cluster, deren Charakteristika Tabelle 2 zeigt und deren Zusammensetzung nach Websites Tabelle 3. Der Silhouette-Score von 0,433 liegt unterhalb der 0,5-Schwelle für einen „guten“ Trennungswert.
 
 **Tabelle 2: Cluster-Charakteristika (Mittelwerte je Cluster)**
-*(Cluster-Zugehörigkeit ist mit Website-Zugehörigkeit teilweise konfundiert, ARI = 0,243. Siehe Tabelle 3.)*
 
 | Cluster | N | Links M | DOM-Tiefe M | Text M | Medien M | Typ (post-hoc) |
 |---|---|---|---|---|---|---|
@@ -126,6 +125,8 @@ Die Clusteranalyse teilt die 47 Seiten in drei Cluster, deren Charakteristika Ta
 | 2 | 11 | 217,3 | 15,3 | 10.831,3 | 19,6 | Medienreiche Seiten |
 
 Die Bezeichnungen sind post-hoc vergebene Hilfsbegriffe, keine validierten Kategorien. Ein Cluster mit hohem `form_count` ergibt sich nicht, eine Folge des Erfassungsartefakts.
+
+Tabelle 3 kreuzt die Cluster-Zugehörigkeit mit der Website-Zugehörigkeit.
 
 **Tabelle 3: Cluster-Verteilung nach Website**
 
@@ -150,6 +151,8 @@ Abbildung 1 stellt diese Konfundierung räumlich dar. Die beiden website-reinen 
 
 Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, die 5-fache Kreuzvalidierung im Mittel nur 0,831 (Folds 0,556 bis 1,000). Stratifiziert liegt das Mittel bei 0,936, die schwachen Folds spiegeln also vor allem die Cluster-Unbalanciertheit wider. Die Cluster-Labels sind aus den Merkmalen überwiegend rekonstruierbar, der Einzelwert bleibt eine optimistische Punktschätzung.
 
+Tabelle 4 stellt die beiden Wichtigkeitsmaße gegenüber.
+
 **Tabelle 4: Feature-Importance (MDI vs. Permutation-Importance)** *(Reproduktion: `check_web_analysis.py`, Permutation mit dokumentiertem Seed)*
 
 | Merkmal | MDI | Permutation-Importance |
@@ -164,6 +167,8 @@ Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, die 5-fache Kreuzv
 `text_length` und `dom_depth` erscheinen unter MDI als relevant, ihre Permutation-Importance beträgt jedoch 0,000. Bei `text_length` passt das zum bekannten MDI-Bias zugunsten merkmalsreicher Werte, bei `dom_depth` mit nur 8 verschiedenen Werten reicht er als Erklärung nicht aus. `dom_nodes` und `link_count` bleiben unter beiden Methoden am wichtigsten. In der Korrelationsmatrix hängen `link_count`, `text_length` und `dom_nodes` stark zusammen (r = 0,72 bis 0,81), `dom_depth` mit keinem anderen Merkmal..
 
 ### 4.4 Website-Vergleich auf Aggregatniveau
+
+Tabelle 5 vergleicht die Merkmals-Mittelwerte auf Website-Ebene.
 
 **Tabelle 5: Merkmals-Mittelwerte je Website**
 
@@ -198,6 +203,8 @@ Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erkl
 
 *Provenienz-Hinweis: Die Einzelmessungen (3 Wiederholungen je Seite, Median) wurden nicht als Datei archiviert und sind nicht mehr auffindbar. Die folgenden Werte stammen aus der verlorenen Messung und lassen sich aus dem Projektstand nicht erneut prüfen. Sie werden der Vollständigkeit halber berichtet und als nicht reproduzierbar gekennzeichnet.*
 
+Tabelle 6 zeigt die Korrelationen der Antwortzeit mit den Strukturmerkmalen.
+
 **Tabelle 6: Korrelation Antwortzeit × Strukturmerkmale**
 
 | Merkmal | r | p |
@@ -210,6 +217,8 @@ Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erkl
 | form_count | 0,147 | 0,325 |
 
 Nur `dom_depth` weist einen schwachen, gerade noch signifikanten Zusammenhang auf, der die Bonferroni-Korrektur für sechs Tests jedoch nicht übersteht. Ein abgesicherter Effekt ist das nicht. Auch die wichtigsten Merkmale `dom_nodes` und `link_count` zeigen keinen signifikanten Zusammenhang.
+
+Tabelle 7 stellt die Antwortzeiten nach Cluster und Website gegenüber.
 
 **Tabelle 7: Antwortzeit nach Cluster und Website**
 
