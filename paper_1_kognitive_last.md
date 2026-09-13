@@ -135,7 +135,7 @@ Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsrei
 
 ### 4.3 Korrelation zwischen Bearbeitungszeit und NASA-TLX
 
-Tabelle 3 stellt die Pearson-Korrelationen zwischen kumulierter Bearbeitungszeit pro Domäne und den NASA-TLX-Dimensionen dar. Die Analyse ist explorativ. Die einfachen Domänen-Korrelationen werden ohne p-Wert berichtet, da die 53 Domänendurchläufe aus nur 18 Personen stammen (Pseudoreplikation). Erst die nachfolgenden Korrekturverfahren liefern interpretierbare Inferenz. Nach Cohen (1988) entspricht r ≈ 0,5 einem großen Effekt.
+Tabelle 3 stellt die Pearson-Korrelationen zwischen kumulierter Bearbeitungszeit pro Domäne und den NASA-TLX-Dimensionen dar. Wegen Pseudoreplikation (53 Durchläufe von 18 Personen) werden die Werte explorativ gelesen, Inferenz liefern erst die Korrekturverfahren in Tabelle 3b. Nach Cohen (1988) entspricht r ≈ 0,5 einem großen Effekt.
 
 **Tabelle 3: Pearson-Korrelationen Bearbeitungszeit × NASA-TLX**
 *(N = 53 statt 54: Ausgeschlossen wurde T-4/Gesundheit mit 891 s kumulierter Dauer nach der >3-SD-Regel.)*
@@ -171,7 +171,7 @@ Der Frustrations-Effekt bleibt nach Zentrierung nahezu unverändert und ist im M
 
 ### 4.4 Sensordaten: Baseline-zentrierte Domänen-Deltas
 
-Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Pooled über alle gültigen Samples ohne weitere Filterung liegen die Pupillendurchmesser bei M = 4,56 mm links und 4,59 mm rechts (Gesamtbereich 1,4 bis 7,7 mm), der Hautleitwert bei M = 2,46 µS (−1,0 bis 24,8 µS, die negativen Werte aus 3.3 eingeschlossen) und das PPG-Rohsignal bei M = 182,9 mV. Für die Domänen-Frage ist die baseline-zentrierte Sicht aussagekräftiger. Tabelle 4 zeigt die Abweichung der Task-Mittelwerte von der jeweiligen Baseline je Trial und Domäne (Reproduktion: `check_sensor_deltas.py`).
+Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Als Überblick über alle gültigen Samples liegt der Pupillendurchmesser im Mittel bei 4,56 mm links und 4,59 mm rechts, der Hautleitwert bei 2,46 µS und das PPG-Rohsignal bei 182,9 mV. Für die Domänen-Frage ist die baseline-zentrierte Sicht aussagekräftiger. Tabelle 4 zeigt die Abweichung der Task-Mittelwerte von der jeweiligen Baseline je Trial und Domäne (Reproduktion: `check_sensor_deltas.py`).
 **Tabelle 4: Baseline-zentrierte Domänen-Deltas (M (SD) über n = 17 Trials)**
 
 | Kanal | Gaming | Gesundheit | Stadt |
