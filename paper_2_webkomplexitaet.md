@@ -108,7 +108,7 @@ Das Analyse-Tool ist in Python implementiert und besitzt eine Streamlit-Oberflä
 | dom_depth | 16,36 | 2,10 | 14 | 21 |
 | dom_nodes | 1.111 | 923 | 521 | 4.733 |
 
-Die Verteilungen sind bei `link_count` und `text_length` extrem rechtsschief, denn einzelne Übersichtsseiten von bpb.de (bis zu 1.187 Links, das Maximum in Tabelle 1) treiben Mittelwert und SD deutlich über das Niveau der übrigen Seiten. `form_count` liegt nahe null (M 0,19), eine Folge des Formular-Erfassungsproblems bei wiesbaden.de (3.1). `media_count` ist durch den bpb.de-Artefakt (durchgängig 0) nach unten verzerrt, der Mittelwert von 6,02 stammt praktisch vollständig von hs-rm.de.
+Zwei Merkmale sind durch die Erfassungsartefakte aus 3.1 systematisch nach unten verzerrt: `media_count`, weil bpb.de durchgängig 0 liefert, und `form_count`, weil wiesbaden.de keine Formulare liefert. Bei `link_count` und `text_length` treiben umgekehrt wenige große Übersichtsseiten die Mittelwerte nach oben, die Verteilungen sind ausgeprägt rechtsschief.
 
 ### 4.2 Clustering: Automatisch identifizierte Seitentypen
 
