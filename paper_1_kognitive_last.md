@@ -32,11 +32,9 @@ Bearbeitungszeit gilt in Usability-Studien häufig als Proxy für kognitive Bean
 
 ### 1.1 Motivation und Problemstellung
 
-Datenvisualisierungen sind in vielen Berufsfeldern unverzichtbar. Ihr impliziter Anspruch ist es, komplexe Sachverhalte einfacher zugänglich zu machen. Mit zunehmender Datenmenge und Komplexität der Visualisierungsformen steigt jedoch die Gefahr kognitiver Überlastung (Sweller, 1988). Klassische Usability-Studien messen Fehlerrate und Bearbeitungszeit, erfassen aber nicht, wie stark das Arbeitsgedächtnis dabei beansprucht wird, denn zwei Personen können dieselbe Aufgabe gleich schnell lösen und dabei dennoch unterschiedliche kognitive Last erleben.
+Datenvisualisierungen sollen komplexe Sachverhalte einfacher zugänglich machen, doch mit zunehmender Komplexität der Darstellungen wächst die Gefahr kognitiver Überlastung (Sweller, 1988). Klassische Usability-Studien messen Fehlerrate und Bearbeitungszeit und setzen letztere stillschweigend mit Beanspruchung gleich. Das ist fragwürdig, denn zwei Personen können dieselbe Aufgabe gleich schnell lösen und dabei unterschiedlich stark beansprucht sein. Ob Bearbeitungszeit mentale Last abbildet oder eher Frustration und Domänenvertrautheit, ist offen.
 
-Bearbeitungszeit gilt häufig als Proxy für kognitive Beanspruchung, obwohl unklar ist, ob sie tatsächlich mentale Last oder andere Faktoren wie Frustration und Domänenvertrautheit abbildet. Subjektive Befragungen wie der NASA-TLX erfassen nur retrospektive Einschätzungen. Physiologische Sensordaten könnten eine kontinuierliche Ergänzung darstellen, wobei ihre Validität im Kontext der Datenvisualisierung bislang kaum untersucht ist.
-
-Ein weiterer offener Punkt betrifft die Rolle der Inhaltsdomäne selbst: Dieselbe Visualisierungsform kann je nach dargestellter Domäne unterschiedlich stark beanspruchen, etwa weil Fachvokabular, Zahlenformate oder die emotionale Relevanz der Inhalte variieren. Ob und wie stark sich dieser Domäneneffekt von der reinen Visualisierungskomplexität trennen lässt, ist bislang kaum systematisch untersucht worden.
+Die Messwege haben jeweils eigene Lücken. Subjektive Befragungen wie der NASA-TLX erfassen nur retrospektive Einschätzungen, physiologische Sensordaten könnten eine kontinuierliche Ergänzung sein, doch ihre Validität ist im Kontext der Datenvisualisierung kaum untersucht. Offen ist zudem die Rolle der Inhaltsdomäne selbst: Dieselbe Visualisierungsform kann je nach Domäne unterschiedlich stark beanspruchen, etwa weil Fachvokabular, Zahlenformate oder emotionale Relevanz variieren. Ob sich dieser Domäneneffekt von der reinen Visualisierungskomplexität trennen lässt, ist bislang kaum systematisch untersucht.
 
 ### 1.2 Zielsetzung
 
