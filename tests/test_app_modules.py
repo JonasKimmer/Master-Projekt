@@ -338,3 +338,40 @@ class TestSensorTab:
         at.selectbox(key="sensor_modality").set_value("shimmer_physio")
         at.run()
         assert not at.exception, f"{at.exception}"
+
+
+class TestWindowResultPersistence:
+    """Ergebnis darf nach Widget-Interaktion nicht verschwinden (E2E-Bug):
+    Button-Runs sind flüchtig; die Kennzahlen-Auswahl löst einen Rerun aus,
+    in dem das Ergebnis aus dem Session-State gerendert werden muss."""
+
+    _APP = str(Path(__file__).resolve().parent.parent / "app.py")
+
+    def test_metric_selection_keeps_result(self, tmp_path, monkeypatch, synthetic_trial):
+        from streamlit.testing.v1 import AppTest
+        monkeypatch.chdir(tmp_path)
+        at = AppTest.from_file(self._APP, default_timeout=120)
+        at.session_state["trials"] = [synthetic_trial]
+        at.run()
+
+        at.button(key="win_compute").click()
+        at.run()
+        assert not at.exception, f"{at.exception}"
+        ms = at.multiselect(key="win_metrics")
+        assert ms is not None and "missing_rate" in ms.options
+        assert at.session_state["_win_result"]["n_windows"] > 0
+
+        # Interaktion mit der Kennzahlen-Auswahl (löst Rerun aus):
+        # Ergebnis muss bleiben, Auswahl muss die Tabelle filtern
+        ms.set_value(["mean", "missing_rate"])
+        at.run()
+        assert not at.exception, f"{at.exception}"
+        assert at.session_state["_win_result"]["n_windows"] > 0, \
+            "Ergebnis wurde durch Widget-Interaktion verworfen"
+        assert at.multiselect(key="win_metrics") is not None
+
+        # Verwerfen räumt auf
+        at.button(key="win_clear").click()
+        at.run()
+        assert not at.exception
+        assert "_win_result" not in at.session_state

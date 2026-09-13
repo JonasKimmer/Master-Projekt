@@ -266,7 +266,7 @@ pytest tests/            # komplette Suite
 pytest tests/test_synchronization.py -v    # einzelne Datei
 ```
 
-- Aktuell **143 Tests**, alle ohne lokale Projektdaten lauffähig (funktioniert auch in einem frischen `git clone`, da `data/` git-ignoriert ist).
+- Aktuell **164 Tests**, alle ohne lokale Projektdaten lauffähig (funktioniert auch in einem frischen `git clone`, da `data/` git-ignoriert ist).
 - Der einzige Real-Data-Test überspringt sich selbst, wenn `data/` fehlt (`skipif`-Marker).
 - Enthalten: Unit-Tests für Synchronisation/Segmentierung/Loader/Statistiken, Store-Roundtrips und **AppTest-Ende-zu-Ende-Tests** (Fensterdefinitionen speichern/laden, Trial-Wechsel, ML, Reporting).
 

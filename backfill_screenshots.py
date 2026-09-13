@@ -43,11 +43,11 @@ def _page_urls(website_dir: Path) -> list[tuple[Path, str]]:
 
 
 def backfill(root: Path, delay: float = 1.0) -> int:
-    targets = [(website, _page_urls(website)) for website in
-               ([root] if (root / "pages").is_dir() else sorted(
-                   w for w in root.iterdir() if w.is_dir() and (w / "pages").is_dir()))]
+    websites = ([root] if (root / "pages").is_dir() else sorted(
+        w for w in root.iterdir() if w.is_dir() and (w / "pages").is_dir()))
+    targets = [(website, _page_urls(website)) for website in websites]
     todo = [(page, url) for _, pages in targets for page, url in pages]
-    total = sum(len(pages) for _, pages in targets)
+    total = sum(1 for w in websites for p in (w / "pages").iterdir() if p.is_dir())
     print(f"Seiten ohne Screenshot: {len(todo)} (von {total} Seiten insgesamt)")
     if not todo:
         return 0
