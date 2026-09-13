@@ -6,6 +6,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from src.analysis.web_consistency import consistency_summary, website_consistency
 from src.feature_engineering.web_features import pages_to_dataframe, website_features
 from src.session import get_websites
 
@@ -31,7 +32,9 @@ def render_website_tab() -> None:
             st.caption("Diese Merkmale werden als 0 gezählt, obwohl die Datei "
                        "existiert — Ursache prüfen statt als 'nicht gecrawlt' lesen.")
 
-    inner_tab1, inner_tab2, inner_tab3 = st.tabs(["Seiten-Übersicht", "Features", "Screenshots"])
+    inner_tab1, inner_tab2, inner_tab3, inner_tab4 = st.tabs(
+        ["Seiten-Übersicht", "Features", "Screenshots", "Konsistenz"]
+    )
 
     # ── Page overview ─────────────────────────────────────────────────────────
     with inner_tab1:
@@ -100,3 +103,30 @@ def render_website_tab() -> None:
                 with cols[i % 3]:
                     st.caption(f"Seite {page.page_id} — {page.url or 'URL unbekannt'}")
                     st.image(page.screenshot_path, use_container_width=True)
+
+    # ── Konsistenzanalyse Screenshots ↔ JSON-Merkmale (AP10) ─────────────────
+    with inner_tab4:
+        st.subheader(f"Konsistenzanalyse: Website {website.website_id}")
+        df_cons = website_consistency(website)
+        if df_cons.empty:
+            st.info("Keine Seiten vorhanden.")
+        else:
+            summary = consistency_summary(df_cons)
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Seiten", summary["pages"])
+            c2.metric("Mit Screenshot", summary["mit_screenshot"])
+            c3.metric("Auffällige Seiten", summary["auffällige_seiten"])
+            if summary["auffällige_seiten"]:
+                st.warning(f"{summary['auffällige_seiten']} Seite(n) mit "
+                           f"{summary['befunde']} Befund(en):")
+                st.dataframe(df_cons[df_cons["n_issues"] > 0], use_container_width=True)
+            else:
+                st.success("Keine Konsistenzbefunde — Screenshots und JSON-"
+                           "Merkmale passen zusammen.")
+            st.download_button(
+                "Konsistenztabelle CSV",
+                data=df_cons.to_csv(index=False).encode(),
+                file_name=f"website_{website.website_id}_consistency.csv",
+                mime="text/csv",
+                key=f"web_consistency_csv_{website.website_id}",
+            )
