@@ -123,7 +123,7 @@ Die K-Means-Analyse (k = 3) ergab drei Cluster mit einem Silhouette-Score von 0,
 | 1 | 6 | 395,0 | 15,7 | 28.589,2 | 0,0 | Hub-/Übersichtsseiten |
 | 2 | 11 | 217,3 | 15,3 | 10.831,3 | 19,6 | Medienreiche Seiten |
 
-Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriffe zu verstehen, nicht als validierte Kategorien. Da `link_count` auch interne Navigation enthält, können hohe Werte sowohl inhaltliche Vielfalt als auch umfangreiche Navigations- und Footer-Strukturen abbilden. Die Typisierung „Hub-/Übersichtsseiten" trägt diese Mehrdeutigkeit mit. Es ergibt sich kein Cluster mit hohem `form_count`, eine direkte Folge des Formular-Erfassungsartefakts. Tabelle 3 zeigt die Website-Komposition der Cluster, sie ist bei der Interpretation aller Cluster-Charakteristika zu berücksichtigen.
+Die Bezeichnungen sind post-hoc vergebene Hilfsbegriffe, keine validierten Kategorien. Da `link_count` auch interne Navigation enthält, bleibt die Typisierung mehrdeutig. Ein Cluster mit hohem `form_count` ergibt sich nicht, eine Folge des Erfassungsartefakts. Zur Website-Komposition siehe Tabelle 3.
 
 **Tabelle 3: Cluster-Verteilung nach Website**
 
@@ -134,7 +134,7 @@ Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriff
 | wiesbaden.de | 12 | 0 | 0 | 12 |
 | **Gesamt** | **30** | **6** | **11** | **47** |
 
-Der ARI zwischen Cluster- und Website-Zugehörigkeit beträgt 0,243 und zeigt eine reale, aber nur partielle Konfundierung: Cluster 1 besteht ausschließlich aus 6 bpb.de-Seiten und Cluster 2 ausschließlich aus 11 hs-rm.de-Seiten, beide faktisch mit einer Website identisch, während nur Cluster 0 alle drei Websites vereint (14 bpb, 4 hs-rm, 12 wiesbaden). Eine pauschale Formulierung wie „kein reines Website-Artefakt" würde das verschleiern.
+Der ARI von 0,243 zeigt eine partielle Konfundierung: Cluster 1 und 2 bestehen ausschließlich aus bpb.de- beziehungsweise hs-rm.de-Seiten, nur Cluster 0 vereint alle drei Websites.
 
 **Abbildung 1: DOM-Tiefe × Linkanzahl nach Cluster**
 
@@ -146,7 +146,7 @@ Abbildung 1 stellt diese Konfundierung räumlich dar. Die beiden website-reinen 
 
 ### 4.3 Feature-Importance und Klassifikationsgüte
 
-Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, während die 5-fache Cross-Validation im Mittel nur 0,831 liefert (SD 0,207, Einzel-Folds 0,556 bis 1,000). Der Einzel-Split überschätzt die Robustheit also erheblich. Eine stratifizierte Variante (StratifiedKFold, 5 Folds, Seed 42) liefert dagegen 0,889 bis 1,000 mit einem Mittel von 0,936 und einer balancierten Accuracy von 0,928. Die schwachen unstratifizierten Folds spiegeln damit vor allem die Cluster-Unbalanciertheit (30/6/11) in einzelnen Folds wider. Die Cluster-Labels sind aus den Merkmalen überwiegend rekonstruierbar, der Einzel-Split-Wert von 1,000 bleibt gleichwohl eine optimistische Punktschätzung.
+Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, die 5-fache Kreuzvalidierung im Mittel nur 0,831 (Folds 0,556 bis 1,000). Stratifiziert liegt das Mittel bei 0,936, die schwachen Folds spiegeln also vor allem die Cluster-Unbalanciertheit wider. Die Cluster-Labels sind aus den Merkmalen überwiegend rekonstruierbar, der Einzelwert bleibt eine optimistische Punktschätzung.
 
 **Tabelle 4: Feature-Importance (MDI vs. Permutation-Importance)** *(Reproduktion: `check_web_analysis.py`, Permutation mit dokumentiertem Seed)*
 
@@ -159,9 +159,7 @@ Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, während die 5-fac
 | text_length | 0,176 | **0,000** |
 | dom_depth | 0,078 | **0,000** |
 
-`text_length` (MDI 17,6 %) und `dom_depth` (MDI 7,8 %) erscheinen unter MDI als relevant, ihre Permutation-Importance beträgt jedoch 0,000. Bei `text_length` passt das zum bekannten MDI-Bias zugunsten merkmalsreicher Werte.
-
-Bei `dom_depth` mit nur 8 verschiedenen Werten reicht dieser Bias als Erklärung jedoch nicht aus. `dom_nodes` und `link_count` bleiben unter beiden Methoden am wichtigsten. In der Korrelationsmatrix hängen `link_count`, `text_length` (r = 0,81) und `dom_nodes` (r = 0,72) stark zusammen, `dom_depth` mit keinem anderen Merkmal (|r| ≤ 0,28), passend zu seiner Permutation-Importance von 0,000..
+`text_length` und `dom_depth` erscheinen unter MDI als relevant, ihre Permutation-Importance beträgt jedoch 0,000. Bei `text_length` passt das zum bekannten MDI-Bias zugunsten merkmalsreicher Werte, bei `dom_depth` mit nur 8 verschiedenen Werten reicht er als Erklärung nicht aus. `dom_nodes` und `link_count` bleiben unter beiden Methoden am wichtigsten. In der Korrelationsmatrix hängen `link_count`, `text_length` und `dom_nodes` stark zusammen (r = 0,72 bis 0,81), `dom_depth` mit keinem anderen Merkmal..
 
 ### 4.4 Website-Vergleich auf Aggregatniveau
 
@@ -182,13 +180,13 @@ Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die h�
 
 Der k-Scan über k = 2 bis 6 liefert Silhouette-Scores von 0,466 (k = 2), 0,446 (k = 4), 0,436 (k = 5) und 0,480 (k = 6), gegenüber 0,433 bei k = 3. k = 3 liefert also nicht den höchsten Score. Die Wahl folgt der Vergleichbarkeit mit der dreiteiligen Datenbasis, nicht der datengetriebenen Optimierung.
 
-**Cluster-Stabilität:** Über 50 Wiederholungen mit dokumentierten Zufallssaaten (aus `default_rng(0)`) ergibt sich ein mittlerer ARI von 0,986 (Minimum 0,717). Die Lösung ist algorithmisch sehr stabil und, anders als die k-Wahl, kein Zufallsartefakt. Die Werte sind seed-abhängig, durch die dokumentierten Saaten aber reproduzierbar.
+**Cluster-Stabilität:** Über 50 Wiederholungen mit anderen Zufallssaaten ergibt sich ein mittlerer ARI von 0,986. Die Lösung ist damit algorithmisch stabil.
 
-**Silhouette-Bootstrap:** 1.000 Resamples ergeben einen Mittelwert von 0,472, 95%-CI [0,380, 0,566]. Der Punktschätzer 0,433 liegt am unteren Rand. Die „gut"-Schwelle von 0,5 wird auch im Bootstrap-Mittel nicht sicher erreicht.
+**Silhouette-Bootstrap:** 1.000 Resamples ergeben einen Mittelwert von 0,472 (95%-CI [0,380, 0,566]). Der Punktschätzer 0,433 liegt am unteren Rand, die 0,5-Schwelle wird auch im Mittel nicht sicher erreicht.
 
 **Baseline-Vergleich:** Clustering nur auf `link_count` erzielt einen Silhouette-Score von 0,667, deutlich höher als das Sechs-Merkmale-Modell (0,433). Beide Lösungen stimmen nur mäßig überein (ARI = 0,527). In dieser Stichprobe erzeugt die Einzelmetrik eine klarer abgegrenzte Clusterstruktur als der vollständige Merkmalsvektor.
 
-**Dekorrelations-Analyse:** Die Korrelationsmatrix (4.3) legt nahe, dass drei der sechs Merkmale überwiegend dieselbe „Umfang"-Dimension messen (`text_length` und `dom_nodes` korrelieren mit r = 0,81 bzw. 0,72 mit `link_count`). Wird das Clustering auf den dekorrelierten Satz `link_count`, `dom_depth`, `media_count`, `form_count` beschränkt, steigt der Silhouette-Score von 0,433 auf **0,500**. Die „gut"-Schwelle wird knapp erreicht, und die Lösung bleibt der 6-Merkmal-Lösung strukturell ähnlich (ARI = 0,717), zur `link_count`-Baseline dagegen deutlich verschieden (ARI = 0,339). Zwei Einschränkungen bleiben: 0,500 liegt weiterhin unterhalb der Einzelmetrik-Baseline (0,667), und die dekorrelierte Lösung isoliert die extremste bpb.de-Seite (1.187 Links, 54.453 Zeichen) als **Single-Page-Cluster** (Clustergrößen 35/11/1), ein Teil des Score-Gewinns stammt also aus Ausreißerisolierung.
+**Dekorrelations-Analyse:** Die Korrelationsmatrix (4.3) legt nahe, dass drei der sechs Merkmale überwiegend dieselbe „Umfang"-Dimension messen (`text_length` und `dom_nodes` korrelieren mit r = 0,81 bzw. 0,72 mit `link_count`). Wird das Clustering auf den dekorrelierten Satz `link_count`, `dom_depth`, `media_count`, `form_count` beschränkt, steigt der Silhouette-Score auf **0,500** und bleibt der ursprünglichen Lösung strukturell ähnlich. Zwei Einschränkungen bleiben: 0,500 liegt weiterhin unterhalb der Einzelmetrik-Baseline (0,667), und die Lösung isoliert die extremste bpb.de-Seite als **Single-Page-Cluster** (35/11/1).
 
 **Log-Transform-Variante:** Auf log1p-transformierten, z-standardisierten Merkmalen (gegen die Rechtsschiefe von `link_count` und `text_length`) steigt der Silhouette-Score nur leicht auf 0,462, und auch die `link_count`-Baseline bleibt bei 0,667. Die Rechtsschiefe erklärt damit praktisch nichts des Baseline-Vorteils, das zentrale Robustheitsproblem ist die Merkmalsredundanz.
 
@@ -209,7 +207,7 @@ Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erkl
 | dom_nodes | −0,184 | 0,216 |
 | form_count | 0,147 | 0,325 |
 
-Nur `dom_depth` weist einen schwachen, gerade noch signifikanten Zusammenhang auf. Bei sechs getesteten Korrelationen ist ein zufälliges p < .05 jedoch nicht unwahrscheinlich. Nach Bonferroni-Korrektur (α = 0,05/6 ≈ 0,0083) wäre auch dieser Wert nicht mehr signifikant. Der Befund ist daher als schwaches, unkorrigiertes Signal zu lesen, nicht als abgesicherter Effekt. Die beiden Merkmale mit der höchsten Permutation-Importance (`dom_nodes`, `link_count`) korrelieren ohnehin nicht signifikant mit der Antwortzeit (p = 0,216 bzw. 0,179).
+Nur `dom_depth` weist einen schwachen, gerade noch signifikanten Zusammenhang auf, der die Bonferroni-Korrektur für sechs Tests jedoch nicht übersteht. Ein abgesicherter Effekt ist das nicht. Auch die wichtigsten Merkmale `dom_nodes` und `link_count` zeigen keinen signifikanten Zusammenhang.
 
 **Tabelle 7: Antwortzeit nach Cluster und Website**
 
@@ -222,7 +220,7 @@ Nur `dom_depth` weist einen schwachen, gerade noch signifikanten Zusammenhang au
 | hs-rm.de | 0,106 | 0,061 | 15 |
 | wiesbaden.de | 0,182 | 0,064 | 12 |
 
-Eine einfaktorielle ANOVA prüft, ob sich die Mittelwerte mehrerer Gruppen stärker unterscheiden, als durch Zufall zu erwarten wäre. Zwischen den drei Clustern ist dieser Unterschied nicht signifikant (F = 1,17, p = 0,319). Auf Website-Ebene ist wiesbaden.de im Mittel langsamer, was eher mit der Server-/Infrastrukturseite als mit den HTML-Strukturmerkmalen zusammenhängen dürfte. Die Clusterzugehörigkeit und die wichtigsten Strukturmerkmale zeigen damit keinen signifikanten Zusammenhang mit dem Außenkriterium. Die reine Server-Antwortzeit bildet zudem nur einen Teil der von Nutzenden erlebten Ladezeit ab.
+Zwischen den drei Clustern ist der Mittelwertunterschied nicht signifikant (ANOVA, p = 0,319). wiesbaden.de antwortet im Mittel am langsamsten. Clusterstruktur und wichtigste Merkmale zeigen damit keinen signifikanten Zusammenhang mit dem Außenkriterium, wobei die reine Server-Antwortzeit nur einen Teil der erlebten Ladezeit abbildet.
 
 ---
 
@@ -232,7 +230,7 @@ Eine einfaktorielle ANOVA prüft, ob sich die Mittelwerte mehrerer Gruppen stär
 
 Dass gerade `link_count` und `dom_nodes` die Cluster tragen, passt zum Befund von Ivory und Hearst (2002), dass quantitative Struktur- und Linkmerkmale prädiktiv für die wahrgenommene Seitenqualität sind. Dass zwei andere, unter MDI relevant erscheinende Merkmale sich bei genauerer Prüfung als wertlos erweisen (4.3), zeigt dagegen den eigentlichen methodischen Ertrag dieser Arbeit: Eine unreflektierte Feature-Importance-Analyse hätte hier in die Irre geführt. Die Dekorrelations-Analyse (4.5) präzisiert das Bild: Der Informationsgewinn der sechs Merkmale ist in dieser Stichprobe real, aber geringer als ihre Redundanz: Drei von sechs messen im Wesentlichen denselben „Umfang". Ein schlankeres Merkmalsset, also vier statt sechs Merkmale ohne die beiden redundanten Umfangs-Indikatoren, wäre der Ausgangspunkt für ähnliche Analysen, mit dem Vorbehalt aus 4.5, dass gerade diese Vier-Merkmale-Lösung die extremste Seite als Single-Page-Cluster isoliert. Die Empfehlung ist damit vorläufig, bis sie an einem größeren Seitenkorpus geprüft ist.
 
-Das Strukturprofil von wiesbaden.de (4.4), schlank im Umfang, aber mit der tiefsten DOM-Verschachtelung, illustriert zudem, dass „Komplexität" kein eindimensionales Konstrukt ist: Eine Website kann in der Umfangsdimension minimal und in der Verschachtelungstiefe gleichzeitig maximal sein. Genau solche Profile, nicht die Gesamtlage im Umfangsraum, wären der interessante Gegenstand einer Folgestudie mit mehr Websites. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung: Sinnvolle Komplexitätsmessung kombiniert mehrere, voneinander unabhängige Metrikfamilien mit einem Außenkriterium. Genau diese Kombination wurde hier versuchsweise umgesetzt. Ihr Außenkriterium (Antwortzeit) geriet allerdings zu grob, um Strukturunterschiede aufzulösen (4.6). Dass ausgerechnet der Outdegree beziehungsweise `link_count` als Einzelmetrik die tragfähigste Kennzahl bleibt, fügt sich zudem zu Chens (2018) Outdegree-basiertem Ansatz: Die Einzelmetrik ist offenbar nicht nur ein statistischer Notbehelf, sondern trägt reale Strukturinformation.
+Das Profil von wiesbaden.de (4.4), schlank im Umfang, aber mit der tiefsten Verschachtelung, zeigt zudem, dass Komplexität kein eindimensionales Konstrukt ist. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung und kombinieren mehrere unabhängige Metrikfamilien mit einem Außenkriterium, genau die Kombination, die hier zu grob geriet, um Strukturunterschiede aufzulösen. Dass ausgerechnet `link_count` als Einzelmetrik am tragfähigsten bleibt, fügt sich zu Chens (2018) Outdegree-Ansatz.
 
 ### 5.2 Grenzen und Verallgemeinerbarkeit
 
@@ -253,7 +251,7 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 Die zentrale Forschungsfrage ist damit differenziert zu beantworten. Automatisierte Merkmalsextraktion und Clustering von Webseiten sind technisch machbar, ein belastbarer Mehrwert des mehrdimensionalen Modells gegenüber einer Einzelmetrik lässt sich mit dieser Stichprobe dagegen nicht zeigen. Auch die Dekorrelations-Analyse (4.5) verbessert das Mehrdimensionale nur auf die „gut"-Schwelle, ohne die Einzelmetrik-Baseline zu erreichen. Jede der in dieser Arbeit durchgeführten Robustheitsprüfungen deckt einen anderen Punkt auf, an dem eine oberflächliche Analyse zu falschen Schlüssen geführt hätte: die suboptimale Cluster-Anzahl, eine durch MDI verzerrte Merkmalsrangfolge, eine durch Einzel-Split überschätzte Modellgüte (stratifiziert 0,94 statt 1,00) und eine Einzelmetrik, die im internen Gütekriterium sogar besser abschneidet als das volle Sechs-Merkmale-Modell. Am schwersten wiegt der Befund aus 4.6, denn erst der Test gegen ein unabhängiges Kriterium zeigt, dass die gefundene Clusterstruktur im geprüften Außenkriterium ohne nachweisbaren Effekt bleibt.
 
-Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websites strukturell beschreiben kann, aber ohne begleitende externe Validierung keine belastbare Aussage über praktische Relevanz trifft. Für die Methodik folgt daraus eine allgemeinere Lehre für vergleichbare Arbeiten: Cluster-Anzahl, Feature-Importance-Verfahren und Modellbewertung sollten grundsätzlich gegeneinander geprüft werden, bevor aus einem einzelnen Durchlauf Schlüsse gezogen werden. Die dabei durchlaufene Prüfabfolge (k-Scan, Einzelmetrik-Baseline, Dekorrelation, Permutations- statt MDI-Importance, stratifizierte Cross-Validation, externes Kriterium) ist als wiederverwendbare Checkliste für Clustering-Studien auf tabellarischen Merkmalen formulierbar. Ebenso ist die Pipeline aus robots.txt-konformem Crawler, typisierten Loader-Datenklassen und entkoppelter Merkmalsberechnung unabhängig von dieser Datenlage einsetzbar und um weitere Merkmalsfamilien erweiterbar.
+Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websites strukturell beschreiben kann, aber ohne begleitende externe Validierung keine belastbare Aussage über praktische Relevanz trifft. Für die Methodik folgt daraus eine allgemeinere Lehre für vergleichbare Arbeiten: Cluster-Anzahl, Feature-Importance-Verfahren und Modellbewertung sollten grundsätzlich gegeneinander geprüft werden, bevor aus einem einzelnen Durchlauf Schlüsse gezogen werden. Die dabei durchlaufene Prüfabfolge (k-Scan, Einzelmetrik-Baseline, Dekorrelation, Permutations- statt MDI-Importance, stratifizierte Cross-Validation, externes Kriterium) ist als wiederverwendbare Checkliste für Clustering-Studien auf tabellarischen Merkmalen formulierbar. Ebenso ist die Pipeline aus Crawler, Ladern und Merkmalsberechnung unabhängig von dieser Datenlage wiederverwendbar.
 
 ---
 
