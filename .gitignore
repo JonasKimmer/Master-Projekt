@@ -25,3 +25,15 @@ paper1_scatter_*.png
 # Alter Screenshot / Poster-Thumbnails (nicht abgaberelevant)
 image.png
 poster*_thumbnail.png
+
+# Poster-Projekt (nicht Teil der Hausarbeit)
+poster_*.pptx
+poster_*.tex
+poster*_thumbnail.png
+_Informatik_Poster-Vorlage_DIN-A0_V1.pptx
+c.tex
+make_posters_pptx.py
+image.png
+
+# Projektdokument (Word, git-unfreundlich)
+Projektplan_Erweiterung_Analyseumgebung_Kimmer*
