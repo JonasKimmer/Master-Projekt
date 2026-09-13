@@ -97,6 +97,8 @@ Das Analyse-Tool ist in Python implementiert und besitzt eine Streamlit-Oberflä
 
 ### 4.1 Merkmalsverteilung über alle Seiten
 
+Die 47 Seiten unterscheiden sich in allen sechs Merkmalen deutlich, die Werte liegen teils eine Größenordnung auseinander.
+
 **Tabelle 1: Merkmalsverteilung (N = 47 Seiten)**
 
 | Merkmal | M | SD | Min | Max |
