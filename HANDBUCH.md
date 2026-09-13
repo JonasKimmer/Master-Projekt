@@ -140,13 +140,16 @@ Pro Trial vier Untertabs:
 ### 5.5 Zeitfenster
 Der Kern für Sensordaten (Details in Abschnitt 6): Stream-Auswahl (kompletter Fusion oder Einzelmodalität), optionale Synchronisation, drei Fenster-Modi, Merkmalsberechnung, Erkennung auffälliger Fenster, Export als lange und breite Feature-Tabelle.
 
-### 5.6 Websites
-Seiten-Übersicht mit Portal-Metadaten und Asset-Index (Shared-Assets-Inventar), aggregierte Merkmale (Mittelwert/Max/Summe über alle Seiten), Screenshot-Galerie verknüpft mit den Seitenmerkmalen.
+### 5.6 Sensoranalyse
+Modalitätsbezogene Übersicht über alle Trials: Qualitäts-Tabelle je Trial/Modalität (Samples, doppelte Timestamps, Max-Gap, Issues, OK-Flag) mit einstellbarem Gap-Schwellenwert sowie Kanalstatistik (gültige Samples, Fehlerrate, min/max/Mittelwert) — beide als CSV exportierbar.
 
-### 5.7 Reporting
+### 5.7 Websites
+Seiten-Übersicht mit Portal-Metadaten und Asset-Index (Shared-Assets-Inventar), aggregierte Merkmale (Mittelwert/Max/Summe über alle Seiten), Screenshot-Galerie verknüpft mit den Seitenmerkmalen, sowie **Konsistenzanalyse** (Screenshots ↔ JSON-Merkmale): leere/unlesbare Screenshots, Inhalt ohne Screenshot, raw.html/dom.json-Mismatches werden als Befund-Tabelle mit CSV-Export ausgewiesen.
+
+### 5.8 Reporting
 Zentrale Exporte: Timeline-/Qualitäts-CSV und Markdown-Report pro Trial; Pages-CSV/-Excel und Website-Report; Website-Übersicht aller geladenen Seiten.
 
-### 5.8 ML
+### 5.9 ML
 Arbeitet ausschließlich auf **aggregierten Merkmals-Tabellen** (exportierte Fenster-Features als CSV wieder hochladen oder beliebige Tabellendaten): K-Means (Silhouette/Inertia), Isolation Forest (Anomalien), Random-Forest-Klassifikation und -Regression mit Feature-Importances und Modellmetriken. Ergebnisse als CSV exportierbar.
 
 ---
@@ -163,7 +166,8 @@ Arbeitet ausschließlich auf **aggregierten Merkmals-Tabellen** (exportierte Fen
 Ungültige Definitionen (leere Fenster, negative Dauer, Offset jenseits des Streams) werfen eine klare Fehlermeldung in der UI statt leerer Ergebnisse.
 
 ### Merkmale pro Kanal und Fenster
-`mean, median, std, variance, min, max, range, peak_count, trend, n_samples`
+`mean, median, std, variance, min, max, range, peak_count, trend, n_samples, missing_rate` —
+`missing_rate` ist die Fehlerrate (Anteil None/unparseabler Samples im Fenster); Kanäle ohne gültige Werte bleiben mit `missing_rate=1.0` sichtbar. Welche Kennzahlen in Tabelle und langem CSV-Export erscheinen, ist per Multiselect wählbar; leere Fenster (kein gültiges Sample) werden separat gezählt und gewarnt.
 
 ### Auffällige Fenster
 Nach jeder Berechnung werden Fenster markiert, deren `mean`- oder `std`-z-Score (pro Kanal über alle Fenster) den Schwellenwert ±2 überschreitet oder die zu wenige Samples (<5) enthalten. Die Flags inkl. Grund stehen in der Tabelle und im CSV-Export.
@@ -205,7 +209,7 @@ Pro Stream und Kanal werden geprüft:
 
 - **Doppelte Timestamps** (global) und **Sampling-Lücken** (Schwellenwert einstellbar, Standard 3000 ms)
 - **Fehlende Werte** pro Kanal (`None`-Rate)
-- **Plausibilitätsbereiche** je Kanaltyp: Herzfrequenz 30–220, PPG 0–4096 mV, GSR 0–100 µS / 0.01–5 MΩ, Gaze-Koordinaten −0.2–1.2, Pupille 1–10 mm, Temperatur 20–45 °C. Gaze-Matching erkennt die realen Kanalnamen (`LeftX/RightX/LeftY/RightY`).
+- **Plausibilitätsbereiche** je Kanaltyp: Herzfrequenz 30–220, PPG 0–4096 mV, GSR 0–100 µS / 0.01–5 MΩ, Gaze-Koordinaten −0.2–1.2, Pupille 1–10 mm, Temperatur 20–45 °C, IMU (Acc/AccWr ±16 g, Gyro ±2000 °/s, Mag ±400 µT), EEG/OpenBCI ±4000 µV (Reservierung). Gaze-Matching erkennt die realen Kanalnamen (`LeftX/RightX/LeftY/RightY`).
 - **Kanal-Ausfälle**: lange konstante Wertfolgen (≥ 5 % der Samples und ≥ 50 Samples) — binäre Validitätsflags ausgenommen; `None`-Lücken zählen nicht als Ausfall, sondern als fehlende Werte.
 
 Bekannte Datenlage: T-10 besitzt kein vollständiges Baseline-Segment (dort ist der Baseline-vs-Task-Vergleich folglich leer — das ist korrekt, kein Bug).
@@ -228,6 +232,14 @@ Beispiel:
 ```bash
 python mini_crawler.py https://www.hs-rm.de/ websites/B_hsrm 15
 ```
+
+**Screenshots nachziehen** (bestehende Crawls, ohne die JSONs zu verändern):
+
+```bash
+python backfill_screenshots.py websites
+```
+
+Die Loader erkennen alternativ benannte Dateien (`events.json`, `fusion_merged.json`, `Links.json`, `dom_v2.json`, `openbci_*.ndjson` …), kanonische Namen haben Vorrang.
 
 ---
 
@@ -265,10 +277,11 @@ pytest tests/test_synchronization.py -v    # einzelne Datei
 ```
 app.py                  Streamlit-Einstieg (Tabs, Sidebar-Upload)
 mini_crawler.py         Webcrawler (CLI)
+backfill_screenshots.py Screenshot-Nachzug für bestehende Crawls
 check_*.py              Paper-Reproduktions-Skripte
 src/
   session.py            zentrale Session-Verwaltung
-  loaders/              tabular / trial / website Loader (+ Sortierung)
+  loaders/              tabular / trial / website / sensor Loader (+ Sortierung)
   models/               Datenmodelle (DatasetRecord, TrialRecord, Segment,
                         WindowDefinition, PageRecord, WebsiteRecord, ...)
   preprocessing/        segmentation (Timeline), windowing (Fenster),
@@ -276,7 +289,8 @@ src/
                         quality_checks (AP8), window_store (AP6-Persistenz)
   feature_engineering/  sensor_features (Fenster-Merkmale), web_features
   analysis/             statistics (Eventdichte, Baseline-vs-Task, auffällige
-                        Fenster), reporting (Exporte/Reports), ml_analysis
+                        Fenster), reporting (Exporte/Reports), ml_analysis,
+                        web_consistency (Screenshot-JSON-Konsistenz)
   ui/                   ein Modul je Tab (+ styles)
 tests/                  pytest-Suite inkl. AppTest
 data/                   Trial-Rohdaten (git-ignoriert)
