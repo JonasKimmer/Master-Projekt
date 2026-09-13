@@ -97,7 +97,7 @@ Das Analyse-Tool ist in Python implementiert und besitzt eine Streamlit-Oberflä
 
 ### 4.1 Merkmalsverteilung über alle Seiten
 
-Die 47 Seiten unterscheiden sich in allen sechs Merkmalen deutlich, die Werte liegen teils eine Größenordnung auseinander.
+Tabelle 1 zeigt, wie die sechs strukturellen Merkmale über die 47 Seiten verteilt sind.
 
 **Tabelle 1: Merkmalsverteilung (N = 47 Seiten)**
 
@@ -114,7 +114,7 @@ Zwei Merkmale sind durch die Erfassungsartefakte aus 3.1 systematisch nach unten
 
 ### 4.2 Clustering: Automatisch identifizierte Seitentypen
 
-Die K-Means-Analyse (k = 3) ergab drei Cluster mit einem Silhouette-Score von 0,433, unterhalb der 0,5-Schwelle für einen "guten" Trennungswert.
+Die Clusteranalyse teilt die 47 Seiten in drei Cluster, deren Charakteristika Tabelle 2 zeigt und deren Zusammensetzung nach Websites Tabelle 3. Der Silhouette-Score von 0,433 liegt unterhalb der 0,5-Schwelle für einen „guten“ Trennungswert.
 
 **Tabelle 2: Cluster-Charakteristika (Mittelwerte je Cluster)**
 *(Cluster-Zugehörigkeit ist mit Website-Zugehörigkeit teilweise konfundiert, ARI = 0,243. Siehe Tabelle 3.)*
