@@ -56,7 +56,7 @@ Sweller (1988) belegt anhand von Problemlöseexperimenten, dass die begrenzte Ka
 
 ### 2.2 Evaluation in der Informationsvisualisierung
 
-Wie in der Informationsvisualisierung evaluiert wird, ist selbst Gegenstand systematischer Bestandsaufnahmen: Isenberg et al. (2013) analysierten 581 Beiträge von zehn Jahren der IEEE-Visualization-Konferenz hinsichtlich ihrer Evaluationspraxis und zeigen, dass messbare Leistungskennzahlen, darunter vornehmlich Zeit und Genauigkeit, die dominierende Rolle spielen. Lam et al. (2012) strukturieren empirische Studien in sieben Szenarien und weisen ebenfalls aus, dass Benutzungszeit als Standardmetrik gilt. Genau diese Konvention ist der Ausgangspunkt der vorliegenden Arbeit: Wenn Bearbeitungszeit routinemäßig als Belastungs- oder Leistungsindikator herangezogen wird, ist die Frage dringend, was sie unter den Bedingungen dieser Studie tatsächlich misst.
+Wie in der Informationsvisualisierung evaluiert wird, ist selbst Gegenstand systematischer Bestandsaufnahmen: Isenberg et al. (2013) analysierten 581 Beiträge von zehn Jahren der IEEE-Visualization-Konferenz hinsichtlich ihrer Evaluationspraxis und zeigen, dass messbare Leistungskennzahlen, darunter vornehmlich Zeit und Genauigkeit, die dominierende Rolle spielen. Lam et al. (2012) strukturieren empirische Studien in sieben Szenarien und weisen ebenfalls aus, dass Benutzungszeit als Standardmetrik gilt. Genau diese Konvention wirft jedoch die Frage auf, was Bearbeitungszeit, wird sie routinemäßig als Belastungs- oder Leistungsindikator herangezogen, tatsächlich misst.
 
 ### 2.3 Physiologische Indikatoren
 
