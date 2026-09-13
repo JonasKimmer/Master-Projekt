@@ -125,7 +125,7 @@ Die Clusteranalyse teilt die 47 Seiten in drei Cluster, deren Charakteristika Ta
 | 1 | 6 | 395,0 | 15,7 | 28.589,2 | 0,0 | Hub-/Übersichtsseiten |
 | 2 | 11 | 217,3 | 15,3 | 10.831,3 | 19,6 | Medienreiche Seiten |
 
-Die Bezeichnungen sind post-hoc vergebene Hilfsbegriffe, keine validierten Kategorien. Da `link_count` auch interne Navigation enthält, bleibt die Typisierung mehrdeutig. Ein Cluster mit hohem `form_count` ergibt sich nicht, eine Folge des Erfassungsartefakts. Zur Website-Komposition siehe Tabelle 3.
+Die Bezeichnungen sind post-hoc vergebene Hilfsbegriffe, keine validierten Kategorien. Ein Cluster mit hohem `form_count` ergibt sich nicht, eine Folge des Erfassungsartefakts.
 
 **Tabelle 3: Cluster-Verteilung nach Website**
 
