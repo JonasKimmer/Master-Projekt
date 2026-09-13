@@ -38,11 +38,11 @@ Websites unterscheiden sich in ihrer strukturellen Komplexität teils stark: Ein
 
 ### 1.2 Zielsetzung
 
-Diese Arbeit verfolgt zwei Ziele: Erstens wird ein modulares Analyse-Tool vorgestellt, das gecrawlte Website-Daten automatisch einliest und pro Seite strukturelle Merkmale extrahiert. Zweitens wird geprüft, ob diese Merkmale ausreichen, um Seitentypen automatisch zu klassifizieren, und ob dieser Merkmalsvektor einer einfachen Einzelmetrik-Heuristik tatsächlich überlegen ist.
+Vorgestellt wird ein modulares Analyse-Tool, das gecrawlte Website-Daten automatisch einliest und pro Seite strukturelle Merkmale extrahiert. Daraus ergibt sich die zentrale Forschungsfrage:
 
 > *Lässt sich die strukturelle Komplexität einzelner Webseiten anhand automatisiert extrahierter Merkmale messen und klassifizieren, ohne manuelle Annotation, und bietet ein mehrdimensionales Merkmalsmodell dabei einen belastbaren Mehrwert gegenüber einer Einzelmetrik?*
 
-Nebenfragestellungen: Welche Merkmale sind die stärksten Komplexitätsindikatoren, und hält diese Einordnung einer methodenkritischen Prüfung stand? Ist die gewählte Cluster-Anzahl datengetrieben begründbar?
+Drei Nebenfragen schärfen sie: Welche Merkmale sind die stärksten Komplexitätsindikatoren? Hält diese Einordnung einer methodenkritischen Prüfung stand? Ist die gewählte Cluster-Anzahl datengetrieben begründbar?
 
 ---
 
