@@ -64,7 +64,7 @@ Jenseits der Strukturmerkmale untersucht die HCI-Forschung die *wahrgenommene* K
 
 ### 3.1 Datenbasis
 
-Die Webcrawler-Daten wurden im Rahmen dieser Arbeit selbst erhoben. Der Beitrag umfasst die Entwicklung eines modularen Analyse-Tools (Python/Streamlit), einen begleitenden robots.txt-konformen Crawler zur Datenerhebung sowie die statistische Auswertung. Eine ursprünglich an drei anderen Websites durchgeführte Erhebung musste aufgrund nicht mehr verfügbarer Rohdaten durch die hier beschriebene Neuerhebung ersetzt werden. Alle Ergebnisse in Kapitel 4 beziehen sich ausschließlich auf diese Neuerhebung.
+Die Webcrawler-Daten wurden im Rahmen dieser Arbeit selbst erhoben. Der Beitrag umfasst die Entwicklung eines modularen Analyse-Tools in Python mit Streamlit-Oberfläche, einen begleitenden robots.txt-konformen Crawler zur Datenerhebung sowie die statistische Auswertung.
 
 Die Analyse basiert auf drei gecrawlten Websites mit insgesamt 47 Unterseiten. bpb.de ist das redaktionell gepflegte Informationsportal der Bundeszentrale für politische Bildung mit thematischen Rubriken (20 Unterseiten). hs-rm.de ist die institutionelle Website der Hochschule RheinMain mit flacher Navigationsstruktur und überwiegend informativen Fachbereichs- und Studienseiten (15 Unterseiten). wiesbaden.de ist das Bürger- und Verwaltungsportal der Stadt Wiesbaden mit Verwaltungsdienstleistungen (12 Unterseiten).
 
