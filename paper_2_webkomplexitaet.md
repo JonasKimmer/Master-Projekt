@@ -161,7 +161,7 @@ Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, während die 5-fac
 
 `text_length` (MDI 17,6 %) und `dom_depth` (MDI 7,8 %) erscheinen unter MDI als relevant, ihre Permutation-Importance beträgt jedoch 0,000. Bei `text_length` passt das zum bekannten MDI-Bias zugunsten merkmalsreicher Werte.
 
-Bei `dom_depth` mit nur 8 verschiedenen Werten reicht dieser Bias als Erklärung jedoch nicht aus. `dom_nodes` und `link_count` bleiben unter beiden Methoden am wichtigsten. In der Korrelationsmatrix hängen `link_count`, `text_length` (r = 0,81) und `dom_nodes` (r = 0,72) stark zusammen, `dom_depth` mit keinem anderen Merkmal (|r| ≤ 0,28), passend zu seiner Permutation-Importance von 0,000. Die Deutung dieser Muster folgt in 5.1.
+Bei `dom_depth` mit nur 8 verschiedenen Werten reicht dieser Bias als Erklärung jedoch nicht aus. `dom_nodes` und `link_count` bleiben unter beiden Methoden am wichtigsten. In der Korrelationsmatrix hängen `link_count`, `text_length` (r = 0,81) und `dom_nodes` (r = 0,72) stark zusammen, `dom_depth` mit keinem anderen Merkmal (|r| ≤ 0,28), passend zu seiner Permutation-Importance von 0,000..
 
 ### 4.4 Website-Vergleich auf Aggregatniveau
 
@@ -176,7 +176,7 @@ Bei `dom_depth` mit nur 8 verschiedenen Werten reicht dieser Bias als Erklärung
 | dom_depth M | 15,3 | 16,0 | 18,6 |
 | dom_nodes M | 1.461,2 | 998,7 | 668,3 |
 
-Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die höchste Textmenge und DOM-Knotenanzahl, hs-rm.de die höchste Linkanzahl, wiesbaden.de die größte DOM-Tiefe. Auffällig ist das Profil von wiesbaden.de mit der **geringsten Knotenzahl (668) bei gleichzeitig höchster DOM-Tiefe (18,6)**. Die `media_count`-Werte von bpb.de und die `form_count`-Werte von wiesbaden.de sind durch die in 3.1 beschriebenen Erfassungsartefakte nach unten verzerrt und nicht als reale Abwesenheit zu lesen. Die Einordnung der Profile folgt in 5.1.
+Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die höchste Textmenge und DOM-Knotenanzahl, hs-rm.de die höchste Linkanzahl, wiesbaden.de die größte DOM-Tiefe. Auffällig ist das Profil von wiesbaden.de mit der **geringsten Knotenzahl (668) bei gleichzeitig höchster DOM-Tiefe (18,6)**. Die `media_count`-Werte von bpb.de und die `form_count`-Werte von wiesbaden.de sind durch die in 3.1 beschriebenen Erfassungsartefakte nach unten verzerrt und nicht als reale Abwesenheit zu lesen..
 
 ### 4.5 Robustheitsprüfungen: k-Wahl, Stabilität, Baseline
 

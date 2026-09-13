@@ -135,7 +135,7 @@ Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchst
 
 Gesundheits-Aufgaben dauerten im Schnitt am längsten und wiesen zugleich die höchste Variabilität auf.
 
-Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsreihenfolge bearbeitet wurden (3.2), entspricht die Aufgabenposition dem Visualisierungstyp. Die mittlere Bearbeitungszeit nimmt über die Positionen zu, von 56,4 s (Position 1, Timeline) bis 89,4 s (Position 5, Dashboard), bei jeweils 54 Aufgaben. Dieses Muster ist nicht als Wirkung der Visualisierungstypen interpretierbar, weil Typ und Position vollständig konfundiert sind und Lern-, Ermüdungs- oder Motivationseffekte über die Sitzung hinweg dasselbe Bild erzeugen.
+Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsreihenfolge bearbeitet wurden (3.2), entspricht die Aufgabenposition dem Visualisierungstyp. Die mittlere Bearbeitungszeit nimmt über die Positionen zu, von 56,4 s (Position 1, Timeline) bis 89,4 s (Position 5, Dashboard), bei jeweils 54 Aufgaben. Weil Position und Visualisierungstyp vollständig konfundiert sind, ist das Muster ihnen nicht kausal zuschreibbar.
 
 ### 4.3 Korrelation zwischen Bearbeitungszeit und NASA-TLX
 
@@ -183,7 +183,7 @@ Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Pooled �
 | Pupillendurchmesser (mm) | −0,07 (0,25) | −0,08 (0,31) | −0,02 (0,25) |
 | Hautleitwert (µS) | +1,64 (3,01) | +1,75 (3,17) | +1,31 (1,92) |
 
-Der Pupillendurchmesser unterscheidet sich über alle drei Domänen hinweg nicht nennenswert von der Baseline (Deltas ≤ 0,08 mm bei Trial-SDs von 0,25–0,31). Der Hautleitwert steigt unter Aufgabe generell an (+1,3 bis +1,8 µS), unterscheidet die Domänen aber ebenfalls nicht: Die Domänen-Deltas überlappen angesichts der großen Streuung vollständig. Ein domänenspezifisches physiologisches Muster existiert in diesen Daten somit nicht, anders als das Frustrationsmuster in Tabelle 1. Ob dies an mangelnder Sensitivität der Maße (Bewegungsartefakte am Handgelenk, Pupillenmessung ohne Beleuchtungskontrolle) oder an einer echten Entkoppelung physiologischer und subjektiver Reaktion liegt, klären diese Daten nicht.
+Der Pupillendurchmesser unterscheidet sich über alle drei Domänen hinweg nicht nennenswert von der Baseline (Deltas ≤ 0,08 mm bei Trial-SDs von 0,25–0,31). Der Hautleitwert steigt unter Aufgabe generell an (+1,3 bis +1,8 µS), unterscheidet die Domänen aber ebenfalls nicht: Die Domänen-Deltas überlappen angesichts der großen Streuung vollständig. Ein domänenspezifisches physiologisches Muster existiert in diesen Daten somit nicht, anders als das Frustrationsmuster in Tabelle 1.
 
 ---
 
