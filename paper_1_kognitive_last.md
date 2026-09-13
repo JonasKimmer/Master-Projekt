@@ -22,11 +22,9 @@ Bearbeitungszeit gilt in Usability-Studien häufig als Proxy für kognitive Bean
 
 - **Tabelle 1:** NASA-TLX-Scores nach Domäne (Abschnitt 4.1)
 - **Tabelle 2:** Bearbeitungszeit nach Domäne (Abschnitt 4.2)
-- **Tabelle 2b:** Bearbeitungszeit nach Aufgabenposition / Visualisierungstyp (Abschnitt 4.2)
 - **Tabelle 3:** Pearson-Korrelationen Bearbeitungszeit × NASA-TLX (Abschnitt 4.3)
 - **Tabelle 3b:** Absicherung gegen Pseudoreplikation: Zentrierung, Bootstrap, Mixed-Model (Abschnitt 4.3)
-- **Tabelle 4:** Deskriptive Statistik ausgewählter Sensorkanäle (Abschnitt 4.4)
-- **Tabelle 5:** Baseline-zentrierte Domänen-Deltas (Abschnitt 4.4)
+- **Tabelle 4:** Baseline-zentrierte Domänen-Deltas (Abschnitt 4.4)
 
 ---
 
@@ -90,7 +88,7 @@ Der NASA-TLX (Raw-Version) wurde nach jedem Domänenblock erhoben (54 Datensätz
 
 Eingesetzt wurden ein Shimmer3-Sensor am Handgelenk (nominal 10 Hz, aus den Timestamps effektiv M = 9,6 Hz über alle Trials) für Hautleitwert, Herzrate (PPG) sowie Beschleunigungs-, Gyroskop- und Magnetometerdaten sowie ein ferngesteuerter Tobii Eye-Tracker für Blickpunkt und beidseitigen Pupillendurchmesser. Die native Abtastrate von etwa 33 Hz liegt in den ausgelieferten Fusionsdaten bei effektiv M = 9,5 Hz, da die Fusion auf das 10-Hz-Zeitraster bündelt. Separate Gültigkeitsflags markieren 83,5 % der Pupillen-Samples als gültig.
 
-Aus den Eventlogs wurden Start-/Endzeitstempel je Aufgabe extrahiert (15 Aufgabensegmente plus Baseline-Segment(e): in der Regel eines, in drei Trials (darunter T-3) zwei, vgl. 4.4 zur Konsequenz für die Zentrierung). Die in 4.3 verwendete kumulierte Bearbeitungszeit je Domäne ist die Summe der fünf Aufgabendauern eines Domänenblocks. Sampling-Lücken (>3.000 ms, Schwellenwert der Standardeinstellung der Analyseumgebung), doppelte Zeitstempel und Plausibilitätsverletzungen wurden automatisch geprüft. Dabei fanden sich 120 negative Hautleitwert-Samples (physiologisch unmögliche Leitfähigkeiten), verteilt auf fünf Trials (T-3, T-7, T-8, T-12, T-14). Diese Werte verbleiben als Rohwerte in den deskriptiven Statistiken (Tabelle 4) und werden in 5.3 als Einschränkung benannt.
+Aus den Eventlogs wurden Start-/Endzeitstempel je Aufgabe extrahiert (15 Aufgabensegmente plus Baseline-Segment(e): in der Regel eines, in drei Trials (darunter T-3) zwei, vgl. 4.4 zur Konsequenz für die Zentrierung). Die in 4.3 verwendete kumulierte Bearbeitungszeit je Domäne ist die Summe der fünf Aufgabendauern eines Domänenblocks. Sampling-Lücken (>3.000 ms, Schwellenwert der Standardeinstellung der Analyseumgebung), doppelte Zeitstempel und Plausibilitätsverletzungen wurden automatisch geprüft. Dabei fanden sich 120 negative Hautleitwert-Samples (physiologisch unmögliche Leitfähigkeiten), verteilt auf fünf Trials (T-3, T-7, T-8, T-12, T-14). Diese Werte verbleiben als Rohwerte in den berichteten Statistiken (4.4) und werden in 5.3 als Einschränkung benannt.
 
 Zwei Event-Paarungslogiken kommen zum Einsatz, die sich in einem konkreten Datenartefakt unterscheiden. In T-3/Stadt existiert ein verwaister `task:start` ohne zugehöriges `task:end` (271 Starts stehen 270 Ends gegenüber, die Lücke zum nächsten Start beträgt rund 825 s). Die tabellarische Aufgaben-Auswertung (Tabelle 2) paart nach dem First-In-First-Out-Vertrag der Analyseumgebung und weist diese Lücke daher als eigene, rund 14 Minuten lange Aufgabe aus. Daraus resultiert der in 4.2 berichtete Ausreißer. Die Korrelationsauswertung (Tabelle 3) behandelt einen neuen Start derselben Domäne als Neustart und verwirft den verwaisten Start. Beide Berechnungswege wurden eigenständig aus den Rohdaten rekonstruiert. Mit der FIFO-Paarung reproduziert sich Tabelle 2 exakt, ohne Restdifferenz (Reproduktion: `check_correlations.py`).
 
@@ -137,19 +135,7 @@ Damit ist die erste Nebenfrage aus 1.2 beantwortet: **Gaming erzeugt die höchst
 
 Gesundheits-Aufgaben dauerten im Schnitt am längsten und wiesen zugleich die höchste Variabilität auf.
 
-Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsreihenfolge bearbeitet wurden (3.2), lässt sich die Bearbeitungszeit zusätzlich nach Aufgabenposition aufschlüsseln. Die Position entspricht dem Visualisierungstyp:
-
-**Tabelle 2b: Bearbeitungszeit in Sekunden nach Aufgabenposition (= Visualisierungstyp, Restart-Paarung, n = 270, 54 je Position über alle Domänen und Trials)**
-
-| Position / Typ | M (s) | SD (s) |
-|---|---|---|
-| 1 – Timeline | 56,4 | 27,0 |
-| 2 – Scatter | 73,4 | 35,2 |
-| 3 – Combo | 64,9 | 36,3 |
-| 4 – Heatmap | 68,3 | 46,2 |
-| 5 – Dashboard | 89,4 | 57,8 |
-
-Die mittlere Bearbeitungszeit nimmt über die Positionen zu (erste Position 56,4 s, letzte 89,4 s). Dieses Muster ist jedoch nicht interpretierbar als Wirkung der Visualisierungstypen: Wegen der festen Reihenfolge sind Typ und Position vollständig konfundiert, und Lern-, Ermüdungs- oder Motivationseffekte über die Sitzung hinweg können dasselbe Bild erzeugen (vgl. 5.3). Die Tabelle dokumentiert das Muster daher nur deskriptiv.
+Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsreihenfolge bearbeitet wurden (3.2), entspricht die Aufgabenposition dem Visualisierungstyp. Die mittlere Bearbeitungszeit nimmt über die Positionen zu, von 56,4 s (Position 1, Timeline) bis 89,4 s (Position 5, Dashboard), bei jeweils 54 Aufgaben. Dieses Muster ist nicht als Wirkung der Visualisierungstypen interpretierbar, weil Typ und Position vollständig konfundiert sind und Lern-, Ermüdungs- oder Motivationseffekte über die Sitzung hinweg dasselbe Bild erzeugen (vgl. 5.3).
 
 ### 4.3 Korrelation zwischen Bearbeitungszeit und NASA-TLX
 
@@ -189,18 +175,8 @@ Beide Korrekturverfahren bestätigen übereinstimmend, dass Frustration nicht au
 
 ### 4.4 Sensordaten: Baseline-zentrierte Domänen-Deltas
 
-Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Die deskriptive Gesamtstatistik ausgewählter Kanäle zeigt Tabelle 4. Für die Domänen-Frage ist die baseline-zentrierte Sicht aussagekräftiger: Tabelle 5 zeigt die Abweichung der Task-Mittelwerte von der jeweiligen Baseline je Trial und Domäne (Reproduktion: `check_sensor_deltas.py`). Für 17 von 18 Trials liegt eine solche Zentrierung vor. Bei T-10 beginnt der Sensor-Stream erst rund 20 Sekunden nach Ende der Baseline, bei T-3 überlappt nur das zweite von zwei Baseline-Segmenten den Stream.
-
-**Tabelle 4: Deskriptive Statistik ausgewählter Sensorkanäle** *(alle gültigen (nicht-leeren) Samples aller 18 Trials, ohne weitere Filterung, Reproduktion: `check_sensor_deltas.py`)*
-
-| Kanal | Einheit | M | SD | Min | Max |
-|---|---|---|---|---|---|
-| Pupillendurchmesser links | mm | 4,56 | 0,81 | 1,51 | 7,17 |
-| Pupillendurchmesser rechts | mm | 4,59 | 0,85 | 1,39 | 7,73 |
-| Hautleitwert (GSR) | µS | 2,46 | 4,63 | −1,00 | 24,77 |
-| PPG-Rohsignal | mV | 182,9 | 34,6 | 59,3 | 244,7 |
-
-**Tabelle 5: Baseline-zentrierte Domänen-Deltas (M (SD) über n = 17 Trials)**
+Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Pooled über alle gültigen Samples ohne weitere Filterung liegen die Pupillendurchmesser bei M = 4,56 mm links und 4,59 mm rechts (Gesamtbereich 1,4 bis 7,7 mm), der Hautleitwert bei M = 2,46 µS (−1,0 bis 24,8 µS, die negativen Werte aus 3.3 eingeschlossen) und das PPG-Rohsignal bei M = 182,9 mV. Für die Domänen-Frage ist die baseline-zentrierte Sicht aussagekräftiger. Tabelle 4 zeigt die Abweichung der Task-Mittelwerte von der jeweiligen Baseline je Trial und Domäne (Reproduktion: `check_sensor_deltas.py`).
+**Tabelle 4: Baseline-zentrierte Domänen-Deltas (M (SD) über n = 17 Trials)**
 
 | Kanal | Gaming | Gesundheit | Stadt |
 |---|---|---|---|
@@ -215,11 +191,11 @@ Der Pupillendurchmesser unterscheidet sich über alle drei Domänen hinweg nicht
 
 ### 5.1 Domänenmuster: stabile mentale Last, domänenspezifische Frustration
 
-Die mentale Anforderung bleibt über alle Domänen praktisch konstant (Δ = 1,7 zwischen den Extremwerten). Weder die Domäne selbst noch die in 3.1 erhobene Domänenvertrautheit scheinen sie zu beeinflussen. Das widerspricht der in Kap. 2 skizzierten Schema-Theorie, wonach Vorwissen die Verarbeitung entlasten sollte. Stattdessen scheint die Visualisierungsform selbst ein stärkerer Treiber der mentalen Last zu sein als der dargestellte Inhalt. Diese Interpretation kann durch die feste Reihenfolge der Visualisierungstypen (3.2) allerdings nicht kausal abgesichert werden. Der über die Aufgabenposition ansteigende Zeitverlauf (Tabelle 2b) ist mit der Treiber-Lesart konsistent (später, komplexere Darstellungstypen dauern länger), wegen der vollständigen Konfundierung von Position und Typ (4.2) aber nicht als Beleg prüfbar. Für die Gestaltungspraxis bedeutet das, dass Fachkompetenz allein die kognitive Beanspruchung nicht reduziert. Die extrinsische Last muss über das Design selbst minimiert werden.
+Die mentale Anforderung bleibt über alle Domänen praktisch konstant (Δ = 1,7 zwischen den Extremwerten). Weder die Domäne selbst noch die in 3.1 erhobene Domänenvertrautheit scheinen sie zu beeinflussen. Das widerspricht der in Kap. 2 skizzierten Schema-Theorie, wonach Vorwissen die Verarbeitung entlasten sollte. Stattdessen scheint die Visualisierungsform selbst ein stärkerer Treiber der mentalen Last zu sein als der dargestellte Inhalt. Diese Interpretation kann durch die feste Reihenfolge der Visualisierungstypen (3.2) allerdings nicht kausal abgesichert werden. Der über die Aufgabenposition ansteigende Zeitverlauf (4.2) ist mit der Treiber-Lesart konsistent (später, komplexere Darstellungstypen dauern länger), wegen der vollständigen Konfundierung von Position und Typ (4.2) aber nicht als Beleg prüfbar. Für die Gestaltungspraxis bedeutet das, dass Fachkompetenz allein die kognitive Beanspruchung nicht reduziert. Die extrinsische Last muss über das Design selbst minimiert werden.
 
 Frustration verhält sich gegenläufig zu dieser Stabilität und folgt auch nicht der erwarteten Vertrautheits-Logik: Gaming-Aufgaben erzeugten die höchste Frustration bei gleichzeitig höchster subjektiver Vertrautheit, Stadt-Aufgaben die niedrigste bei geringster Vertrautheit. Hohe Domänenvertrautheit schützt demnach nicht vor Frustration. Als alternative Erklärungen kommen mindestens drei Mechanismen in Betracht, die diese Daten nicht trennen können: unterschiedliche Aufgabenschwierigkeit zwischen den Domänen, die nicht unabhängig validiert wurde, emotional andere Besetztheit der Domäneninhalte (Spielerstatistiken versus Patientendaten) sowie frustrationstreibende Interaktionseigenschaften gerade der Gaming-Darstellungen. Bemerkenswert ist zudem, dass die TLX-Dimension „Leistung" den stärksten Domänenunterschied aller Dimensionen aufweist (M = 49,7 in Stadt vs. 41,4/41,8). Gilt die Original-Konvention (hoher Wert = schlechtere Selbsteinschätzung, vgl. 3.2), geht die niedrigste Frustration also nicht mit der besten Leistungseinschätzung einher. Frustration und mentale Anforderung erweisen sich damit als empirisch trennbare Konstrukte, die nicht synonym als „kognitive Last" behandelt werden sollten.
 
-Das physiologische Nullergebnis aus 4.4 (keine domänenspezifischen Deltas für Pupille und Hautleitwert) kontrastiert mit Befunden wie denen von Toker und Conati (2017), die Pupillendilatation als Workload-Indikator bei Diagrammaufgaben in Ansätzen validierten. Ein naheliegender Grund für die Diskrepanz liegt in der Aggregation. Domänen-Blockmittel glätten kurzfristige Belastungsspitzen, und die vorliegende Erhebung kontrolliert weder Beleuchtung (Pupillometrie) noch Bewegungsartefakte (Handgelenk-GSR). Beide sind bekannte Störgrößen dieser Verfahren (Dawson et al., 2007; Mathôt, 2018). Der gleichförmige Hautleitwert-Anstieg unter Aufgabe gegenüber der Baseline (+1,3 bis +1,8 µS in allen Domänen, Tabelle 5) ist zwar mit einem allgemeinen Erregungsanstieg konsistent, jedoch ohne Kontrollbedingung kausal nicht interpretierbar.
+Das physiologische Nullergebnis aus 4.4 (keine domänenspezifischen Deltas für Pupille und Hautleitwert) kontrastiert mit Befunden wie denen von Toker und Conati (2017), die Pupillendilatation als Workload-Indikator bei Diagrammaufgaben in Ansätzen validierten. Ein naheliegender Grund für die Diskrepanz liegt in der Aggregation. Domänen-Blockmittel glätten kurzfristige Belastungsspitzen, und die vorliegende Erhebung kontrolliert weder Beleuchtung (Pupillometrie) noch Bewegungsartefakte (Handgelenk-GSR). Beide sind bekannte Störgrößen dieser Verfahren (Dawson et al., 2007; Mathôt, 2018). Der gleichförmige Hautleitwert-Anstieg unter Aufgabe gegenüber der Baseline (+1,3 bis +1,8 µS in allen Domänen, Tabelle 4) ist zwar mit einem allgemeinen Erregungsanstieg konsistent, jedoch ohne Kontrollbedingung kausal nicht interpretierbar.
 
 ### 5.2 Bearbeitungszeit als partieller Belastungsindikator
 
@@ -255,7 +231,7 @@ Für die Forschung folgt ein doppelter Bedarf: eine Replikation mit größerer, 
 
 ## Daten- und Analyse-Verfügbarkeit
 
-Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. **Alle Kennzahlen und beide Abbildungen sind über die im Projekt versionskontrollierten Skripte reproduzierbar:** `check_correlations.py` (Korrelationen, Abbildungen 1 und 2, Tabellen 1, 2 und 2b, Vertrautheitsmittel, DomainOrder-Balance, Start-/End-Zählungen), `check_mixed_model.py` (Tabelle 3b: Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabellen 4 und 5, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung. Zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert.
+Die Rohdaten sind aus Datenschutzgründen (physiologische Messungen, Einwilligung durch die Ursprungserhebung) nicht öffentlich. **Alle Kennzahlen und beide Abbildungen sind über die im Projekt versionskontrollierten Skripte reproduzierbar:** `check_correlations.py` (Korrelationen, Abbildungen 1 und 2, Tabellen 1 und 2, Positionsdauern, Vertrautheitsmittel, DomainOrder-Balance, Start-/End-Zählungen), `check_mixed_model.py` (Tabelle 3b: Zentrierung, Bootstrap, Mixed-Model) und `check_sensor_deltas.py` (Tabelle 4, pooled Statistik, Messraten, Pupillen-Validität, negative Hautleitwert-Samples). Die Skripte nutzen denselben Lade- und Segmentierungsvertrag wie die Analyseumgebung. Zentrale Verarbeitungsschritte sind durch eine automatisierte Testsuite abgesichert.
 
 ---
 

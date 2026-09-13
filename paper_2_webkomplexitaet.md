@@ -15,19 +15,17 @@ Automatisierte Verfahren zur Einschätzung von Website-Komplexität beschränken
 
 ## Abbildungsverzeichnis
 
-- **Abbildung 1:** Merkmalsverteilungen über alle 47 Seiten (Abschnitt 4.1)
-- **Abbildung 2:** DOM-Tiefe × Linkanzahl nach Cluster (Abschnitt 4.2)
+- **Abbildung 1:** DOM-Tiefe × Linkanzahl nach Cluster (Abschnitt 4.2)
 
 ## Tabellenverzeichnis
 
 - **Tabelle 1:** Merkmalsverteilung, N = 47 Seiten (Abschnitt 4.1)
 - **Tabelle 2:** Cluster-Charakteristika (Abschnitt 4.2)
 - **Tabelle 3:** Cluster-Verteilung nach Website (Abschnitt 4.2)
-- **Tabelle 4:** Klassifikationsgenauigkeit: Einzel-Split vs. Cross-Validation (Abschnitt 4.3)
-- **Tabelle 5:** Feature-Importance: MDI vs. Permutation (Abschnitt 4.3)
-- **Tabelle 6:** Merkmals-Mittelwerte je Website (Abschnitt 4.4)
-- **Tabelle 7:** Korrelation Antwortzeit × Strukturmerkmale (Abschnitt 4.6)
-- **Tabelle 8:** Antwortzeit nach Cluster und Website (Abschnitt 4.6)
+- **Tabelle 4:** Feature-Importance: MDI vs. Permutation (Abschnitt 4.3)
+- **Tabelle 5:** Merkmals-Mittelwerte je Website (Abschnitt 4.4)
+- **Tabelle 6:** Korrelation Antwortzeit × Strukturmerkmale (Abschnitt 4.6)
+- **Tabelle 7:** Antwortzeit nach Cluster und Website (Abschnitt 4.6)
 
 
 ---
@@ -97,7 +95,7 @@ Das Analyse-Tool ist in Python implementiert (Streamlit-Oberfläche), liest Webs
 
 **Cluster-Stabilität:** Die K-Means-Lösung (`random_state=42`, `n_init=10`) wurde gegen 50 Wiederholungen mit anderen Zufallssaaten verglichen (ARI zur Referenzlösung, Saaten aus `default_rng(0)` im Bereich 1–100.000, damit reproduzierbar). Dieser Check prüft nur algorithmische Konsistenz, nicht inhaltliche Korrektheit.
 
-**Reproduzierbarkeit:** Alle Kennzahlen der Tabellen 1–6 sowie k-Scan, Baseline, Dekorrelation, Log-Transform-Variante, stratifizierte CV mit balancierter Accuracy, Importance, Bootstrap und Stabilität erzeugt das Skript `check_web_analysis.py` aus der versionierten Merkmalsdatei `new_web_features.csv` (die ihrerseits exakt der Tool-Pipeline aus den Crawl-Artefakten entspricht). Auch beide Abbildungen werden dort erzeugt. Seed-abhängige Größen (Stabilität, Permutation) können sich bei anderen Saaten leicht verschieben.
+**Reproduzierbarkeit:** Alle Kennzahlen der Tabellen 1–5 sowie k-Scan, Baseline, Dekorrelation, Log-Transform-Variante, stratifizierte CV mit balancierter Accuracy, Importance, Bootstrap und Stabilität erzeugt das Skript `check_web_analysis.py` aus der versionierten Merkmalsdatei `new_web_features.csv` (die ihrerseits exakt der Tool-Pipeline aus den Crawl-Artefakten entspricht). Auch beide Abbildungen werden dort erzeugt. Seed-abhängige Größen (Stabilität, Permutation) können sich bei anderen Saaten leicht verschieben.
 
 **Baseline-Vergleich:** K-Means (k = 3) nur auf dem z-standardisierten Merkmal `link_count`, verglichen (Silhouette, ARI) mit dem Sechs-Merkmale-Clustering.
 
@@ -120,13 +118,7 @@ Das Analyse-Tool ist in Python implementiert (Streamlit-Oberfläche), liest Webs
 | dom_depth | 16,36 | 2,10 | 14 | 21 |
 | dom_nodes | 1.111 | 923 | 521 | 4.733 |
 
-**Abbildung 1: Merkmalsverteilungen über alle 47 Seiten**
-
-![Abbildung 1: Merkmalsverteilung](figures/paper2_abb1_feature_distribution_v2.png)
-
-*Mittelwert ± SD der sechs Merkmale (text_length ÷ 100, dom_nodes ÷ 10 für Darstellbarkeit).*
-
-Abbildung 1 veranschaulicht die in Tabelle 1 berichteten Streuungsunterschiede grafisch. Die Fehlerbalken von `link_count` und `text_length` überdecken einen Großteil des Wertebereichs, während `dom_depth` sichtbar kompakt bleibt. Die Verteilungen zeigen extreme Rechtsschiefe bei `link_count` und `text_length`, denn einzelne Übersichtsseiten von bpb.de (bis zu 1.187 Links, das Maximum in Tabelle 1) treiben Mittelwert und SD deutlich über das Niveau der übrigen Seiten. `form_count` liegt nahe null (M 0,19), eine Folge des Formular-Erfassungsproblems bei wiesbaden.de (3.1). `media_count` ist dagegen durch den bpb.de-Artefakt (durchgängig 0) nach unten verzerrt, der Mittelwert von 6,02 stammt praktisch vollständig von hs-rm.de.
+Die Verteilungen sind bei `link_count` und `text_length` extrem rechtsschief, denn einzelne Übersichtsseiten von bpb.de (bis zu 1.187 Links, das Maximum in Tabelle 1) treiben Mittelwert und SD deutlich über das Niveau der übrigen Seiten. `form_count` liegt nahe null (M 0,19), eine Folge des Formular-Erfassungsproblems bei wiesbaden.de (3.1). `media_count` ist durch den bpb.de-Artefakt (durchgängig 0) nach unten verzerrt, der Mittelwert von 6,02 stammt praktisch vollständig von hs-rm.de.
 
 ### 4.2 Clustering: Automatisch identifizierte Seitentypen
 
@@ -154,27 +146,19 @@ Die Bezeichnungen wurden post-hoc vergeben und sind als analytische Hilfsbegriff
 
 Der ARI zwischen Cluster- und Website-Zugehörigkeit beträgt 0,243 und zeigt eine reale, aber nur partielle Konfundierung: Cluster 1 besteht ausschließlich aus 6 bpb.de-Seiten und Cluster 2 ausschließlich aus 11 hs-rm.de-Seiten, beide faktisch mit einer Website identisch, während nur Cluster 0 alle drei Websites vereint (14 bpb, 4 hs-rm, 12 wiesbaden). Eine pauschale Formulierung wie „kein reines Website-Artefakt" würde das verschleiern.
 
-**Abbildung 2: DOM-Tiefe × Linkanzahl nach Cluster**
+**Abbildung 1: DOM-Tiefe × Linkanzahl nach Cluster**
 
-![Abbildung 2: Cluster Scatter](figures/paper2_abb2_cluster_scatter_v2.png)
+![Abbildung 1: Cluster Scatter](figures/paper2_abb2_cluster_scatter_v2.png)
 
 *Scatter-Plot der 47 Seiten, eingefärbt nach Cluster. ★ markiert das jeweilige Clusterzentrum.*
 
-Abbildung 2 stellt diese Konfundierung räumlich dar. Die beiden website-reinen Cluster bilden im Zentrum klar getrennte Punktwolken, die sich in den Randbereichen überlappen. Cluster 0 verteilt sich über weite Teile des Diagramms.
+Abbildung 1 stellt diese Konfundierung räumlich dar. Die beiden website-reinen Cluster bilden im Zentrum klar getrennte Punktwolken, die sich in den Randbereichen überlappen. Cluster 0 verteilt sich über weite Teile des Diagramms.
 
 ### 4.3 Feature-Importance und Klassifikationsgüte
 
-**Tabelle 4: Klassifikationsgenauigkeit (Einzel-Split vs. Cross-Validation)**
+Der einzelne 75/25-Split erreicht eine Genauigkeit von 1,000, während die 5-fache Cross-Validation im Mittel nur 0,831 liefert (SD 0,207, Einzel-Folds 0,556 bis 1,000). Der Einzel-Split überschätzt die Robustheit also erheblich. Eine stratifizierte Variante (StratifiedKFold, 5 Folds, Seed 42) liefert dagegen 0,889 bis 1,000 mit einem Mittel von 0,936 und einer balancierten Accuracy von 0,928. Die schwachen unstratifizierten Folds spiegeln damit vor allem die Cluster-Unbalanciertheit (30/6/11) in einzelnen Folds wider. Die Cluster-Labels sind aus den Merkmalen überwiegend rekonstruierbar, der Einzel-Split-Wert bleibt gleichwohl eine optimistische Punktschätzung. Beide Lesarten bleiben im Fazit berücksichtigt: Die Cluster-Labels sind aus den Merkmalen überwiegend rekonstruierbar, der Einzel-Split-Wert von 1,000 bleibt gleichwohl eine optimistische Punktschätzung.
 
-| Verfahren | Genauigkeit |
-|---|---|
-| Einzelner 75/25-Split | 1,000 |
-| 5-fache CV (Mittelwert) | 0,831 (SD 0,207) |
-| 5-fache CV (Einzel-Folds) | 1,000 / 0,600 / 0,556 / 1,000 / 1,000 |
-
-Der Einzel-Split-Wert überschätzt die tatsächliche Robustheit erheblich, da einzelne CV-Folds auf 55,6 % zurückfallen (SD 20,7 Punkte bei N = 47). Eine stratifizierte Variante (StratifiedKFold, 5 Folds, Seed 42) relativiert diesen Befund. Sie liefert 0,889–1,000 mit einem Mittel von 0,936 und einer balancierten Accuracy von 0,928. Die schwachen unstratifizierten Folds spiegeln also vor allem die Cluster-Unbalanciertheit (30/6/11) in einzelnen Folds wider, nicht unbedingt eine fragile Trennung. Beide Lesarten bleiben im Fazit berücksichtigt: Die Cluster-Labels sind aus den Merkmalen überwiegend rekonstruierbar, der Einzel-Split-Wert von 1,000 bleibt gleichwohl eine optimistische Punktschätzung.
-
-**Tabelle 5: Feature-Importance (MDI vs. Permutation-Importance)** *(Reproduktion: `check_web_analysis.py`, Permutation mit dokumentiertem Seed)*
+**Tabelle 4: Feature-Importance (MDI vs. Permutation-Importance)** *(Reproduktion: `check_web_analysis.py`, Permutation mit dokumentiertem Seed)*
 
 | Merkmal | MDI | Permutation-Importance |
 |---|---|---|
@@ -193,7 +177,7 @@ Die Korrelationsmatrix liefert eine Erklärung für die MDI-Dominanz, denn `link
 
 ### 4.4 Website-Vergleich auf Aggregatniveau
 
-**Tabelle 6: Merkmals-Mittelwerte je Website**
+**Tabelle 5: Merkmals-Mittelwerte je Website**
 
 | Merkmal | bpb.de (N=20) | hs-rm.de (N=15) | wiesbaden.de (N=12) |
 |---|---|---|---|
@@ -208,15 +192,7 @@ Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die h�
 
 ### 4.5 Robustheitsprüfungen: k-Wahl, Stabilität, Baseline
 
-**k-Scan (k = 2–6):**
-
-| k | Silhouette-Score |
-|---|---|
-| 2 | 0,466 |
-| **3 (gewählt)** | **0,433** |
-| 4 | 0,446 |
-| 5 | 0,436 |
-| 6 | 0,480 |
+Der k-Scan über k = 2 bis 6 liefert Silhouette-Scores von 0,466 (k = 2), 0,446 (k = 4), 0,436 (k = 5) und 0,480 (k = 6), gegenüber 0,433 bei k = 3. k = 3 liefert also nicht den höchsten Score, k = 6 schneidet besser ab.
 
 k = 3 liefert nicht den höchsten Score, k = 6 schneidet besser ab. Die Wahl ist primär durch Vergleichbarkeit mit der dreiteiligen Datenbasis motiviert, nicht durch datengetriebene Optimierung. Diese Einschränkung wird hier explizit gemacht statt verschwiegen.
 
@@ -228,7 +204,7 @@ k = 3 liefert nicht den höchsten Score, k = 6 schneidet besser ab. Die Wahl ist
 
 **Dekorrelations-Analyse:** Die Korrelationsmatrix (4.3) legt nahe, dass drei der sechs Merkmale überwiegend dieselbe „Umfang"-Dimension messen (`text_length` und `dom_nodes` korrelieren mit r = 0,81 bzw. 0,72 mit `link_count`). Wird das Clustering auf den dekorrelierten Satz `link_count`, `dom_depth`, `media_count`, `form_count` beschränkt, steigt der Silhouette-Score von 0,433 auf **0,500**. Die „gut"-Schwelle wird knapp erreicht, und die Lösung bleibt der 6-Merkmal-Lösung strukturell ähnlich (ARI = 0,717), zur `link_count`-Baseline dagegen deutlich verschieden (ARI = 0,339). Zwei Einschränkungen trüben das Ergebnis: Erstens bleibt auch 0,500 unterhalb der Einzelmetrik-Baseline (0,667). Redundanz erklärt also einen Teil, aber nicht die ganze Differenz zum Baseline-Vorteil. Zweitens isoliert die dekorrelierte Lösung die extremste bpb.de-Seite (1.187 Links, 54.453 Zeichen) als **Single-Page-Cluster** (Clustergrößen 35/11/1). Ein Teil des Silhouette-Gewinns stammt damit aus Ausreißerisolierung, nicht aus sauber getrennten inhaltlichen Gruppen. Das Ergebnis verfeinert die Schlussfolgerung, dreht sie aber nicht: Das mehrdimensionale Modell gewinnt durch Dekorrelation an innerer Güte, der postulierte Mehrwert gegenüber der Einzelmetrik lässt sich auch damit nicht zeigen.
 
-**Log-Transform-Variante:** Da `link_count` und `text_length` ausgeprägt rechtsschief sind (4.1), wurde das Clustering zusätzlich auf log1p-transformierten, z-standardisierten Merkmalen wiederholt. Der Silhouette-Score steigt dabei nur leicht auf 0,462 (ARI 0,609 zur untransformierten Lösung). Auch die `link_count`-Baseline bleibt unter Log-Transformierung bei 0,667. Die Rechtsschiefe erklärt damit praktisch nichts des Baseline-Vorteils. Das zentrale Robustheitsproblem ist die Merkmalsredundanz, nicht die Verteilungsform.
+**Log-Transform-Variante:** Auf log1p-transformierten, z-standardisierten Merkmalen (gegen die Rechtsschiefe von `link_count` und `text_length`, s. 4.1) steigt der Silhouette-Score nur leicht auf 0,462, und auch die `link_count`-Baseline bleibt bei 0,667. Die Rechtsschiefe erklärt damit praktisch nichts des Baseline-Vorteils, das zentrale Robustheitsproblem ist die Merkmalsredundanz.
 
 ### 4.6 Externes Kriterium: Zusammenhang mit realer Antwortzeit
 
@@ -236,7 +212,7 @@ Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erkl
 
 *Provenienz-Hinweis: Die Einzelmessungen (3 Wiederholungen je Seite, Median) wurden nicht als Datei archiviert und sind nicht mehr auffindbar. Die folgenden Werte stammen aus der verlorenen Messung und lassen sich aus dem Projektstand nicht erneut prüfen. Sie werden der Vollständigkeit halber berichtet und als nicht reproduzierbar gekennzeichnet (vgl. Verfügbarkeitsstatement).*
 
-**Tabelle 7: Korrelation Antwortzeit × Strukturmerkmale**
+**Tabelle 6: Korrelation Antwortzeit × Strukturmerkmale**
 
 | Merkmal | r | p |
 |---|---|---|
@@ -249,7 +225,7 @@ Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erkl
 
 Nur `dom_depth` weist einen schwachen, gerade noch signifikanten Zusammenhang auf. Bei sechs getesteten Korrelationen ist ein zufälliges p < .05 jedoch nicht unwahrscheinlich. Nach Bonferroni-Korrektur (α = 0,05/6 ≈ 0,0083) wäre auch dieser Wert nicht mehr signifikant. Der Befund ist daher als schwaches, unkorrigiertes Signal zu lesen, nicht als abgesicherter Effekt. Die beiden Merkmale mit der höchsten Permutation-Importance (`dom_nodes`, `link_count`) korrelieren ohnehin nicht signifikant mit der Antwortzeit (p = 0,216 bzw. 0,179).
 
-**Tabelle 8: Antwortzeit nach Cluster und Website**
+**Tabelle 7: Antwortzeit nach Cluster und Website**
 
 | Gruppe | M (s) | SD | N |
 |---|---|---|---|
@@ -298,7 +274,7 @@ Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websit
 
 ## Daten- und Analyse-Verfügbarkeit
 
-Crawl-Artefakte (`websites/`), Merkmalsdatei (`new_web_features.csv`) und Crawler (`mini_crawler.py`) sind Teil des versionskontrollierten Projekts. Die Merkmalsdatei entspricht exakt der Tool-Pipeline aus den Crawl-Artefakten (verifiziert über `website_loader` + `web_features`). Alle Kennzahlen der Tabellen 1–6 sowie k-Scan, Baseline, Dekorrelation, Log-Transform-Variante, Feature-Importance, (stratifizierte) Cross-Validation, Bootstrap und Cluster-Stabilität erzeugt `check_web_analysis.py` aus der CSV, ebenfalls inklusive beider Abbildungen. Seed-abhängige Größen sind mit festen, dokumentierten Saaten versehen. **Nicht verfügbar sind die HTTP-Antwortzeit-Messungen hinter Tabelle 7 und Tabelle 8 (Abschnitt 4.6)**: Die Einzelmessungen wurden nicht archiviert. Die berichteten Werte sind als nicht reproduzierbar gekennzeichnet und sollten bei einer Replikation neu erhoben werden.
+Crawl-Artefakte (`websites/`), Merkmalsdatei (`new_web_features.csv`) und Crawler (`mini_crawler.py`) sind Teil des versionskontrollierten Projekts. Die Merkmalsdatei entspricht exakt der Tool-Pipeline aus den Crawl-Artefakten (verifiziert über `website_loader` + `web_features`). Alle Kennzahlen der Tabellen 1–5 sowie k-Scan, Baseline, Dekorrelation, Log-Transform-Variante, Feature-Importance, (stratifizierte) Cross-Validation, Bootstrap und Cluster-Stabilität erzeugt `check_web_analysis.py` aus der CSV, inklusive der Abbildung. Seed-abhängige Größen sind mit festen, dokumentierten Saaten versehen. **Nicht verfügbar sind die HTTP-Antwortzeit-Messungen hinter Tabelle 6 und Tabelle 7 (Abschnitt 4.6)**: Die Einzelmessungen wurden nicht archiviert. Die berichteten Werte sind als nicht reproduzierbar gekennzeichnet und sollten bei einer Replikation neu erhoben werden.
 
 ---
 
