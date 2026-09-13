@@ -114,7 +114,7 @@ Zwei Merkmale sind durch die Erfassungsartefakte aus 3.1 systematisch nach unten
 
 ### 4.2 Clustering: Automatisch identifizierte Seitentypen
 
-Die Clusteranalyse teilt die 47 Seiten in drei Cluster, deren Charakteristika Tabelle 2 zeigt und deren Zusammensetzung nach Websites Tabelle 3. Der Silhouette-Score von 0,433 liegt unterhalb der 0,5-Schwelle für einen „guten“ Trennungswert.
+Tabelle 2 zeigt die Merkmals-Mittelwerte der Cluster.
 
 **Tabelle 2: Cluster-Charakteristika (Mittelwerte je Cluster)**
 
@@ -124,7 +124,7 @@ Die Clusteranalyse teilt die 47 Seiten in drei Cluster, deren Charakteristika Ta
 | 1 | 6 | 395,0 | 15,7 | 28.589,2 | 0,0 | Hub-/Übersichtsseiten |
 | 2 | 11 | 217,3 | 15,3 | 10.831,3 | 19,6 | Medienreiche Seiten |
 
-Die Bezeichnungen sind post-hoc vergebene Hilfsbegriffe, keine validierten Kategorien. Ein Cluster mit hohem `form_count` ergibt sich nicht, eine Folge des Erfassungsartefakts.
+Die Bezeichnungen sind post-hoc vergebene Hilfsbegriffe, keine validierten Kategorien. Ein Cluster mit hohem `form_count` ergibt sich nicht, eine Folge des Erfassungsartefakts. Der Silhouette-Score von 0,433 liegt unterhalb der 0,5-Schwelle für einen „guten“ Trennungswert.
 
 Tabelle 3 kreuzt die Cluster-Zugehörigkeit mit der Website-Zugehörigkeit.
 
