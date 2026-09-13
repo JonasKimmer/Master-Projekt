@@ -40,11 +40,11 @@ Ein weiterer offener Punkt betrifft die Rolle der Inhaltsdomäne selbst: Dieselb
 
 ### 1.2 Zielsetzung
 
-Diese Studie prüft, ob sich kognitive Beanspruchung systematisch zwischen drei Inhaltsdomänen unterscheidet, und ob Bearbeitungszeit den subjektiv empfundenen Aufwand zuverlässig abbildet. Physiologische Sensordaten (Pupillendurchmesser, Hautleitwert, Photoplethysmographie) werden ergänzend als Grundlage für weiterführende Analysen erhoben.
+Ausgewertet werden die Daten einer bestehenden Erhebung mit NASA-TLX-Fragebögen, physiologischen Sensordaten und Eye-Tracking, und zwar mit einem eigenen Analyse-Tool. Daraus ergibt sich die zentrale Forschungsfrage:
 
 > *Unterscheidet sich die kognitive Beanspruchung bei der Exploration interaktiver Datenvisualisierungen je nach Inhaltsdomäne, und ist Bearbeitungszeit ein verlässlicher Indikator für kognitive Last?*
 
-Nebenfragestellungen: Welche Domäne erzeugt die höchste Frustration? Wie hängen Bearbeitungszeit und die einzelnen NASA-TLX-Dimensionen zusammen?
+Zwei Nebenfragen schärfen sie: Welche Domäne erzeugt die höchste Frustration? Wie hängen Bearbeitungszeit und die einzelnen NASA-TLX-Dimensionen zusammen?
 
 ---
 
