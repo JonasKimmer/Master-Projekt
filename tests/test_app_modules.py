@@ -267,3 +267,40 @@ class TestMissingRateFeature:
     def test_empty_slice_returns_empty(self):
         from src.feature_engineering.sensor_features import compute_channel_features
         assert compute_channel_features([]) == {}
+
+
+class TestImuEegPlausibility:
+    """AP8: IMU- und EEG/OpenBCI-Plausibilitätsbereiche (Review-Final #3)."""
+
+    def test_imu_channels_get_ranges(self):
+        from src.preprocessing.quality_checks import _plausibility_for_channel
+        for ch, lo, hi in [
+            ("shimmer.AccX", -16.0, 16.0), ("shimmer.AccWrZ", -16.0, 16.0),
+            ("shimmer.GyroY", -2000.0, 2000.0), ("shimmer.MagX", -400.0, 400.0),
+            ("eeg", -4000.0, 4000.0), ("openbci.eeg3", -4000.0, 4000.0),
+        ]:
+            r = _plausibility_for_channel(ch)
+            assert r == (lo, hi), f"{ch}: {r}"
+
+    def test_imu_out_of_range_flagged(self):
+        from src.models.experiment_records import SensorStreamRecord
+        from src.preprocessing.quality_checks import check_stream
+        s = SensorStreamRecord(source="t", modality="fusion",
+                               timestamps=[0.0, 100.0, 200.0],
+                               channels={"shimmer.AccX": [1.0, 99.0, 2.0]})
+        rep = check_stream("T", s)
+        issues = [i for c in rep.channels for i in c.issues]
+        assert any("outside plausible" in i for i in issues)
+
+    def test_real_data_imu_stays_in_range(self):
+        # Gegenprobe auf echten Daten: normale IMU-Werte dürfen keine
+        # Plausibilitäts-Issues erzeugen
+        from src.loaders.trial_loader import load_trial
+        from src.preprocessing.quality_checks import check_stream
+        t = load_trial("data/T-1")
+        rep = check_stream(t.trial_id, t.streams[0])
+        imu = [c for c in rep.channels if c.channel.split(".")[-1]
+               .lower().startswith(("acc", "gyro", "mag"))]
+        assert imu, "IMU-Kanäle nicht gefunden"
+        assert all(c.n_out_of_range == 0 for c in imu), \
+            [(c.channel, c.n_out_of_range) for c in imu if c.n_out_of_range]

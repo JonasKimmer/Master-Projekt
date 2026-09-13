@@ -27,6 +27,35 @@ _PLAUSIBILITY: dict[str, tuple[float, float]] = {
     "righty":           (-0.2,  1.2),
     "pupil":            (1.0,   10.0),    # mm realistic pupil diameter
     "temperature":      (20.0,  45.0),    # °C skin
+    # IMU (Shimmer3, Kanäle shimmer.AccX/AccWrX/GyroX/MagX …).
+    # Beschleunigung in g (Sensorbereich ±16 g; Erdbeschleunigung ~1 g
+    # liegt mit ~9 sichtbar in Ruhe-daten), Gyroskop in °/s (Spec ±2000),
+    # Magnetometer in µT (Erdmagnetfeld ~25–65 µT, Hard-Iron-Offsets
+    # möglich → großzügiger Bereich).
+    "accx":             (-16.0, 16.0),
+    "accy":             (-16.0, 16.0),
+    "accz":             (-16.0, 16.0),
+    "accwrx":           (-16.0, 16.0),
+    "accwry":           (-16.0, 16.0),
+    "accwrz":           (-16.0, 16.0),
+    "gyrox":            (-2000.0, 2000.0),
+    "gyroy":            (-2000.0, 2000.0),
+    "gyroz":            (-2000.0, 2000.0),
+    "magx":             (-400.0, 400.0),
+    "magy":             (-400.0, 400.0),
+    "magz":             (-400.0, 400.0),
+    # EEG/OpenBCI (Reservierung, AP8: keine negativen/absurden Amplituden;
+    # Rohwerte in µV, typisch ±100 µV, Artefakte bis ~±4000 µV)
+    "eeg":              (-4000.0, 4000.0),
+    "eeg1":             (-4000.0, 4000.0),
+    "eeg2":             (-4000.0, 4000.0),
+    "eeg3":             (-4000.0, 4000.0),
+    "eeg4":             (-4000.0, 4000.0),
+    "eeg5":             (-4000.0, 4000.0),
+    "eeg6":             (-4000.0, 4000.0),
+    "eeg7":             (-4000.0, 4000.0),
+    "eeg8":             (-4000.0, 4000.0),
+    "openbci":          (-4000.0, 4000.0),
 }
 
 # Normalisierte Key-Form (klein, ohne '_'/'-') für exaktes Matching
