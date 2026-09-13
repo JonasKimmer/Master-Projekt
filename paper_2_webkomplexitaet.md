@@ -23,9 +23,8 @@ Automatisierte Verfahren zur Einschätzung von Website-Komplexität beschränken
 - **Tabelle 2:** Cluster-Charakteristika (Abschnitt 4.2)
 - **Tabelle 3:** Cluster-Verteilung nach Website (Abschnitt 4.2)
 - **Tabelle 4:** Feature-Importance: MDI vs. Permutation (Abschnitt 4.3)
-- **Tabelle 5:** Merkmals-Mittelwerte je Website (Abschnitt 4.4)
-- **Tabelle 6:** Korrelation Antwortzeit × Strukturmerkmale (Abschnitt 4.6)
-- **Tabelle 7:** Antwortzeit nach Cluster und Website (Abschnitt 4.6)
+- **Tabelle 5:** Korrelation Antwortzeit × Strukturmerkmale (Abschnitt 4.5)
+- **Tabelle 6:** Antwortzeit nach Cluster und Website (Abschnitt 4.5)
 
 
 ---
@@ -166,24 +165,7 @@ Tabelle 4 stellt die beiden Wichtigkeitsmaße gegenüber.
 
 `text_length` und `dom_depth` erscheinen unter MDI als relevant, ihre Permutation-Importance beträgt jedoch 0,000. Bei `text_length` passt das zum bekannten MDI-Bias zugunsten merkmalsreicher Werte, bei `dom_depth` mit nur 8 verschiedenen Werten reicht er als Erklärung nicht aus. `dom_nodes` und `link_count` bleiben unter beiden Methoden am wichtigsten. In der Korrelationsmatrix hängen `link_count`, `text_length` und `dom_nodes` stark zusammen (r = 0,72 bis 0,81), `dom_depth` mit keinem anderen Merkmal..
 
-### 4.4 Website-Vergleich auf Aggregatniveau
-
-Tabelle 5 vergleicht die Merkmals-Mittelwerte auf Website-Ebene.
-
-**Tabelle 5: Merkmals-Mittelwerte je Website**
-
-| Merkmal | bpb.de (N=20) | hs-rm.de (N=15) | wiesbaden.de (N=12) |
-|---|---|---|---|
-| link_count M | 206,6 | 210,5 | 58,6 |
-| form_count M | 0,0 | 0,6 | 0,0 |
-| media_count M | 0,0 | 18,3 | 0,8 |
-| text_length M | 11.639,6 | 9.813,7 | 2.768,2 |
-| dom_depth M | 15,3 | 16,0 | 18,6 |
-| dom_nodes M | 1.461,2 | 998,7 | 668,3 |
-
-Keine der drei Websites ist in allen sechs Merkmalen führend: bpb.de hat die höchste Textmenge und DOM-Knotenanzahl, hs-rm.de die höchste Linkanzahl, wiesbaden.de die größte DOM-Tiefe. Auffällig ist das Profil von wiesbaden.de mit der **geringsten Knotenzahl (668) bei gleichzeitig höchster DOM-Tiefe (18,6)**. Die `media_count`-Werte von bpb.de und die `form_count`-Werte von wiesbaden.de sind durch die in 3.1 beschriebenen Erfassungsartefakte nach unten verzerrt und nicht als reale Abwesenheit zu lesen..
-
-### 4.5 Robustheitsprüfungen: k-Wahl, Stabilität, Baseline
+### 4.4 Robustheitsprüfungen: k-Wahl, Stabilität, Baseline
 
 Der k-Scan über k = 2 bis 6 liefert Silhouette-Scores von 0,466 (k = 2), 0,446 (k = 4), 0,436 (k = 5) und 0,480 (k = 6), gegenüber 0,433 bei k = 3. k = 3 liefert also nicht den höchsten Score. Die Wahl folgt der Vergleichbarkeit mit der dreiteiligen Datenbasis, nicht der datengetriebenen Optimierung.
 
@@ -197,15 +179,15 @@ Der k-Scan über k = 2 bis 6 liefert Silhouette-Scores von 0,466 (k = 2), 0,446 
 
 **Log-Transform-Variante:** Auf log1p-transformierten, z-standardisierten Merkmalen (gegen die Rechtsschiefe von `link_count` und `text_length`) steigt der Silhouette-Score nur leicht auf 0,462, und auch die `link_count`-Baseline bleibt bei 0,667. Die Rechtsschiefe erklärt damit praktisch nichts des Baseline-Vorteils, das zentrale Robustheitsproblem ist die Merkmalsredundanz.
 
-### 4.6 Externes Kriterium: Zusammenhang mit realer Antwortzeit
+### 4.5 Externes Kriterium: Zusammenhang mit realer Antwortzeit
 
 Alle bisherigen Kennzahlen bewerten, wie gut die sechs Merkmale sich selbst erklären. Das ist ein internes Gütekriterium. Als unabhängige Gegenprobe wurde die HTTP-Antwortzeit aller 47 Seiten gemessen und gegen Strukturmerkmale und Clusterzugehörigkeit getestet.
 
 *Provenienz-Hinweis: Die Einzelmessungen (3 Wiederholungen je Seite, Median) wurden nicht als Datei archiviert und sind nicht mehr auffindbar. Die folgenden Werte stammen aus der verlorenen Messung und lassen sich aus dem Projektstand nicht erneut prüfen. Sie werden der Vollständigkeit halber berichtet und als nicht reproduzierbar gekennzeichnet.*
 
-Tabelle 6 zeigt die Korrelationen der Antwortzeit mit den Strukturmerkmalen.
+Tabelle 5 zeigt die Korrelationen der Antwortzeit mit den Strukturmerkmalen.
 
-**Tabelle 6: Korrelation Antwortzeit × Strukturmerkmale**
+**Tabelle 5: Korrelation Antwortzeit × Strukturmerkmale**
 
 | Merkmal | r | p |
 |---|---|---|
@@ -218,9 +200,9 @@ Tabelle 6 zeigt die Korrelationen der Antwortzeit mit den Strukturmerkmalen.
 
 Nur `dom_depth` weist einen schwachen, gerade noch signifikanten Zusammenhang auf, der die Bonferroni-Korrektur für sechs Tests jedoch nicht übersteht. Ein abgesicherter Effekt ist das nicht. Auch die wichtigsten Merkmale `dom_nodes` und `link_count` zeigen keinen signifikanten Zusammenhang.
 
-Tabelle 7 stellt die Antwortzeiten nach Cluster und Website gegenüber.
+Tabelle 6 stellt die Antwortzeiten nach Cluster und Website gegenüber.
 
-**Tabelle 7: Antwortzeit nach Cluster und Website**
+**Tabelle 6: Antwortzeit nach Cluster und Website**
 
 | Gruppe | M (s) | SD | N |
 |---|---|---|---|
@@ -241,7 +223,7 @@ Zwischen den drei Clustern ist der Mittelwertunterschied nicht signifikant (ANOV
 
 Dass gerade `link_count` und `dom_nodes` die Cluster tragen, passt zum Befund von Ivory und Hearst (2002), dass quantitative Struktur- und Linkmerkmale prädiktiv für die wahrgenommene Seitenqualität sind. Dass zwei andere, unter MDI relevant erscheinende Merkmale sich bei genauerer Prüfung als wertlos erweisen (4.3), zeigt dagegen den eigentlichen methodischen Ertrag dieser Arbeit: Eine unreflektierte Feature-Importance-Analyse hätte hier in die Irre geführt. Die Dekorrelations-Analyse (4.5) präzisiert das Bild: Der Informationsgewinn der sechs Merkmale ist in dieser Stichprobe real, aber geringer als ihre Redundanz: Drei von sechs messen im Wesentlichen denselben „Umfang". Ein schlankeres Merkmalsset, also vier statt sechs Merkmale ohne die beiden redundanten Umfangs-Indikatoren, wäre der Ausgangspunkt für ähnliche Analysen, mit dem Vorbehalt aus 4.5, dass gerade diese Vier-Merkmale-Lösung die extremste Seite als Single-Page-Cluster isoliert. Die Empfehlung ist damit vorläufig, bis sie an einem größeren Seitenkorpus geprüft ist.
 
-Das Profil von wiesbaden.de (4.4), schlank im Umfang, aber mit der tiefsten Verschachtelung, zeigt zudem, dass Komplexität kein eindimensionales Konstrukt ist. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung und kombinieren mehrere unabhängige Metrikfamilien mit einem Außenkriterium, genau die Kombination, die hier zu grob geriet, um Strukturunterschiede aufzulösen. Dass ausgerechnet `link_count` als Einzelmetrik am tragfähigsten bleibt, fügt sich zu Chens (2018) Outdegree-Ansatz.
+Das Profil von wiesbaden.de, das die geringste Knotenzahl (668) mit der tiefsten DOM-Verschachtelung (18,6) verbindet, zeigt zudem, dass Komplexität kein eindimensionales Konstrukt ist. Butkiewicz et al. (2011) argumentieren in dieselbe Richtung und kombinieren mehrere unabhängige Metrikfamilien mit einem Außenkriterium, genau die Kombination, die hier zu grob geriet, um Strukturunterschiede aufzulösen. Dass ausgerechnet `link_count` als Einzelmetrik am tragfähigsten bleibt, fügt sich zu Chens (2018) Outdegree-Ansatz.
 
 ### 5.2 Grenzen und Verallgemeinerbarkeit
 
@@ -249,7 +231,7 @@ Die beiden Erfassungslücken aus 3.1 unterscheiden sich in der Ursache, nicht nu
 
 ### 5.3 Einschränkungen
 
-**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.6) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale und deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility und Nutzereinschätzung fehlen). Insbesondere die *wahrgenommene* Komplexität, die Tuch et al. (2012) und Miniukovich und De Angeli (2014) als eigenständige, verhaltensrelevante Dimension belegen, wurde nicht erhoben. Ob die strukturellen Merkmale abbilden, was Nutzende unter Komplexität verstehen, bleibt damit offen. Mit nur 3 Websites (47 Beobachtungen, die zu drei Websites gehören, statt unabhängig zu sein, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
+**Externes Kriterium und Website-Konfundierung:** Das einzige geprüfte externe Kriterium (4.5) bestätigt weder Clusterzugehörigkeit noch die wichtigsten Merkmale und deckt nur einen Ausschnitt möglicher Außenkriterien ab (Accessibility und Nutzereinschätzung fehlen). Insbesondere die *wahrgenommene* Komplexität, die Tuch et al. (2012) und Miniukovich und De Angeli (2014) als eigenständige, verhaltensrelevante Dimension belegen, wurde nicht erhoben. Ob die strukturellen Merkmale abbilden, was Nutzende unter Komplexität verstehen, bleibt damit offen. Mit nur 3 Websites (47 Beobachtungen, die zu drei Websites gehören, statt unabhängig zu sein, ARI = 0,243) lässt sich zudem nicht sicher zwischen „generalisierbarem Seitentyp" und „individueller Website-Eigenheit" trennen.
 
 **Stichprobenauswahl:** Ausgewählt wurden die drei Websites nach öffentlicher Zugänglichkeit und einer robots.txt ohne für die Crawling-Pfade einschlägige Disallow-Einträge. Das ist eine Positivselektion, die restriktiver geschützte, oft strukturell komplexere Websites systematisch ausschließt.
 **Rechtlicher Rahmen:** Die robots.txt-Konformität (3.1) deckt nur die technische Zugriffsebene ab. Nutzungsbedingungen der jeweiligen Website können automatisiertes Crawling unabhängig davon einschränken. Für die hier gecrawlten drei öffentlichen Informations- und Verwaltungsportale wurden ausschließlich frei zugängliche, nicht personenbezogene Inhalte zu Forschungszwecken erfasst. Eine kommerzielle Nutzung der Rohdaten war nicht Gegenstand dieser Arbeit.
@@ -268,7 +250,7 @@ Für die Praxis bedeutet dies, dass ein Werkzeug wie das hier entwickelte Websit
 
 ## Daten- und Analyse-Verfügbarkeit
 
-Crawl-Artefakte (`websites/`), Merkmalsdatei (`new_web_features.csv`) und Crawler (`mini_crawler.py`) sind Teil des versionskontrollierten Projekts. Die Merkmalsdatei entspricht exakt der Tool-Pipeline aus den Crawl-Artefakten , verifiziert über `website_loader` und `web_features`,. Alle Kennzahlen der Tabellen 1–5 sowie k-Scan, Baseline, Dekorrelation, Log-Transform-Variante, Feature-Importance, stratifizierte Cross-Validation, Bootstrap und Cluster-Stabilität erzeugt `check_web_analysis.py` aus der CSV, inklusive der Abbildung. Seed-abhängige Größen sind mit festen, dokumentierten Saaten versehen. **Nicht verfügbar sind die HTTP-Antwortzeit-Messungen hinter Tabelle 6 und Tabelle 7 (Abschnitt 4.6)**: Die Einzelmessungen wurden nicht archiviert. Die berichteten Werte sind als nicht reproduzierbar gekennzeichnet und sollten bei einer Replikation neu erhoben werden.
+Crawl-Artefakte (`websites/`), Merkmalsdatei (`new_web_features.csv`) und Crawler (`mini_crawler.py`) sind Teil des versionskontrollierten Projekts. Die Merkmalsdatei entspricht exakt der Tool-Pipeline aus den Crawl-Artefakten , verifiziert über `website_loader` und `web_features`,. Alle Kennzahlen der Tabellen 1–4 sowie k-Scan, Baseline, Dekorrelation, Log-Transform-Variante, Feature-Importance, stratifizierte Cross-Validation, Bootstrap und Cluster-Stabilität erzeugt `check_web_analysis.py` aus der CSV, inklusive der Abbildung. Seed-abhängige Größen sind mit festen, dokumentierten Saaten versehen. **Nicht verfügbar sind die HTTP-Antwortzeit-Messungen hinter Tabelle 5 und Tabelle 6 (Abschnitt 4.5)**: Die Einzelmessungen wurden nicht archiviert. Die berichteten Werte sind als nicht reproduzierbar gekennzeichnet und sollten bei einer Replikation neu erhoben werden.
 
 ---
 
