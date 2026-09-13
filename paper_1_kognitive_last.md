@@ -129,9 +129,7 @@ Tabelle 2 zeigt die Bearbeitungszeiten je Domäne.
 
 ¹ Ein Aufgabenmesswert (T-3, Stadt, 849 s) wurde als Datenerfassungsstörung ausgeschlossen (Ursache in 3.3).
 
-Gesundheits-Aufgaben dauerten im Schnitt am längsten und wiesen zugleich die höchste Variabilität auf.
-
-Da die fünf Aufgaben eines Domänenblocks stets in derselben Visualisierungsreihenfolge bearbeitet wurden (3.2), entspricht die Aufgabenposition dem Visualisierungstyp. Die mittlere Bearbeitungszeit nimmt über die Positionen zu, von 56,4 s (Position 1, Timeline) bis 89,4 s (Position 5, Dashboard), bei jeweils 54 Aufgaben. Weil Position und Visualisierungstyp vollständig konfundiert sind, ist das Muster ihnen nicht kausal zuschreibbar.
+Die mittlere Bearbeitungszeit liegt in allen drei Domänen in ähnlicher Größenordnung, Gesundheits-Aufgaben dauern im Schnitt am längsten und streuen zugleich am stärksten. Eine zweite Sichtweise ergibt sich aus der festen Reihenfolge der Aufgaben innerhalb eines Blocks: Weil jede Position einem Visualisierungstyp entspricht (3.2), lässt sich die Bearbeitungszeit auch nach Positionen aufschlüsseln. Sie nimmt von 56,4 s auf Position 1 (Timeline) bis 89,4 s auf Position 5 (Dashboard) zu, bei jeweils 54 Aufgaben. Wegen der vollständigen Konfundierung von Position und Typ ist das Muster kein kausaler Effekt der Visualisierungstypen.
 
 ### 4.3 Korrelation zwischen Bearbeitungszeit und NASA-TLX
 
@@ -171,7 +169,7 @@ Der Frustrations-Effekt bleibt nach Zentrierung nahezu unverändert und ist im M
 
 ### 4.4 Sensordaten: Baseline-zentrierte Domänen-Deltas
 
-Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Als Überblick über alle gültigen Samples liegt der Pupillendurchmesser im Mittel bei 4,56 mm links und 4,59 mm rechts, der Hautleitwert bei 2,46 µS und das PPG-Rohsignal bei 182,9 mV. Für die Domänen-Frage ist die baseline-zentrierte Sicht aussagekräftiger. Tabelle 4 zeigt die Abweichung der Task-Mittelwerte von der jeweiligen Baseline je Trial und Domäne (Reproduktion: `check_sensor_deltas.py`).
+Physiologische Sensordaten liegen für alle 18 Trials vollständig vor. Für die Domänen-Frage ist die baseline-zentrierte Sicht aussagekräftiger, Tabelle 4 zeigt die Abweichung der Task-Mittelwerte von der jeweiligen Baseline je Trial und Domäne (Reproduktion: `check_sensor_deltas.py`).
 **Tabelle 4: Baseline-zentrierte Domänen-Deltas (M (SD) über n = 17 Trials)**
 
 | Kanal | Gaming | Gesundheit | Stadt |
