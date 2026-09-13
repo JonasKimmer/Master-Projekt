@@ -18,3 +18,10 @@ window_definitions.json
 # Claude Code Sitzungsdaten
 .claude/
 build/
+
+# Generierte Scatter-Plots (werden bei jedem check_correlations-Lauf neu erzeugt)
+paper1_scatter_*.png
+
+# Alter Screenshot / Poster-Thumbnails (nicht abgaberelevant)
+image.png
+poster*_thumbnail.png
