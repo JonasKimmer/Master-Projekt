@@ -239,7 +239,7 @@ def _render_tab3(numeric_df: pd.DataFrame, filtered_df: pd.DataFrame) -> None:
     )
 
     if smart_encode:
-        cat_cols = filtered_df.select_dtypes(include=["object", "category"]).columns
+        cat_cols = filtered_df.select_dtypes(include=["object", "str", "category"]).columns
         encoded_cols = []
 
         pos_terms = ["yes", "ja", "true", "wahr", "m", "male"]
@@ -304,7 +304,7 @@ def _render_tab4(filtered_df: pd.DataFrame, numeric_df: pd.DataFrame) -> None:
                 )
                 st.pyplot(fig)
 
-                cat_cols = filtered_df.select_dtypes(include=["object", "category"]).columns
+                cat_cols = filtered_df.select_dtypes(include=["object", "str", "category"]).columns
                 if len(cat_cols) > 0:
                     group_col = cat_cols[0]
                     st.write(f"**Missing-Rate (%) gruppiert nach '{group_col}':**")
@@ -348,7 +348,7 @@ def _render_tab4(filtered_df: pd.DataFrame, numeric_df: pd.DataFrame) -> None:
 
     with col4:
         if st.button("Value Counts"):
-            cat_cols = filtered_df.select_dtypes(include=["object", "category"]).columns
+            cat_cols = filtered_df.select_dtypes(include=["object", "str", "category"]).columns
             if len(cat_cols) > 0:
                 for col in cat_cols:
                     st.write(f"**Top Werte in '{col}':**")
